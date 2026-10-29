@@ -20,3 +20,6 @@ services:
       - "25565:25565"
     volumes:
       - ./data:/data
+    # environment:
+    #   # turns off KillAura, AutoEat, AntiAFK and the other modules that play for you
+    #   ZENITH_DISABLE_CHEATS: "true"

@@ -123,6 +123,13 @@ on the JVM and uses more memory per instance.
 | `ZENITH_LOBBY_PORT` | `25565` | Public Minecraft port (lobby and router) |
 | `ZENITH_INSTANCE_PORT_BASE` / `ZENITH_CONTROL_PORT_BASE` | `30000` / `40000` | Localhost ports for instances |
 | `ZENITH_LOBBY_ONLINE_MODE` | `true` | Set to `false` only for local testing |
+| `ZENITH_DISABLE_CHEATS` | off | Set to `true` to turn off cheats for every instance (see below) |
+
+With `ZENITH_DISABLE_CHEATS=true`, these modules are off, their settings are hidden and their commands
+don't exist: KillAura, SpawnPatrol, TickRate, AutoTotem, AutoArmor, AutoMend, Spook, AntiAFK,
+AutoFish, AutoEat, AutoOmen, AutoDrop, AutoRespawn, Spammer and AutoReply. Pathfinder (Baritone),
+PearlLoader, AutoDisconnect, VisualRange, Tasks and spectating stay available. Settings people had
+for those modules come back when the variable is removed.
 
 ## How it works
 

@@ -271,6 +271,8 @@ public final class Supervisor {
         env.put("ZENITH_CONTROL_PORT", Integer.toString(ctx.instance().controlPort));
         env.put("ZENITH_CONTROL_TOKEN", rt.token);
         env.remove("ZENITH_LAUNCHER");
+        if (config.cheatsDisabled()) env.put("ZENITH_DISABLE_CHEATS", "1");
+        else env.remove("ZENITH_DISABLE_CHEATS");
 
         rt.status = null;
         rt.eventsConnected = false;
@@ -519,9 +521,9 @@ public final class Supervisor {
                 .orElseThrow(() -> new IllegalStateException("Instance server was deleted"));
             var account = s.accounts.stream().filter(a -> a.id.equals(instance.accountId)).findFirst()
                 .orElseThrow(() -> new IllegalStateException("Instance account was deleted"));
-            return new ConfigComposer.Context(instance, server, account, s.globalSettings, s.settings, null);
+            return new ConfigComposer.Context(instance, server, account, s.globalSettings, s.settings, null, config.cheatsDisabled());
         });
-        return new ConfigComposer.Context(ctx.instance(), ctx.server(), ctx.account(), ctx.globalSettings(), ctx.managerSettings(), joinLists.apply(instanceId));
+        return new ConfigComposer.Context(ctx.instance(), ctx.server(), ctx.account(), ctx.globalSettings(), ctx.managerSettings(), joinLists.apply(instanceId), ctx.cheatsDisabled());
     }
 
     private volatile java.util.function.Function<String, ConfigComposer.JoinLists> joinLists = id -> ConfigComposer.JoinLists.EMPTY;

@@ -100,7 +100,9 @@ public final class SettingsService {
             var full = Json.readObject(config.zenithSchemaFile());
             var visible = new JsonObject();
             for (var e : full.entrySet()) {
-                if (editable(e.getValue().getAsJsonObject()) && !hidden(e.getKey())) visible.add(e.getKey(), e.getValue());
+                if (!editable(e.getValue().getAsJsonObject()) || hidden(e.getKey())) continue;
+                if (config.cheatsDisabled() && Cheats.covers(e.getKey())) continue;
+                visible.add(e.getKey(), e.getValue());
             }
             schema = visible;
             return visible;
@@ -215,6 +217,7 @@ public final class SettingsService {
         var json = new JsonObject();
         json.addProperty("scope", ownLayerName);
         json.addProperty("live", live);
+        json.addProperty("cheatsDisabled", config.cheatsDisabled());
         json.add("schema", schema);
         json.add("values", values);
         json.add("inherited", inheritedValues);

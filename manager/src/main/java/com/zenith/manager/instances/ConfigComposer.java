@@ -23,7 +23,8 @@ public final class ConfigComposer {
         State.Account account,
         JsonObject globalSettings,
         State.ManagerSettings managerSettings,
-        JoinLists joinLists
+        JoinLists joinLists,
+        boolean cheatsDisabled
     ) {}
 
     /** Zenith player entries derived from grants; the lobby is the only way in, so these replace Zenith's own lists. */
@@ -80,6 +81,7 @@ public final class ConfigComposer {
         if (!ctx.managerSettings().outboundProxiesEnabled) {
             forced.put("client.connectionProxy.enabled", new JsonPrimitive(false));
         }
+        if (ctx.cheatsDisabled()) forced.putAll(Cheats.forcedValues());
         return forced;
     }
 

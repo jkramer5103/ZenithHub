@@ -27,6 +27,10 @@ class ConfigComposerTest {
         """);
 
     private static ConfigComposer.Context ctx(JsonObject global, JsonObject serverSettings, JsonObject instanceSettings, boolean proxies) {
+        return ctx(global, serverSettings, instanceSettings, proxies, false);
+    }
+
+    private static ConfigComposer.Context ctx(JsonObject global, JsonObject serverSettings, JsonObject instanceSettings, boolean proxies, boolean cheatsDisabled) {
         var instance = new State.Instance();
         instance.id = "i1";
         instance.mcPort = 30001;
@@ -41,7 +45,7 @@ class ConfigComposerTest {
         var settings = new State.ManagerSettings();
         settings.publicAddress = "proxy.example.com";
         settings.outboundProxiesEnabled = proxies;
-        return new ConfigComposer.Context(instance, server, account, global, settings, ConfigComposer.JoinLists.EMPTY);
+        return new ConfigComposer.Context(instance, server, account, global, settings, ConfigComposer.JoinLists.EMPTY, cheatsDisabled);
     }
 
     @Test
@@ -83,6 +87,20 @@ class ConfigComposerTest {
         assertFalse(saved.getAsJsonObject("client").getAsJsonObject("connectionProxy").get("enabled").getAsBoolean());
         var overrides = ConfigComposer.extractInstanceOverrides(DEFAULTS, c, saved);
         assertEquals(c.instance().settings, overrides);
+    }
+
+    @Test
+    void disabledCheatsAreForcedOffButKeepTheirOverrides() {
+        var c = ctx(new JsonObject(), new JsonObject(), json("{\"client\": {\"extra\": {\"autoEat\": {\"enabled\": true, \"hunger\": 16}}}}"), false, true);
+        var saved = ConfigComposer.compose(DEFAULTS, c);
+        var extra = saved.getAsJsonObject("client").getAsJsonObject("extra");
+        assertFalse(extra.getAsJsonObject("autoEat").get("enabled").getAsBoolean());
+        assertFalse(extra.getAsJsonObject("antiafk").get("enabled").getAsBoolean());
+        assertEquals(1.0, saved.getAsJsonObject("client").get("tickRate").getAsDouble());
+        // turning the switch off again brings back what the instance had
+        assertEquals(c.instance().settings, ConfigComposer.extractInstanceOverrides(DEFAULTS, c, saved));
+        var normal = ConfigComposer.compose(DEFAULTS, ctx(new JsonObject(), new JsonObject(), c.instance().settings, false));
+        assertTrue(normal.getAsJsonObject("client").getAsJsonObject("extra").getAsJsonObject("autoEat").get("enabled").getAsBoolean());
     }
 
     @Test

@@ -13,7 +13,7 @@ import java.nio.file.StandardCopyOption;
 import static com.zenith.Globals.*;
 
 /**
- * Managed mode: this process is one instance supervised by the ZenithProxy manager.
+ * Managed mode: this process is one instance supervised by the ZenithHub manager.
  *
  * The manager owns account login, Discord, updates, and user input.
  * Zenith exposes a localhost control API and logs to stdout.
@@ -43,6 +43,7 @@ public final class ManagedMode {
      * Called early in startup, before any subsystem reads these settings.
      */
     public static void applyOverrides() {
+        Cheats.applyOverrides();
         if (!MANAGED) return;
         CONFIG.authentication.openBrowserOnLogin = false;
         writeDefaults();

@@ -47,6 +47,8 @@ Run prettier only on `.ts` files. No Svelte plugin is installed, so it fails on 
 - Settings layer Zenith defaults → Global → Server → Instance → forced managed values
   (`ConfigComposer`). Instance changes made in-game are diffed back into overrides on stop.
 - Secrets are files with 0600 permissions under `/data/manager/secrets`. The API never returns them.
+- `ZENITH_DISABLE_CHEATS` lists cheat modules twice: `com.zenith.control.Cheats` (bot) and
+  `manager/.../instances/Cheats.java` (settings). Change both together.
 - Copy buttons must work over plain `http://<ip>`, where `navigator.clipboard` is missing.
 
 ## Gotchas

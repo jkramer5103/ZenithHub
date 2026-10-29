@@ -17,7 +17,9 @@ public record ManagerConfig(
     int controlPortBase,
     int lobbyPort,
     /** Off only for local testing: lets unauthenticated clients into the lobby. */
-    boolean lobbyOnlineMode
+    boolean lobbyOnlineMode,
+    /** ZENITH_DISABLE_CHEATS: turns off KillAura, AutoEat, AntiAFK and the other cheat modules everywhere. */
+    boolean cheatsDisabled
 ) {
     public static ManagerConfig fromEnv() {
         var env = System.getenv();
@@ -31,7 +33,8 @@ public record ManagerConfig(
             Integer.parseInt(env.getOrDefault("ZENITH_INSTANCE_PORT_BASE", "30000")),
             Integer.parseInt(env.getOrDefault("ZENITH_CONTROL_PORT_BASE", "40000")),
             Integer.parseInt(env.getOrDefault("ZENITH_LOBBY_PORT", "25565")),
-            !"false".equalsIgnoreCase(env.get("ZENITH_LOBBY_ONLINE_MODE"))
+            !"false".equalsIgnoreCase(env.get("ZENITH_LOBBY_ONLINE_MODE")),
+            com.zenith.manager.instances.Cheats.isTruthy(env.get("ZENITH_DISABLE_CHEATS"))
         );
     }
 

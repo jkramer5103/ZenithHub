@@ -72,6 +72,7 @@ public final class Config {
         public String bindAddress = "0.0.0.0";
         public boolean maxPlaytimeReconnect = false;
         public long maxPlaytimeReconnectMins = 1440;
+        public long maxPlaytimeReconnectRandomMins = 0; // each session lasts maxPlaytimeReconnectMins +- this
         public int defaultClientRenderDistance = 25;
         public final ClientTimeout timeout = new ClientTimeout();
         public final Ping ping = new Ping();
@@ -571,6 +572,7 @@ public final class Config {
             public static final class AutoReconnect {
                 public boolean enabled = true;
                 public int delaySeconds = 5;
+                public int randomSeconds = 0; // delay is picked from delaySeconds +- randomSeconds
                 public int maxAttempts = 200;
             }
 

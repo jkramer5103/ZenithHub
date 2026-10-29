@@ -195,7 +195,7 @@ public class Proxy {
             CACHE.reset(CacheResetType.FULL);
             EXECUTOR.scheduleAtFixedRate(this::serverHealthCheck, 1L, 5L, TimeUnit.MINUTES);
             EXECUTOR.scheduleAtFixedRate(this::tablistUpdate, 20L, 3L, TimeUnit.SECONDS);
-            EXECUTOR.scheduleAtFixedRate(this::maxPlaytimeTick, CONFIG.client.maxPlaytimeReconnectMins, 1L, TimeUnit.MINUTES);
+            EXECUTOR.scheduleAtFixedRate(this::maxPlaytimeTick, 1L, 1L, TimeUnit.MINUTES);
             EXECUTOR.schedule(this::serverConnectionTest, 10L, TimeUnit.SECONDS);
             boolean connected = false;
             if (CONFIG.client.autoConnect && !isConnected()) {
@@ -332,9 +332,25 @@ public class Proxy {
             });
     }
 
+    // the session length is picked once per connection, and again if the settings change
+    @Nullable private Instant maxPlaytimeRolledFor;
+    private long maxPlaytimeRolledBase = -1;
+    private long maxPlaytimeRolledSpread = -1;
+    private long maxPlaytimeMins;
+
     private void maxPlaytimeTick() {
-        if (CONFIG.client.maxPlaytimeReconnect && isOnlineForAtLeastDuration(Duration.ofMinutes(CONFIG.client.maxPlaytimeReconnectMins))) {
-            CLIENT_LOG.info("Max playtime minutes reached: {}, reconnecting...", CONFIG.client.maxPlaytimeReconnectMins);
+        if (!CONFIG.client.maxPlaytimeReconnect) return;
+        long base = CONFIG.client.maxPlaytimeReconnectMins;
+        long spread = CONFIG.client.maxPlaytimeReconnectRandomMins;
+        if (maxPlaytimeRolledFor != connectTime || maxPlaytimeRolledBase != base || maxPlaytimeRolledSpread != spread) {
+            maxPlaytimeRolledFor = connectTime;
+            maxPlaytimeRolledBase = base;
+            maxPlaytimeRolledSpread = spread;
+            maxPlaytimeMins = AutoReconnect.randomize(base, spread, 1);
+            if (spread > 0 && connectTime != null) CLIENT_LOG.info("Reconnecting after {} minutes of playtime", maxPlaytimeMins);
+        }
+        if (isOnlineForAtLeastDuration(Duration.ofMinutes(maxPlaytimeMins))) {
+            CLIENT_LOG.info("Max playtime minutes reached: {}, reconnecting...", maxPlaytimeMins);
             disconnect(MAX_PT_DISCONNECT);
             MODULE.get(AutoReconnect.class).cancelAutoReconnect();
             connect();

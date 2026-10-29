@@ -69,6 +69,7 @@ public abstract class Module extends ModuleUtils {
      * Enables the module, does not check enabledSetting() or set any config values
      */
     public synchronized void enable() {
+        if (com.zenith.control.Cheats.blocks(this)) return;
         try {
             if (!enabled) {
                 subscribeEvents();

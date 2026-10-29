@@ -121,6 +121,7 @@ public class CommandManager {
     public CommandManager() {
         this.dispatcher = new CommandDispatcher<>();
         if (com.zenith.control.ManagedMode.isManaged()) commandsList.add(new com.zenith.command.impl.LobbyCommand());
+        commandsList.removeIf(com.zenith.control.Cheats::blocks);
         registerCommands();
         mcplCommandNodesStale.set(true);
     }

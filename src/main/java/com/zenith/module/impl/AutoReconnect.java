@@ -14,6 +14,7 @@ import org.jspecify.annotations.Nullable;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Future;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static com.github.rfresh2.EventConsumer.of;
 import static com.zenith.Globals.*;
@@ -59,10 +60,17 @@ public class AutoReconnect extends Module {
         var autoReconnectEvent = new AutoReconnectDecisionEvent(event);
         EVENT_BUS.post(autoReconnectEvent);
         if (!autoReconnectEvent.isCancelled()) {
-            scheduleAutoReconnect(CONFIG.client.extra.autoReconnect.delaySeconds);
+            var config = CONFIG.client.extra.autoReconnect;
+            scheduleAutoReconnect((int) randomize(config.delaySeconds, config.randomSeconds, 0));
         } else {
             info("Cancelling AutoReconnect because disconnect reason is not reconnectable");
         }
+    }
+
+    /** A random value in [value - spread, value + spread], never below min. */
+    public static long randomize(long value, long spread, long min) {
+        if (spread <= 0) return Math.max(min, value);
+        return Math.max(min, value + ThreadLocalRandom.current().nextLong(-spread, spread + 1));
     }
 
     public void scheduleAutoReconnect(final int delaySeconds) {

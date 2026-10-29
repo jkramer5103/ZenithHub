@@ -1413,11 +1413,17 @@ if `consumeFullOmenStack` is disabled, a single omen potion will be left per sta
 
 Automatically reconnects the bot when it is disconnected.
 
+
+
+`random` makes the delay vary by up to that many seconds either way, so reconnects don't happen at a fixed interval.
+
 **Usage**
 
   ```autoReconnect on/off```
 
   ```autoReconnect delay <seconds>```
+
+  ```autoReconnect random <seconds>```
 
   ```autoReconnect maxAttempts <number>```
 

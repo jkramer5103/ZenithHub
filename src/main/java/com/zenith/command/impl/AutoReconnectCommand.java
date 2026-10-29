@@ -23,10 +23,13 @@ public class AutoReconnectCommand extends Command {
             .category(CommandCategory.MODULE)
             .description("""
              Automatically reconnects the bot when it is disconnected.
+
+             `random` makes the delay vary by up to that many seconds either way, so reconnects don't happen at a fixed interval.
              """)
             .usageLines(
                 "on/off",
                 "delay <seconds>",
+                "random <seconds>",
                 "maxAttempts <number>"
             )
             .build();
@@ -44,10 +47,17 @@ public class AutoReconnectCommand extends Command {
                 return OK;
             }))
             .then(literal("delay")
-                      .then(argument("delaySec", integer(0, 1000)).executes(c -> {
+                      .then(argument("delaySec", integer(0, 86400)).executes(c -> {
                           CONFIG.client.extra.autoReconnect.delaySeconds = IntegerArgumentType.getInteger(c, "delaySec");
                           c.getSource().getEmbed()
                               .title("AutoReconnect Delay Updated!");
+                          return OK;
+                      })))
+            .then(literal("random")
+                      .then(argument("randomSec", integer(0, 86400)).executes(c -> {
+                          CONFIG.client.extra.autoReconnect.randomSeconds = IntegerArgumentType.getInteger(c, "randomSec");
+                          c.getSource().getEmbed()
+                              .title("AutoReconnect Random Delay Updated!");
                           return OK;
                       })))
             .then(literal("maxAttempts")
@@ -64,6 +74,7 @@ public class AutoReconnectCommand extends Command {
         builder
             .addField("AutoReconnect", toggleStr(CONFIG.client.extra.autoReconnect.enabled), false)
             .addField("Delay", CONFIG.client.extra.autoReconnect.delaySeconds, true)
+            .addField("Random", "± " + CONFIG.client.extra.autoReconnect.randomSeconds, true)
             .addField("Max Attempts", CONFIG.client.extra.autoReconnect.maxAttempts, true)
             .primaryColor();
     }

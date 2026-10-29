@@ -177,6 +177,8 @@ export interface SettingsView {
 	scope: SettingScope;
 	/** the instance is running and changes apply immediately */
 	live: boolean;
+	/** ZENITH_DISABLE_CHEATS is set: cheat modules are off and left out of the schema */
+	cheatsDisabled: boolean;
 	schema: Record<string, SettingType>;
 	values: Record<string, unknown>;
 	inherited: Record<string, unknown>;

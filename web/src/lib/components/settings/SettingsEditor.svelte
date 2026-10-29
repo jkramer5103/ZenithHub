@@ -5,7 +5,7 @@
 	import { matchedWords, parseQuery, score, type Haystack } from '#lib/settings-search.js';
 	import { toasts } from '#lib/toast.svelte.js';
 	import type { SettingScope, SettingsView } from '#lib/types.js';
-	import { Check, Code, Lock, LoaderCircle, RotateCcw, Search, X } from '@lucide/svelte';
+	import { Check, Code, Lock, LoaderCircle, RotateCcw, Search, ShieldOff, X } from '@lucide/svelte';
 		import Highlight from './Highlight.svelte';
 	import SettingRow from './SettingRow.svelte';
 	import Switch from './Switch.svelte';
@@ -331,6 +331,14 @@
 					{/if}
 				</p>
 			</div>
+
+			{#if view?.cheatsDisabled}
+				<p class="flex items-start gap-2 rounded-lg border border-zinc-800 bg-zinc-900/60 px-3 py-2.5 text-sm text-zinc-400">
+					<ShieldOff size={16} class="mt-0.5 shrink-0 text-zinc-500" />
+					Cheats are turned off for every instance here. KillAura, AutoEat, AntiAFK and the other modules that play
+					for you aren’t available.
+				</p>
+			{/if}
 
 			{#each groups as group (group.id)}
 				<div id="settings-{group.id}" class="scroll-mt-20 space-y-3">

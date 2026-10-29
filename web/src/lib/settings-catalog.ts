@@ -83,6 +83,13 @@ export const catalog: Group[] = [
 				toggle: 'client.extra.autoReconnect.enabled',
 				fields: [
 					{ path: 'client.extra.autoReconnect.delaySeconds', label: 'Wait before reconnecting', unit: 'seconds', min: 0 },
+					{
+						path: 'client.extra.autoReconnect.randomSeconds',
+						label: 'Randomize the wait by ±',
+						unit: 'seconds',
+						min: 0,
+						help: 'Each reconnect waits a random time this much shorter or longer, so it doesn’t look like a bot. 0 waits exactly the time above.'
+					},
 					{ path: 'client.extra.autoReconnect.maxAttempts', label: 'Give up after', unit: 'attempts', min: 1 }
 				]
 			},
@@ -91,7 +98,16 @@ export const catalog: Group[] = [
 				title: 'Scheduled reconnect',
 				description: 'Reconnect after a fixed session length, e.g. to stay ahead of server session limits.',
 				toggle: 'client.maxPlaytimeReconnect',
-				fields: [{ path: 'client.maxPlaytimeReconnectMins', label: 'Reconnect every', unit: 'minutes', min: 1 }]
+				fields: [
+					{ path: 'client.maxPlaytimeReconnectMins', label: 'Reconnect every', unit: 'minutes', min: 1 },
+					{
+						path: 'client.maxPlaytimeReconnectRandomMins',
+						label: 'Randomize by ±',
+						unit: 'minutes',
+						min: 0,
+						help: 'Each session lasts a random time this much shorter or longer. 0 reconnects at exactly the interval above.'
+					}
+				]
 			},
 			{
 				id: 'activeHours',
