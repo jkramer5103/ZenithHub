@@ -10,6 +10,8 @@ for [2b2t.org](https://www.2b2t.org/) but works on any server.
 This fork wraps it in a manager. You never edit config files or type commands: adding an account,
 connecting it to a server, sharing it and changing settings all happen in the browser.
 
+![Instances dashboard](docs/images/dashboard.png)
+
 ## What the fork adds
 
 - **Web UI** to add accounts (Microsoft device-code login with one click, auth-cache import, or
@@ -35,7 +37,71 @@ Discord chat relay, the interactive terminal, the self-updater and its commands,
 launcher, the VPS install scripts, the release workflows and the setup guides in the wiki. Updates
 come from new Docker images.
 
-## Running it
+## Quickstart
+
+You need a Linux machine with [Docker](https://docs.docker.com/engine/install/) and an x86-64-v3 CPU
+(most CPUs from 2015 onwards). For ARM, see [Building it yourself](#building-it-yourself).
+
+**1. Start it.**
+
+```sh
+mkdir zenith && cd zenith
+curl -O https://raw.githubusercontent.com/jkramer5103/ZenithProxy/main/quickstart/docker-compose.yml
+docker compose up -d
+```
+
+**2. Create the admin account.** Open `http://<host>:8080`. The first visit asks for a username and
+password.
+
+**3. Set the public address.** Under Settings → General, enter the address players type in
+Minecraft, for example `mc.example.net` or your server's IP.
+
+**4. Add a Minecraft account.** Accounts → Add account → Get login code. Enter the code on
+Microsoft's page from any device. Nothing is typed into a terminal.
+
+![Add account dialog](docs/images/add-account.png)
+
+**5. Add a server and connect.** Servers → Add server with `2b2t.org` (or any server), then Instances → New
+instance, pick the account and the server, and press Connect.
+
+**6. Join in Minecraft.** Connect to the public address on port 25565. The lobby shows a chest menu
+of the bots you may use: click to play, right-click to spectate, type `/lobby` to go back.
+
+### Updating
+
+```sh
+docker compose pull && docker compose up -d
+```
+
+Images are tagged `latest` and `sha-<commit>`. All data (state, accounts, instance folders, secrets)
+lives in `./data`, next to the compose file. Serve the web UI over HTTPS by putting it behind your
+own reverse proxy.
+
+## Screenshots
+
+Each instance shows its status, chat and how to join:
+
+![Instance overview](docs/images/instance.png)
+
+Settings are curated pages with search, instead of commands:
+
+![Settings search](docs/images/settings.png)
+
+Share an instance with a user, a Minecraft player or a Discord user. Access works the same on the
+web, in the lobby and on Discord:
+
+![Sharing](docs/images/sharing.png)
+
+It works on phones too:
+
+<p>
+  <img src="docs/images/mobile-dashboard.png" alt="Dashboard on a phone" width="300">
+  <img src="docs/images/mobile-instance.png" alt="Instance on a phone" width="300">
+</p>
+
+## Building it yourself
+
+The `docker-compose.yml` in the repo root builds the image from your checkout:
 
 ```sh
 git clone https://github.com/jkramer5103/ZenithProxy.git
@@ -43,17 +109,11 @@ cd ZenithProxy
 docker compose up -d --build
 ```
 
-Open `http://<host>:8080`. The first visit creates the admin account. Point Minecraft clients at
-`<host>:25565`.
+By default Zenith is compiled to a GraalVM native binary, which needs an x86-64-v3 CPU. On ARM or
+older CPUs, set the build argument `ZENITH_RUNTIME: jar` in `docker-compose.yml`. Zenith then runs
+on the JVM and uses more memory per instance.
 
-All data (state, accounts, instance folders, secrets) lives in `./data`. Serve the web UI over HTTPS
-by putting it behind your own reverse proxy.
-
-The image builds Zenith as a GraalVM native binary for x86-64-v3 CPUs by default. On ARM or older
-CPUs, set the build argument `ZENITH_RUNTIME: jar` in `docker-compose.yml`. Zenith then runs on the
-JVM and uses more memory per instance.
-
-### Environment variables
+## Environment variables
 
 | Variable | Default | Meaning |
 |---|---|---|

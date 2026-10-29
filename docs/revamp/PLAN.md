@@ -33,7 +33,7 @@ Status: design settled 2026-10-28. This document is the source of truth for the 
   - no interactive terminal, no self-updater and no per-instance Discord bot;
   - logs go to stdout, where the manager captures and streams them;
   - no device-code prompts inside instances: the manager owns MSA login, refreshes tokens and syncs `mc_auth_cache.json`.
-- **Updates**: Docker image tags only. There is no self-update.
+- **Updates**: Docker image tags only. CI (`.github/workflows/ci.yml`) publishes `ghcr.io/jkramer5103/zenithproxy` (`latest`, `sha-<commit>`) from `main`. There is no self-update.
 
 ## Data model (`/data/manager/state.json`)
 

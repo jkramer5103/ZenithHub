@@ -1,3 +1,5 @@
+# Builds the image from this checkout. To run the published image without cloning,
+# use quickstart/docker-compose.yml instead.
 services:
   zenith:
     build:
@@ -5,7 +7,7 @@ services:
       args:
         # "native" (x86-64-v3 CPUs, low memory) or "jar" (any CPU, incl. ARM)
         ZENITH_RUNTIME: native
-    image: zenithproxy:latest
+    image: zenithproxy:local
     container_name: zenith
     restart: unless-stopped
     # reaps stray processes and forwards stop signals to the manager
@@ -15,7 +17,7 @@ services:
     ports:
       # web UI: put it behind your reverse proxy for HTTPS
       - "8080:8080"
-      # Minecraft lobby: players join here and pick an instance (1.21.4 clients)
+      # Minecraft lobby: players join here and pick an instance
       - "25565:25565"
     volumes:
       - ./data:/data
