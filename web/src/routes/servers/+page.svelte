@@ -24,7 +24,7 @@
 	}
 </script>
 
-<svelte:head><title>Servers · ZenithProxy</title></svelte:head>
+<svelte:head><title>Servers · ZenithHub</title></svelte:head>
 
 <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
 	<div>

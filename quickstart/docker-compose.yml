@@ -1,4 +1,4 @@
-# ZenithProxy quickstart: runs the image CI publishes from main (x86-64-v3 CPUs).
+# ZenithHub quickstart: runs the image CI publishes from main (x86-64-v3 CPUs).
 #
 #   docker compose up -d                              start, then open http://<host>:8080
 #   docker compose pull && docker compose up -d       update
@@ -6,8 +6,8 @@
 # On ARM or older CPUs, clone the repo and build it yourself (see the README).
 services:
   zenith:
-    image: ghcr.io/jkramer5103/zenithproxy:latest
-    container_name: zenith
+    image: ghcr.io/jkramer5103/zenithhub:latest
+    container_name: zenithhub
     restart: unless-stopped
     # reaps stray processes and forwards stop signals to the manager
     init: true

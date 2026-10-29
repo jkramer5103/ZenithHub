@@ -49,7 +49,7 @@
 
 {#if loadError}
 	<div class="flex min-h-dvh items-center justify-center p-6 text-center text-sm text-zinc-400">
-		Can't reach the ZenithProxy manager: {loadError}
+		Can't reach ZenithHub: {loadError}
 	</div>
 {:else if !app.session}
 	<div class="min-h-dvh"></div>
@@ -59,7 +59,7 @@
 	<div class="flex min-h-dvh flex-col pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0">
 		<header class="sticky top-0 z-30 border-b border-zinc-800/80 bg-zinc-950/85 backdrop-blur">
 			<div class="mx-auto flex h-14 max-w-6xl items-center gap-6 px-4">
-				<a href="/" class="flex items-center gap-2 font-semibold"><Logo /> ZenithProxy</a>
+				<a href="/" class="flex items-center gap-2 font-semibold"><Logo /> ZenithHub</a>
 				<nav class="hidden items-center gap-1 md:flex">
 					{#each nav as item}
 						<a

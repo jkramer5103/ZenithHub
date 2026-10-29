@@ -7,8 +7,8 @@ services:
       args:
         # "native" (x86-64-v3 CPUs, low memory) or "jar" (any CPU, incl. ARM)
         ZENITH_RUNTIME: native
-    image: zenithproxy:local
-    container_name: zenith
+    image: zenithhub:local
+    container_name: zenithhub
     restart: unless-stopped
     # reaps stray processes and forwards stop signals to the manager
     init: true

@@ -1,18 +1,19 @@
-# ZenithProxy Manager
+# ZenithHub
 
-A hard fork of [ZenithProxy](https://github.com/rfresh2/ZenithProxy) that runs many Minecraft accounts
-from one Docker container and one web UI.
+Run many Minecraft accounts from one Docker container and one web UI. ZenithHub is a hard fork of
+[ZenithProxy](https://github.com/rfresh2/ZenithProxy).
 
 ZenithProxy is a Minecraft bot that players can also log into and control in-game. It keeps accounts
 online around the clock and lets you share them with friends without sharing passwords. It was built
 for [2b2t.org](https://www.2b2t.org/) but works on any server.
 
-This fork wraps it in a manager. You never edit config files or type commands: adding an account,
-connecting it to a server, sharing it and changing settings all happen in the browser.
+ZenithHub runs one ZenithProxy per account and server and wraps them in a manager. You never edit
+config files or type commands: adding an account, connecting it to a server, sharing it and changing
+settings all happen in the browser.
 
 ![Instances dashboard](docs/images/dashboard.png)
 
-## What the fork adds
+## What ZenithHub adds
 
 - **Web UI** to add accounts (Microsoft device-code login with one click, auth-cache import, or
   offline), add servers, and connect, disconnect or watch every bot. Works on phones.
@@ -45,8 +46,8 @@ You need a Linux machine with [Docker](https://docs.docker.com/engine/install/) 
 **1. Start it.**
 
 ```sh
-mkdir zenith && cd zenith
-curl -O https://raw.githubusercontent.com/jkramer5103/ZenithProxy/main/quickstart/docker-compose.yml
+mkdir zenithhub && cd zenithhub
+curl -O https://raw.githubusercontent.com/jkramer5103/ZenithHub/main/quickstart/docker-compose.yml
 docker compose up -d
 ```
 
@@ -104,8 +105,8 @@ It works on phones too:
 The `docker-compose.yml` in the repo root builds the image from your checkout:
 
 ```sh
-git clone https://github.com/jkramer5103/ZenithProxy.git
-cd ZenithProxy
+git clone https://github.com/jkramer5103/ZenithHub.git
+cd ZenithHub
 docker compose up -d --build
 ```
 

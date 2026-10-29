@@ -232,7 +232,7 @@ public final class DiscordBot extends ListenerAdapter {
 
     private void registerCommands(Guild guild) {
         guild.updateCommands().addCommands(
-            Commands.slash("link", "Link your Discord account to your ZenithProxy login")
+            Commands.slash("link", "Link your Discord account to your ZenithHub login")
                 .addOption(OptionType.STRING, "code", "The code shown in the web UI", true),
             Commands.slash("status", "Show this instance's status"),
             Commands.slash("connect", "Connect this instance to its server"),
@@ -431,7 +431,7 @@ public final class DiscordBot extends ListenerAdapter {
                 if (phase.equals("BACKOFF")) {
                     var error = str(event.payload(), "lastError");
                     var embed = new EmbedBuilder()
-                        .setTitle("ZenithProxy crashed")
+                        .setTitle("Instance crashed")
                         .setDescription(error != null ? truncate(error, 4000) : "It restarts by itself shortly.")
                         .setColor(0xE74C3C)
                         .setTimestamp(Instant.now());
@@ -515,7 +515,7 @@ public final class DiscordBot extends ListenerAdapter {
                 if (category == null) continue;
                 var owner = snapshot.users().stream().filter(u -> u.id.equals(instance.ownerId)).findFirst().map(u -> u.username).orElse("nobody");
                 var main = syncChannel(guild, category, instance.discordChannelId, channelName(instance.name),
-                    "ZenithProxy instance " + instance.name + ", owned by " + owner + ". Notifications land here. Use /status, /connect and /command.",
+                    "ZenithHub instance " + instance.name + ", owned by " + owner + ". Notifications land here. Use /status, /connect and /command.",
                     id -> store.update(s -> s.instances.stream().filter(i -> i.id.equals(instance.id)).forEach(i -> i.discordChannelId = id)),
                     everyone, self);
                 keptChannels.add(main.getId());

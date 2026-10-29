@@ -211,7 +211,7 @@
 				{#if toggleForced}
 					<p class="mt-1 flex items-center gap-1 text-xs text-zinc-500">
 						<Lock size={11} />
-						{section.toggle === 'client.connectionProxy.enabled' ? 'Outbound proxies are turned off in the manager settings.' : 'Managed by ZenithProxy'}
+						{section.toggle === 'client.connectionProxy.enabled' ? 'Outbound proxies are turned off in the manager settings.' : 'Managed by ZenithHub'}
 					</p>
 				{/if}
 			</div>

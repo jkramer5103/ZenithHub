@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.7
 #
-# ZenithProxy: one container running the manager (web UI + supervisor) and one
+# ZenithHub: one container running the manager (web UI + supervisor) and one
 # Zenith process per instance.
 #
 #   docker compose up -d        then open http://<host>:8080

@@ -25,7 +25,7 @@ public final class ManagerMain {
 
     public static void main(String[] args) throws Exception {
         var config = ManagerConfig.fromEnv();
-        LOG.info("ZenithProxy manager starting, data directory: {}", config.dataDir());
+        LOG.info("ZenithHub starting, data directory: {}", config.dataDir());
         Files.createDirectories(config.dataDir().resolve("manager"));
 
         var store = new StateStore(config.stateFile());

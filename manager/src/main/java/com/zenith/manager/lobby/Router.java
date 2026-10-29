@@ -96,7 +96,7 @@ public final class Router {
                     if (!LobbyVia.supports(handshake.protocol)) {
                         loginDisconnect(out, handshake.protocol < LobbyVia.MIN_PROTOCOL
                             ? "This server needs Minecraft 1.20.5 or newer."
-                            : "This Minecraft version is too new for this server. Update ZenithProxy.");
+                            : "This Minecraft version is too new for this server. Update ZenithHub.");
                         return;
                     }
                     if (handshake.intent == 2) {

@@ -1,6 +1,7 @@
-# ZenithProxy Revamp: Multi-Account Web UI (hard fork)
+# ZenithHub: Multi-Account Web UI (hard fork of ZenithProxy)
 
-Status: design settled 2026-10-28. This document is the source of truth for the revamp.
+Status: design settled 2026-10-28. This document is the source of truth for the revamp. Renamed
+from ZenithProxy to ZenithHub on 2026-10-29: user-facing names only, code keeps `com.zenith` and `ZENITH_*`.
 
 ## Goals
 
@@ -33,7 +34,7 @@ Status: design settled 2026-10-28. This document is the source of truth for the 
   - no interactive terminal, no self-updater and no per-instance Discord bot;
   - logs go to stdout, where the manager captures and streams them;
   - no device-code prompts inside instances: the manager owns MSA login, refreshes tokens and syncs `mc_auth_cache.json`.
-- **Updates**: Docker image tags only. CI (`.github/workflows/ci.yml`) publishes `ghcr.io/jkramer5103/zenithproxy` (`latest`, `sha-<commit>`) from `main`. There is no self-update.
+- **Updates**: Docker image tags only. CI (`.github/workflows/ci.yml`) publishes `ghcr.io/jkramer5103/zenithhub` (`latest`, `sha-<commit>`) from `main`. There is no self-update.
 
 ## Data model (`/data/manager/state.json`)
 

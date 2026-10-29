@@ -39,7 +39,7 @@
 	}
 </script>
 
-<svelte:head><title>Accounts · ZenithProxy</title></svelte:head>
+<svelte:head><title>Accounts · ZenithHub</title></svelte:head>
 
 <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
 	<div>

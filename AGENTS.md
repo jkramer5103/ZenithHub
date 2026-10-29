@@ -1,6 +1,6 @@
 # AGENTS.md
 
-A hard fork of rfresh2/ZenithProxy: a Docker-only, multi-account manager with a web UI. Read
+ZenithHub, a hard fork of rfresh2/ZenithProxy: a Docker-only, multi-account manager with a web UI. Read
 [docs/revamp/PLAN.md](docs/revamp/PLAN.md) first. It is the source of truth for the design and
 records what is done. Keep it up to date when you change behaviour.
 
@@ -57,11 +57,17 @@ Run prettier only on `.ts` files. No Svelte plugin is installed, so it fails on 
 - Avoid `backdrop-blur` on sticky elements: headless Chromium without a GPU stops rendering tall pages.
 - Frontend changes need screenshots, desktop and mobile, before they count as done.
 
+## Naming
+
+- The product is ZenithHub everywhere users see it (web UI, lobby, Discord, docs, image). The bot
+  it runs is still ZenithProxy, and code keeps the `com.zenith` packages, `ZENITH_*` env vars and
+  the `ZenithProxy` binary name so upstream merges stay easy.
+
 ## Git
 
 - One branch: `main`. Zenith's native version is 1.21.4 and ViaVersion covers every other version in
   both directions, so there are no per-version branches like upstream's.
-- `origin` is this repo (jkramer5103/ZenithProxy) and `upstream` is rfresh2/ZenithProxy. Merge
+- `origin` is this repo (jkramer5103/ZenithHub) and `upstream` is rfresh2/ZenithProxy. Merge
   `upstream/1.21.4` into `main` to pick up bot fixes. If the native version ever has to move
   (e.g. 2b2t switches versions), merge upstream's newer version branch into `main` instead.
 - Commit only when asked.

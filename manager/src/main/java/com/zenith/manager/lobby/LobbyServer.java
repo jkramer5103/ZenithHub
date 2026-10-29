@@ -138,7 +138,7 @@ public final class LobbyServer {
         if (!onlineMode) LOG.warn("Lobby is in offline mode: anyone can claim any name");
         server.setGlobalFlag(MinecraftConstants.SERVER_COMPRESSION_THRESHOLD, -1);
         server.setGlobalFlag(MinecraftConstants.SERVER_INFO_BUILDER_KEY, session -> new ServerStatusInfo(
-            Component.text("ZenithProxy", NamedTextColor.GREEN),
+            Component.text("ZenithHub", NamedTextColor.GREEN),
             new PlayerInfo(0, 0, List.of()),
             new VersionInfo("1.20.5+", Router.PROTOCOL),
             null,
@@ -337,7 +337,7 @@ public final class LobbyServer {
         return Component.text()
             .append(Component.text("You are not whitelisted on this server.", NamedTextColor.RED))
             .append(Component.newline()).append(Component.newline())
-            .append(Component.text("Have a ZenithProxy login? Link this account with code", NamedTextColor.GRAY))
+            .append(Component.text("Have a ZenithHub login? Link this account with code", NamedTextColor.GRAY))
             .append(Component.newline())
             .append(Component.text(access.mcLinkCode(mcName), NamedTextColor.GREEN, TextDecoration.BOLD))
             .append(Component.newline())
@@ -429,7 +429,7 @@ public final class LobbyServer {
         components.put(DataComponentTypes.CUSTOM_NAME, line("Link this account", NamedTextColor.AQUA));
         components.put(DataComponentTypes.LORE, List.of(
             line("Connect this Minecraft account to your", NamedTextColor.GRAY),
-            line("ZenithProxy login to get full access", NamedTextColor.GRAY),
+            line("ZenithHub login to get full access", NamedTextColor.GRAY),
             line("to everything you own.", NamedTextColor.GRAY),
             Component.empty(),
             line("Click: show a link code", NamedTextColor.YELLOW)));

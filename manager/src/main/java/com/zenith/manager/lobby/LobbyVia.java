@@ -75,7 +75,7 @@ final class LobbyVia {
 
         @Override
         public String getPlatformName() {
-            return "ZenithProxy Manager";
+            return "ZenithHub";
         }
 
         @Override
@@ -146,7 +146,7 @@ final class LobbyVia {
 
         @Override
         public boolean isCheckForUpdates() {
-            return false; // updates come with the ZenithProxy image
+            return false; // updates come with the ZenithHub image
         }
 
         @Override

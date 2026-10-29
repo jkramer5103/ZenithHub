@@ -58,7 +58,7 @@
 	});
 </script>
 
-<svelte:head><title>{instance?.name ?? 'Instance'} · ZenithProxy</title></svelte:head>
+<svelte:head><title>{instance?.name ?? 'Instance'} · ZenithHub</title></svelte:head>
 
 {#if !instance || !runtime}
 	<div class="py-16 text-center text-sm text-zinc-400">

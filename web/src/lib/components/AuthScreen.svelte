@@ -33,7 +33,7 @@
 	<div class="w-full max-w-sm">
 		<div class="mb-8 flex flex-col items-center gap-3 text-center">
 			<Logo size={48} />
-			<h1 class="text-xl font-semibold">{setup ? 'Welcome to ZenithProxy' : 'Sign in'}</h1>
+			<h1 class="text-xl font-semibold">{setup ? 'Welcome to ZenithHub' : 'Sign in'}</h1>
 			{#if setup}
 				<p class="text-sm text-zinc-400">Create the admin login. The admin can add accounts and sees everything.</p>
 			{/if}

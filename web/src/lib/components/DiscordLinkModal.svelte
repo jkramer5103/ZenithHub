@@ -57,7 +57,7 @@
 		<ol class="mt-4 space-y-3 text-sm">
 			<li class="flex gap-3">
 				<span class="flex size-6 shrink-0 items-center justify-center rounded-full bg-zinc-800 text-xs font-semibold">1</span>
-				<span class="pt-0.5 text-zinc-300">Open the Discord server the ZenithProxy bot is in.</span>
+				<span class="pt-0.5 text-zinc-300">Open the Discord server the ZenithHub bot is in.</span>
 			</li>
 			<li class="flex gap-3">
 				<span class="flex size-6 shrink-0 items-center justify-center rounded-full bg-zinc-800 text-xs font-semibold">2</span>

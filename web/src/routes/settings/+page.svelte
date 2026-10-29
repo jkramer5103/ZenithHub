@@ -30,7 +30,7 @@
 	}
 </script>
 
-<svelte:head><title>Settings · ZenithProxy</title></svelte:head>
+<svelte:head><title>Settings · ZenithHub</title></svelte:head>
 
 <h1 class="mb-4 text-2xl font-semibold">Settings</h1>
 

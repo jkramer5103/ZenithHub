@@ -160,7 +160,7 @@
 			{/if}
 		</div>
 		{#if forced}
-			<p class="mt-0.5 flex items-center gap-1 text-xs text-zinc-500"><Lock size={11} /> Managed by ZenithProxy</p>
+			<p class="mt-0.5 flex items-center gap-1 text-xs text-zinc-500"><Lock size={11} /> Managed by ZenithHub</p>
 		{:else if field.help || inheritedFrom}
 			<p class="mt-0.5 text-xs text-zinc-500">
 				<Highlight text={field.help ?? ''} {query} />{field.help && inheritedFrom ? ' · ' : ''}{inheritedFrom}

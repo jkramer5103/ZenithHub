@@ -8,7 +8,7 @@
 	const server = $derived(app.overview?.servers.find((s) => s.id === id));
 </script>
 
-<svelte:head><title>{server?.name ?? 'Server'} settings · ZenithProxy</title></svelte:head>
+<svelte:head><title>{server?.name ?? 'Server'} settings · ZenithHub</title></svelte:head>
 
 <a href="/servers" class="mb-4 inline-flex items-center gap-1 text-sm text-zinc-400 hover:text-zinc-200"><ArrowLeft size={15} /> Servers</a>
 

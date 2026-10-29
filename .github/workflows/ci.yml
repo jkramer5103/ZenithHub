@@ -1,7 +1,7 @@
 name: CI
 
 # Tests and UI checks on every push and pull request.
-# Pushes to main also publish the Docker image to ghcr.io/jkramer5103/zenithproxy.
+# Pushes to main also publish the Docker image to ghcr.io/jkramer5103/zenithhub.
 
 on:
   pull_request:
@@ -93,7 +93,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/jkramer5103/zenithproxy
+          images: ghcr.io/jkramer5103/zenithhub
           tags: |
             type=raw,value=latest,enable={{is_default_branch}}
             type=sha,format=short
