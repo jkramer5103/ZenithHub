@@ -15,6 +15,9 @@ import com.zenith.manager.auth.LoginThrottle;
 import com.zenith.manager.auth.Passwords;
 import com.zenith.manager.auth.Permissions;
 import com.zenith.manager.auth.Sessions;
+import com.zenith.manager.instances.Actions;
+import com.zenith.manager.instances.PearlService;
+import com.zenith.manager.instances.PlayerHistory;
 import com.zenith.manager.instances.SettingsService;
 import com.zenith.manager.instances.Supervisor;
 import com.zenith.manager.state.State;
@@ -59,11 +62,15 @@ public final class WebServer {
     private final SettingsService settings;
     private final AccessService access;
     private final DiscordBot discord;
+    private final PearlService pearls;
+    private final PlayerHistory history;
     private final Map<WsContext, WsClient> wsClients = new ConcurrentHashMap<>();
     private Javalin app;
 
-    public WebServer(ManagerConfig config, StateStore store, AccountService accounts, Supervisor supervisor, EventHub events, SettingsService settings, AccessService access, DiscordBot discord) {
+    public WebServer(ManagerConfig config, StateStore store, AccountService accounts, Supervisor supervisor, EventHub events, SettingsService settings, AccessService access, DiscordBot discord, PearlService pearls, PlayerHistory history) {
         this.config = config;
+        this.pearls = pearls;
+        this.history = history;
         this.discord = discord;
         this.access = access;
         this.settings = settings;
@@ -111,6 +118,7 @@ public final class WebServer {
         registerInstanceRoutes();
         registerSettingsRoutes();
         registerAccessRoutes();
+        registerControlRoutes();
         registerWebSocket();
         // single page app: unknown non-API paths get index.html, the client-side router takes over
         var index = config.webDir().resolve("index.html");
@@ -392,6 +400,8 @@ public final class WebServer {
         app.delete("/api/instances/{id}", ctx -> {
             var id = requireOwner(ctx).id;
             supervisor.forget(id);
+            pearls.forget(id, null);
+            history.forget(id);
             store.update(s -> s.instances.removeIf(i -> i.id.equals(id)));
             SecureFiles.deleteRecursively(config.instanceDir(id));
             changed();
@@ -446,6 +456,196 @@ public final class WebServer {
             supervisor.runtime(id).logs.tail(limit).forEach(l -> lines.add(Supervisor.logLineJson(l)));
             send(ctx, lines);
         });
+    }
+
+    // --- controls: actions, pearls, tasks, replays ---
+
+    private void registerControlRoutes() {
+        app.get("/api/instances/{id}/details", ctx -> {
+            var id = requireCapability(ctx, Capability.VIEW).id;
+            JsonObject details;
+            if (supervisor.isRunning(id)) {
+                details = supervisor.details(id);
+                // the manager's names for task triggers
+                if (details.has("tasks")) {
+                    for (var t : details.getAsJsonArray("tasks")) {
+                        var task = t.getAsJsonObject();
+                        if (task.has("event")) task.addProperty("event", Actions.TASK_EVENT_CLASSES.getOrDefault(task.get("event").getAsString(), task.get("event").getAsString()));
+                    }
+                }
+            } else {
+                details = new JsonObject();
+                details.addProperty("online", false);
+                details.add("tasks", new JsonArray());
+            }
+            details.addProperty("running", supervisor.isRunning(id));
+            var waypoints = settings.effective(id, "client.extra.waypoints.waypoints");
+            details.add("waypoints", waypoints != null && waypoints.isJsonArray() ? waypoints : new JsonArray());
+            send(ctx, details);
+        });
+        app.post("/api/instances/{id}/action", ctx -> {
+            var body = body(ctx);
+            var action = Actions.parse(body);
+            var instance = requireCapability(ctx, action.capability());
+            if (action.alsoNeeds() != null) requireCapability(ctx, action.alsoNeeds());
+            if (action.command().startsWith("pearlLoader load ")) {
+                var result = pearls.load(instance.id, action.command().substring("pearlLoader load ".length()), actor(ctx));
+                if (!result.ok()) throw ApiException.badRequest(result.message());
+                var json = new JsonObject();
+                json.addProperty("message", result.message());
+                send(ctx, json);
+                return;
+            }
+            if (!supervisor.isRunning(instance.id)) throw ApiException.badRequest("Connect the instance first");
+            var who = requireUser(ctx).username;
+            switch (body.get("action").getAsString()) {
+                case "kick" -> history.noteAction(instance.id, "kick", optString(body, "player"), who);
+                // the swap reconnects players; whoever ends up switching was swapped by this person
+                case "makePlayer", "makeSpectator" -> history.noteAction(instance.id, "swap", null, who);
+                default -> {}
+            }
+            send(ctx, supervisor.command(instance.id, action.command(), actor(ctx)));
+        });
+        app.get("/api/instances/{id}/history", ctx -> {
+            var instance = requireCapability(ctx, Capability.CONTROL);
+            send(ctx, history.list(instance.id));
+        });
+
+        app.get("/api/instances/{id}/pearls", ctx -> {
+            var instance = requireCapability(ctx, Capability.PEARLS);
+            var user = requireUser(ctx);
+            var list = new JsonArray();
+            for (var pearl : pearls.pearls(instance.id)) {
+                var json = new JsonObject();
+                json.addProperty("id", pearl.id());
+                json.addProperty("x", pearl.x());
+                json.addProperty("y", pearl.y());
+                json.addProperty("z", pearl.z());
+                json.addProperty("hasWebhook", pearls.hasWebhook(user.id, instance.id, pearl.id()));
+                list.add(json);
+            }
+            send(ctx, list);
+        });
+        // the caller's own secret URL for one pearl; created on first use
+        app.post("/api/instances/{id}/pearls/{pearl}/webhook", ctx -> {
+            var instance = requireCapability(ctx, Capability.PEARLS);
+            var user = requireUser(ctx);
+            var pearl = ctx.pathParam("pearl");
+            if (pearls.pearls(instance.id).stream().noneMatch(p -> p.id().equals(pearl))) throw ApiException.notFound();
+            var webhook = pearls.webhook(user.id, instance.id, pearl, optBoolean(body(ctx), "replace"));
+            var json = new JsonObject();
+            json.addProperty("path", "/hooks/pearl/" + webhook.token());
+            send(ctx, json);
+        });
+        app.delete("/api/instances/{id}/pearls/{pearl}/webhook", ctx -> {
+            var instance = requireCapability(ctx, Capability.PEARLS);
+            pearls.deleteWebhook(requireUser(ctx).id, instance.id, ctx.pathParam("pearl"));
+            send(ctx, ok());
+        });
+        // webhooks: outside /api, no login, the token is the secret. GET shows a button so link previews load nothing.
+        app.get("/hooks/pearl/{token}", ctx -> {
+            var hook = activeWebhook(ctx.pathParam("token"));
+            ctx.contentType("text/html; charset=utf-8").header("Cache-Control", "no-store").header("Referrer-Policy", "no-referrer")
+                .header("X-Robots-Tag", "noindex").result(webhookPage(hook == null ? null : hook.pearl(), null));
+        });
+        app.post("/hooks/pearl/{token}", ctx -> {
+            var token = ctx.pathParam("token");
+            var hook = activeWebhook(token);
+            boolean form = ctx.contentType() != null && ctx.contentType().startsWith("application/x-www-form-urlencoded");
+            PearlService.LoadResult result;
+            int status;
+            if (hook == null) {
+                result = new PearlService.LoadResult(false, "This link doesn't work anymore.");
+                status = 404;
+            } else if (!pearls.webhookCooldown(token)) {
+                result = new PearlService.LoadResult(false, "Already loading. Try again in a few seconds.");
+                status = 429;
+            } else {
+                var username = store.read(s -> s.users.stream().filter(u -> u.id.equals(hook.userId())).findFirst().map(u -> u.username).orElse("?"));
+                result = pearls.load(hook.instanceId(), hook.pearl(), "webhook:" + username);
+                status = result.ok() ? 200 : 409;
+            }
+            ctx.header("Cache-Control", "no-store").status(status);
+            if (form) {
+                ctx.contentType("text/html; charset=utf-8").result(webhookPage(hook == null ? null : hook.pearl(), result));
+            } else {
+                var json = new JsonObject();
+                json.addProperty("ok", result.ok());
+                json.addProperty("message", result.message());
+                send(ctx, json);
+            }
+        });
+
+        app.get("/api/instances/{id}/replays", ctx -> {
+            var id = requireCapability(ctx, Capability.CONTROL).id;
+            var dir = config.instanceDir(id).resolve("replays");
+            var list = new JsonArray();
+            if (Files.isDirectory(dir)) {
+                try (var files = Files.list(dir)) {
+                    for (var f : files.filter(f -> f.getFileName().toString().endsWith(".mcpr")).sorted(java.util.Comparator.reverseOrder()).toList()) {
+                        var json = new JsonObject();
+                        json.addProperty("name", f.getFileName().toString());
+                        json.addProperty("size", Files.size(f));
+                        json.addProperty("modified", Files.getLastModifiedTime(f).toMillis());
+                        list.add(json);
+                    }
+                }
+            }
+            send(ctx, list);
+        });
+        app.get("/api/instances/{id}/replays/{name}", ctx -> {
+            var id = requireCapability(ctx, Capability.CONTROL).id;
+            var name = ctx.pathParam("name");
+            if (!name.matches("[A-Za-z0-9_.\\-]+\\.mcpr")) throw ApiException.notFound();
+            var file = config.instanceDir(id).resolve("replays").resolve(name);
+            if (!Files.isRegularFile(file)) throw ApiException.notFound();
+            ctx.header("Content-Disposition", "attachment; filename=\"" + name + "\"");
+            ctx.contentType("application/octet-stream").result(Files.newInputStream(file));
+        });
+        app.delete("/api/instances/{id}/replays/{name}", ctx -> {
+            var id = requireCapability(ctx, Capability.CONTROL).id;
+            var name = ctx.pathParam("name");
+            if (!name.matches("[A-Za-z0-9_.\\-]+\\.mcpr")) throw ApiException.notFound();
+            Files.deleteIfExists(config.instanceDir(id).resolve("replays").resolve(name));
+            send(ctx, ok());
+        });
+    }
+
+    /** A webhook whose owner still exists and still may load pearls on its instance. */
+    private PearlService.Webhook activeWebhook(String token) {
+        var hook = pearls.resolve(token);
+        if (hook == null) return null;
+        boolean allowed = store.read(s -> {
+            var user = s.users.stream().filter(u -> u.id.equals(hook.userId())).findFirst().orElse(null);
+            var instance = s.instances.stream().filter(i -> i.id.equals(hook.instanceId())).findFirst().orElse(null);
+            return user != null && instance != null && Permissions.has(Permissions.Identity.of(user), instance, Capability.PEARLS);
+        });
+        return allowed ? hook : null;
+    }
+
+    private static String webhookPage(String pearl, PearlService.LoadResult result) {
+        var title = pearl == null ? "Link not found" : "Load " + escapeHtml(pearl) + "'s pearl";
+        var message = result != null ? "<p class=\"" + (result.ok() ? "ok" : "err") + "\">" + escapeHtml(result.message()) + "</p>" : "";
+        var button = pearl == null ? "<p>This pearl link doesn't work anymore. Get a new one in ZenithHub.</p>"
+            : "<form method=\"post\"><button type=\"submit\">Load pearl</button></form>";
+        return """
+            <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+            <meta name="robots" content="noindex"><title>%s · ZenithHub</title><style>
+            body{margin:0;min-height:100dvh;display:grid;place-items:center;background:#09090b;color:#e4e4e7;font:16px system-ui,sans-serif}
+            main{width:min(22rem,90vw);text-align:center}h1{font-size:1.25rem;font-weight:600}
+            button{width:100%%;padding:.8rem;border:0;border-radius:.6rem;background:#059669;color:#fff;font-size:1rem;font-weight:600;cursor:pointer}
+            button:hover{background:#047857}.ok{color:#6ee7b7}.err{color:#fca5a5}p{color:#a1a1aa}
+            </style></head><body><main><h1>%s</h1>%s%s</main></body></html>
+            """.formatted(title, title, message, button);
+    }
+
+    private static String escapeHtml(String text) {
+        return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;").replace("'", "&#39;");
+    }
+
+    private static boolean optBoolean(JsonObject body, String key) {
+        var e = body.get(key);
+        return e != null && e.isJsonPrimitive() && e.getAsBoolean();
     }
 
     // --- manager settings (admin) ---
@@ -538,6 +738,7 @@ public final class WebServer {
             requireAdmin(ctx);
             var id = ctx.pathParam("id");
             access.deleteUser(id);
+            pearls.forget(null, id);
             sessions.invalidateUser(id);
             changed();
             send(ctx, ok());

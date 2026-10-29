@@ -10,6 +10,7 @@ import com.zenith.manager.util.Json;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Settings layering: Zenith defaults → global → server → instance → forced managed values.
@@ -39,6 +40,20 @@ public final class ConfigComposer {
         if (address.startsWith("[") ? !address.contains("]:") : !address.contains(":")) return address + ":25565";
         return address;
     }
+
+    /**
+     * Paths {@link #forcedValues} forces for every instance, whatever its account, server or manager settings.
+     * The settings pages leave them out. The outbound proxy switch and cheats are forced only sometimes.
+     */
+    public static final Set<String> ALWAYS_FORCED = Set.of(
+        "server.bind.address", "server.bind.port", "server.upnp", "server.ping.lanBroadcast", "server.proxyIP",
+        "server.verifyUsers", "server.acceptTransfers", "server.onlyZenithTransfers", "server.enforceMatchingConnectingAddress",
+        "server.loginRateLimiter.enabled", "server.extra.whitelist.enable", "server.extra.whitelist.autoAddClient",
+        "server.extra.whitelist.whitelist", "server.spectator.whitelistEnabled", "server.spectator.whitelist",
+        "client.server.address", "client.server.port", "client.autoConnect",
+        "discord.accountOwnerRoleId", "discord.notificationMentionRoleId",
+        "authentication.openBrowserOnLogin", "authentication.username", "authentication.accountType"
+    );
 
     /** Values the manager always controls. Instances can't override these; in-game changes to them are discarded. */
     public static Map<String, JsonElement> forcedValues(Context ctx) {

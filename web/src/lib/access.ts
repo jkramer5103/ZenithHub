@@ -3,28 +3,29 @@ import type { Capability, Role } from './types';
 /** What each role means, in the words the UI uses. Mirrors the manager's Role enum. */
 export const roles: { id: Role; label: string; description: string; capabilities: Capability[] }[] = [
 	{ id: 'VIEWER', label: 'Viewer', description: 'Sees status and chat', capabilities: ['VIEW'] },
-	{ id: 'SPECTATOR', label: 'Spectator', description: 'Can also watch in-game', capabilities: ['VIEW', 'SPECTATE'] },
-	{ id: 'PLAYER', label: 'Player', description: 'Can also play and chat as the account', capabilities: ['VIEW', 'SPECTATE', 'PLAY', 'CHAT'] },
+	{ id: 'SPECTATOR', label: 'Spectator', description: 'Can also watch in-game', capabilities: ['VIEW', 'SPECTATE', 'PEARLS'] },
+	{ id: 'PLAYER', label: 'Player', description: 'Can also play and chat as the account', capabilities: ['VIEW', 'SPECTATE', 'PEARLS', 'PLAY', 'CHAT'] },
 	{
 		id: 'OPERATOR',
 		label: 'Operator',
-		description: 'Can also start, stop and run commands',
-		capabilities: ['VIEW', 'SPECTATE', 'PLAY', 'CHAT', 'CONTROL', 'COMMANDS']
+		description: 'Can also control the bot and run commands',
+		capabilities: ['VIEW', 'SPECTATE', 'PEARLS', 'PLAY', 'CHAT', 'CONTROL', 'COMMANDS']
 	},
 	{
 		id: 'ADMIN',
 		label: 'Co-owner',
 		description: 'Everything, including settings and sharing',
-		capabilities: ['VIEW', 'SPECTATE', 'PLAY', 'CHAT', 'CONTROL', 'COMMANDS', 'SETTINGS', 'SHARE']
+		capabilities: ['VIEW', 'SPECTATE', 'PEARLS', 'PLAY', 'CHAT', 'CONTROL', 'COMMANDS', 'SETTINGS', 'SHARE']
 	}
 ];
 
 export const capabilityLabels: Record<Capability, string> = {
 	VIEW: 'See status and chat',
 	SPECTATE: 'Watch in-game',
+	PEARLS: 'Load stasis pearls',
 	PLAY: 'Play in-game',
 	CHAT: 'Send chat messages',
-	CONTROL: 'Start, stop and connect',
+	CONTROL: 'Connect and control the bot',
 	COMMANDS: 'Run commands',
 	SETTINGS: 'Change settings',
 	SHARE: 'Share with others'

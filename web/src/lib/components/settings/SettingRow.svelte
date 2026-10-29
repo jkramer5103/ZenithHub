@@ -15,6 +15,7 @@
 		source,
 		scope,
 		mono = false,
+		advanced = false,
 		query = null,
 		onset,
 		onreset
@@ -26,6 +27,8 @@
 		scope: SettingScope;
 		/** raw path labels in the developer view */
 		mono?: boolean;
+		/** tag it as an advanced setting, shown only because of a search */
+		advanced?: boolean;
 		/** search words to highlight */
 		query?: Query | null;
 		onset: (value: unknown) => void;
@@ -92,6 +95,7 @@
 				step={type.type === 'integer' ? 1 : 'any'}
 				min={field.min}
 				max={field.max}
+				placeholder={field.placeholder}
 				disabled={forced}
 				bind:value={draft}
 				onblur={commitText}
@@ -146,6 +150,9 @@
 	<div class="min-w-0 flex-1 {block ? 'mb-2' : ''}">
 		<div class="flex flex-wrap items-center gap-x-2 gap-y-1">
 			<span class="text-sm {mono ? 'font-mono text-[13px] break-all' : ''}"><Highlight text={field.label} {query} /></span>
+			{#if advanced}
+				<span class="rounded bg-zinc-800 px-1.5 py-px text-[11px] font-medium text-zinc-400">Advanced</span>
+			{/if}
 			{#if changed}
 				<span class="rounded bg-emerald-950 px-1.5 py-px text-[11px] font-medium text-emerald-300">Changed</span>
 				<button

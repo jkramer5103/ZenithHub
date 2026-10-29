@@ -8,6 +8,7 @@ import com.zenith.manager.auth.AccessService;
 import com.zenith.manager.auth.Capability;
 import com.zenith.manager.auth.Permissions;
 import com.zenith.manager.instances.InstanceRuntime;
+import com.zenith.manager.instances.PearlService;
 import com.zenith.manager.instances.Supervisor;
 import com.zenith.manager.state.State;
 import com.zenith.manager.state.StateStore;
@@ -23,7 +24,9 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
 import net.dv8tion.jda.api.events.role.GenericRoleEvent;
+import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.exceptions.InvalidTokenException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -78,6 +81,7 @@ public final class DiscordBot extends ListenerAdapter {
     private final StateStore store;
     private final AccessService access;
     private final Supervisor supervisor;
+    private final PearlService pearls;
     private final ScheduledExecutorService worker = Executors.newSingleThreadScheduledExecutor(Thread.ofPlatform().name("discord").daemon().factory());
     private final Map<String, LinkCode> linkCodes = new ConcurrentHashMap<>();
     private final Map<String, String> lastPhase = new ConcurrentHashMap<>();
@@ -87,7 +91,8 @@ public final class DiscordBot extends ListenerAdapter {
     private volatile String error;
     private ScheduledFuture<?> pendingSync;
 
-    public DiscordBot(ManagerConfig config, StateStore store, AccessService access, Supervisor supervisor, EventHub events) {
+    public DiscordBot(ManagerConfig config, StateStore store, AccessService access, Supervisor supervisor, EventHub events, PearlService pearls) {
+        this.pearls = pearls;
         this.tokenFile = config.dataDir().resolve("manager").resolve("secrets").resolve("discord-token");
         this.store = store;
         this.access = access;
@@ -237,6 +242,8 @@ public final class DiscordBot extends ListenerAdapter {
             Commands.slash("status", "Show this instance's status"),
             Commands.slash("connect", "Connect this instance to its server"),
             Commands.slash("disconnect", "Disconnect this instance and shut it down"),
+            Commands.slash("pearl", "Load a stasis pearl with this instance's bot")
+                .addOption(OptionType.STRING, "pearl", "Whose pearl", true, true),
             Commands.slash("command", "Run a ZenithProxy command on this instance")
                 .addOption(OptionType.STRING, "command", "The command, without a prefix", true)
         ).queue(null, e -> LOG.warn("Couldn't register commands: {}", e.getMessage()));
@@ -265,6 +272,7 @@ public final class DiscordBot extends ListenerAdapter {
         var needed = switch (name) {
             case "status" -> Capability.VIEW;
             case "connect", "disconnect" -> Capability.CONTROL;
+            case "pearl" -> Capability.PEARLS;
             default -> Capability.COMMANDS;
         };
         if (!caps.contains(needed)) {
@@ -302,6 +310,10 @@ public final class DiscordBot extends ListenerAdapter {
                         supervisor.disconnect(id, actor);
                         event.getHook().sendMessage("Disconnected.").queue();
                     }
+                    case "pearl" -> {
+                        var result = pearls.load(id, event.getOption("pearl").getAsString().trim(), actor);
+                        event.getHook().sendMessage(result.message()).queue();
+                    }
                     default -> {
                         var command = name.equals("command") ? event.getOption("command").getAsString().trim() : name;
                         replyWithOutput(event, supervisor.command(id, command, actor), null);
@@ -310,6 +322,30 @@ public final class DiscordBot extends ListenerAdapter {
             } catch (Exception e) {
                 event.getHook().sendMessage(e.getMessage() != null ? e.getMessage() : "That didn't work.").queue();
             }
+        });
+    }
+
+    /** Pearl names for /pearl, only for people who may load them. */
+    @Override
+    public void onCommandAutoCompleteInteraction(CommandAutoCompleteInteractionEvent event) {
+        if (!event.getName().equals("pearl")) return;
+        var instanceId = store.read(s -> s.instances.stream()
+            .filter(i -> event.getChannel() != null && event.getChannel().getId().equals(i.discordChannelId))
+            .filter(i -> Permissions.has(access.identityOfDiscord(event.getUser().getId()), i, Capability.PEARLS))
+            .findFirst().map(i -> i.id).orElse(null));
+        if (instanceId == null) {
+            event.replyChoices(List.of()).queue();
+            return;
+        }
+        Thread.ofVirtual().name("discord-autocomplete").start(() -> {
+            var typed = event.getFocusedOption().getValue().toLowerCase(Locale.ROOT);
+            var choices = pearls.pearls(instanceId).stream()
+                .map(PearlService.Pearl::id)
+                .filter(p -> p.toLowerCase(Locale.ROOT).contains(typed))
+                .limit(25)
+                .map(p -> new Command.Choice(p, p))
+                .toList();
+            event.replyChoices(choices).queue(null, e -> { });
         });
     }
 

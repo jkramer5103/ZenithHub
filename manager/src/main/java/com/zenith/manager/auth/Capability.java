@@ -12,6 +12,8 @@ public enum Capability {
     PLAY,
     /** Send chat messages as the account. */
     CHAT,
+    /** Load any of the instance's stasis pearls. */
+    PEARLS,
     /** Start, stop, connect and disconnect. */
     CONTROL,
     /** Run any Zenith command. */

@@ -1,4 +1,4 @@
-export type Capability = 'VIEW' | 'SPECTATE' | 'PLAY' | 'CHAT' | 'CONTROL' | 'COMMANDS' | 'SETTINGS' | 'SHARE';
+export type Capability = 'VIEW' | 'SPECTATE' | 'PLAY' | 'CHAT' | 'PEARLS' | 'CONTROL' | 'COMMANDS' | 'SETTINGS' | 'SHARE';
 export type Phase = 'STOPPED' | 'STARTING' | 'RUNNING' | 'STOPPING' | 'BACKOFF';
 export type Autostart = 'RESTORE' | 'ALWAYS' | 'NEVER';
 
@@ -149,6 +149,8 @@ export interface Embed {
 	title: string | null;
 	description: string | null;
 	color?: number;
+	/** the command reported a failure */
+	error?: boolean;
 	fields: { name: string; value: string; inline: boolean }[];
 }
 
@@ -219,4 +221,116 @@ export interface AccessView {
 	grants: Grant[];
 	myCapabilities: Capability[];
 	users: { id: string; username: string }[];
+}
+
+export interface ItemStack {
+	/** registry name without the minecraft: prefix, e.g. "diamond_sword" */
+	id: string;
+	count: number;
+	/** set with an anvil */
+	name?: string;
+}
+
+export interface Waypoint {
+	id: string;
+	dimension: string;
+	x: number;
+	y: number;
+	z: number;
+}
+
+/** The open container, or the player inventory, with Zenith's slot numbers. */
+export interface Inventory {
+	containerId: number;
+	title: string | null;
+	size: number;
+	/** first hotbar slot: 36 in the player inventory, else size - 9 */
+	hotbarStart: number;
+	/** the held hotbar slot, as a slot number */
+	heldSlot: number;
+	slots: (ItemStack | null)[];
+}
+
+export type TaskEvent = 'connect' | 'death' | 'disconnect' | 'online' | 'playerConnect' | 'playerDisconnect';
+
+export interface ScheduledTask {
+	id: string;
+	type: 'timed' | 'interval' | 'event' | 'other';
+	intervalSeconds?: number;
+	/** epoch ms of the next run, for timed and interval tasks */
+	next?: number;
+	event?: string;
+	repeat?: boolean;
+	command: string;
+}
+
+/** Live details for the Control and Tasks tabs, polled while they're open. */
+export interface ConnectedPlayer {
+	name: string;
+	uuid: string | null;
+	spectator: boolean;
+	/** on the account's whitelist, so a swap lets them play */
+	canPlay: boolean;
+	/** new enough (1.20.5+) to be swapped with a transfer */
+	canSwap: boolean;
+	version: string;
+}
+
+/** another player the bot can see */
+export interface NearbyPlayer {
+	/** from the tab list; null if the server hides it */
+	name: string | null;
+	uuid: string;
+	x: number;
+	y: number;
+	z: number;
+	distance: number;
+	friend: boolean;
+}
+
+export interface HistoryEntry {
+	ts: number;
+	event: 'joined' | 'left' | 'switched' | 'kicked';
+	name: string;
+	uuid?: string;
+	/** the role after the event */
+	spectator: boolean;
+	reason?: string;
+	/** who kicked or swapped them, from the web UI */
+	actor?: string;
+}
+
+export interface InstanceDetails {
+	running: boolean;
+	online: boolean;
+	alive?: boolean;
+	controlled?: boolean;
+	/** everyone connected through the proxy, the controlling player first */
+	players?: ConnectedPlayer[];
+	/** only while the bot is in the game, closest first */
+	nearby?: NearbyPlayer[];
+	inventory?: Inventory;
+	pathfinder?: { active: boolean; process: string | null };
+	recording?: boolean;
+	/** a held mouse button, while the bot keeps clicking */
+	clicking?: 'left' | 'right';
+	tasks: ScheduledTask[];
+	/** the Tasks module is on; tasks only run when it is */
+	tasksEnabled?: boolean;
+	waypoints: Waypoint[];
+}
+
+export interface Pearl {
+	id: string;
+	x: number;
+	y: number;
+	z: number;
+	/** the viewer has a webhook URL for it */
+	hasWebhook: boolean;
+}
+
+export interface Replay {
+	name: string;
+	size: number;
+	modified: number;
 }

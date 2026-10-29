@@ -1,4 +1,5 @@
 <script lang="ts">
+	import type { Capability } from '#lib/types.js';
 	import { app } from '#lib/app.svelte.js';
 	import Console from '#lib/components/Console.svelte';
 	import InstanceActions from '#lib/components/InstanceActions.svelte';
@@ -7,10 +8,13 @@
 	import PhaseBadge from '#lib/components/PhaseBadge.svelte';
 	import SettingsEditor from '#lib/components/settings/SettingsEditor.svelte';
 	import SharingPanel from '#lib/components/SharingPanel.svelte';
+	import ControlPanel from '#lib/components/control/ControlPanel.svelte';
+	import PearlsPanel from '#lib/components/PearlsPanel.svelte';
+	import TasksPanel from '#lib/components/TasksPanel.svelte';
 	import CopyField from '#lib/components/CopyField.svelte';
 	import { duration } from '#lib/format.js';
 	import { page } from '$app/state';
-	import { Activity, ArrowLeft, Gamepad2, Settings2, Share2, SlidersHorizontal, Terminal } from '@lucide/svelte';
+	import { Activity, ArrowLeft, CalendarClock, Gamepad2, Joystick, Settings2, Share2, SlidersHorizontal, Orbit, Terminal } from '@lucide/svelte';
 
 	const id = $derived(page.params.id ?? '');
 	const instance = $derived(app.instance(id));
@@ -18,11 +22,15 @@
 	const runtime = $derived(instance?.runtime);
 	const status = $derived(runtime?.phase === 'RUNNING' ? runtime.status : null);
 	let showSettings = $state(false);
+	const can = (c: Capability) => !!instance?.capabilities.includes(c);
 
-	type Tab = 'overview' | 'settings' | 'sharing' | 'console';
+	type Tab = 'overview' | 'control' | 'pearls' | 'tasks' | 'settings' | 'sharing' | 'console';
 	const tabs = $derived(
 		[
 			{ id: 'overview' as Tab, label: 'Overview', icon: Activity, show: true },
+			{ id: 'control' as Tab, label: 'Control', icon: Joystick, show: !!instance && (can('PLAY') || can('CONTROL')) },
+			{ id: 'pearls' as Tab, label: 'Pearls', icon: Orbit, show: can('PEARLS') },
+			{ id: 'tasks' as Tab, label: 'Tasks', icon: CalendarClock, show: can('CONTROL') },
 			{ id: 'settings' as Tab, label: 'Settings', icon: SlidersHorizontal, show: !!instance?.capabilities.includes('SETTINGS') },
 			{ id: 'sharing' as Tab, label: 'Sharing', icon: Share2, show: !!instance?.capabilities.includes('SHARE') },
 			{ id: 'console' as Tab, label: 'Console', icon: Terminal, show: app.devMode }
@@ -106,13 +114,14 @@
 	{/if}
 
 	{#if tabs.length > 1}
-		<div class="mb-4 flex gap-1 border-b border-zinc-800">
+		<!-- scrolls sideways on phones instead of wrapping -->
+		<div class="-mx-4 mb-4 flex gap-1 overflow-x-auto border-b border-zinc-800 px-4 [scrollbar-width:none] sm:mx-0 sm:px-0">
 			{#each tabs as t (t.id)}
 				<a
 					href="?tab={t.id}"
 					data-sveltekit-replacestate
 					data-sveltekit-noscroll
-					class="-mb-px flex items-center gap-1.5 border-b-2 px-3 py-2 text-sm font-medium transition-colors {tab === t.id
+					class="-mb-px flex shrink-0 items-center gap-1.5 border-b-2 px-3 py-2 text-sm font-medium transition-colors {tab === t.id
 						? 'border-emerald-500 text-zinc-100'
 						: 'border-transparent text-zinc-400 hover:text-zinc-200'}"
 				>
@@ -123,7 +132,19 @@
 		</div>
 	{/if}
 
-	{#if tab === 'settings'}
+	{#if tab === 'control'}
+		{#key id}
+			<ControlPanel instanceId={id} capabilities={instance.capabilities} {status} running={runtime.phase === 'RUNNING'} />
+		{/key}
+	{:else if tab === 'pearls'}
+		{#key id}
+			<PearlsPanel instanceId={id} capabilities={instance.capabilities} {status} />
+		{/key}
+	{:else if tab === 'tasks'}
+		{#key id}
+			<TasksPanel instanceId={id} capabilities={instance.capabilities} running={runtime.phase === 'RUNNING'} />
+		{/key}
+	{:else if tab === 'settings'}
 		{#key id}
 			<SettingsEditor endpoint="/instances/{id}/settings" scope="instance" />
 		{/key}

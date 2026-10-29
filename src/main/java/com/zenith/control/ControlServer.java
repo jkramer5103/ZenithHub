@@ -6,6 +6,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.zenith.Proxy;
 import com.zenith.command.api.CommandContext;
 import com.zenith.discord.Embed;
@@ -13,7 +14,25 @@ import com.zenith.event.client.ClientConnectEvent;
 import com.zenith.event.client.ClientDisconnectEvent;
 import com.zenith.event.console.ConsoleLogEvent;
 import com.zenith.event.discord.MainChannelMessageSentEvent;
+import com.zenith.event.player.PlayerConnectedEvent;
+import com.zenith.event.player.PlayerDisconnectedEvent;
+import com.zenith.event.player.SpectatorConnectedEvent;
+import com.zenith.event.player.SpectatorDisconnectedEvent;
+import com.zenith.cache.data.entity.Entity;
+import com.zenith.cache.data.inventory.Container;
 import com.zenith.feature.queue.Queue;
+import com.zenith.feature.tasks.CommandAction;
+import com.zenith.feature.tasks.EventCondition;
+import com.zenith.feature.tasks.IntervalCondition;
+import com.zenith.feature.tasks.OnceContinuation;
+import com.zenith.mc.item.ItemRegistry;
+import com.zenith.module.impl.ReplayMod;
+import com.zenith.module.impl.Tasks;
+import com.zenith.network.server.ServerSession;
+import com.zenith.util.ComponentSerializer;
+import org.geysermc.mcprotocollib.auth.GameProfile;
+import org.geysermc.mcprotocollib.protocol.data.game.PlayerListEntry;
+import org.geysermc.mcprotocollib.protocol.data.game.item.component.DataComponentTypes;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -41,6 +60,7 @@ import static java.util.Objects.nonNull;
  * POST /v1/command  - {"command": "..."} executes a Zenith command, returns its output
  * POST /v1/shutdown - graceful shutdown
  * GET  /v1/events   - server-sent events stream of structured log lines, Discord notifications and chat relay embeds
+ * GET  /v1/details  - inventory, pathfinder, replay and tasks, for the web UI's controls
  * GET  /v1/config   - the live config
  * POST /v1/config   - {"settings": {...nested partial config}} changes settings live and saves them
  */
@@ -68,6 +88,7 @@ public final class ControlServer {
         server.setExecutor(Executors.newVirtualThreadPerTaskExecutor());
         server.createContext("/v1/status", ex -> handle(ex, "GET", this::status));
         server.createContext("/v1/command", ex -> handle(ex, "POST", this::command));
+        server.createContext("/v1/details", ex -> handle(ex, "GET", this::details));
         server.createContext("/v1/shutdown", ex -> handle(ex, "POST", this::shutdown));
         server.createContext("/v1/events", this::events);
         server.createContext("/v1/config", ex -> handle(ex, ex.getRequestMethod().equals("POST") ? "POST" : "GET",
@@ -77,6 +98,10 @@ public final class ControlServer {
             of(ConsoleLogEvent.class, this::onConsoleLog),
             of(MainChannelMessageSentEvent.class, e -> onDiscordMessage("notification", e.embed(), e.message())),
             of(ClientConnectEvent.class, e -> lastDisconnectReason = null),
+            of(PlayerConnectedEvent.class, e -> onPlayer("joined", false, e.clientGameProfile(), null)),
+            of(SpectatorConnectedEvent.class, e -> onPlayer("joined", true, e.clientGameProfile(), null)),
+            of(PlayerDisconnectedEvent.class, e -> onPlayer("left", false, e.clientGameProfile(), e.reason())),
+            of(SpectatorDisconnectedEvent.class, e -> onPlayer("left", true, e.clientGameProfile(), null)),
             of(ClientDisconnectEvent.class, e -> {
                 lastDisconnectReason = e.manualDisconnect() ? null : friendlyReason(e.reason());
                 lastDisconnectAt = System.currentTimeMillis();
@@ -169,6 +194,137 @@ public final class ControlServer {
         var spectators = new JsonArray();
         proxy.getSpectatorConnections().forEach(s -> spectators.add(s.getName()));
         json.add("spectators", spectators);
+        return json;
+    }
+
+    private JsonObject details(HttpExchange ex) {
+        var proxy = Proxy.getInstance();
+        var json = new JsonObject();
+        boolean online = proxy.isConnected() && !proxy.isInQueue();
+        json.addProperty("online", online);
+        json.addProperty("alive", online && CACHE.getPlayerCache().isAlive());
+        json.addProperty("controlled", proxy.hasActivePlayer());
+        json.add("players", players());
+        if (online) {
+            json.add("inventory", inventory());
+            json.add("nearby", nearby());
+        }
+        var pathfinder = new JsonObject();
+        boolean pathing = online && BARITONE.isActive();
+        pathfinder.addProperty("active", pathing);
+        if (pathing) {
+            BARITONE.getPathingControlManager().mostRecentInControl()
+                .ifPresent(process -> pathfinder.addProperty("process", process.displayName()));
+        }
+        json.add("pathfinder", pathfinder);
+        json.addProperty("recording", MODULE.get(ReplayMod.class).isEnabled());
+        var click = CONFIG.client.extra.click;
+        if (click.holdLeftClick || click.holdRightClick) json.addProperty("clicking", click.holdLeftClick ? "left" : "right");
+        var tasks = new JsonArray();
+        for (var task : MODULE.get(Tasks.class).getTasks()) {
+            var t = new JsonObject();
+            t.addProperty("id", task.getId());
+            switch (task.getCondition()) {
+                case IntervalCondition c -> {
+                    boolean once = task.getContinuation() instanceof OnceContinuation;
+                    t.addProperty("type", once ? "timed" : "interval");
+                    t.addProperty("intervalSeconds", c.getInterval().toSeconds());
+                    t.addProperty("next", c.getLastT().plus(c.getInterval()).toEpochMilli());
+                }
+                case EventCondition c -> {
+                    t.addProperty("type", "event");
+                    t.addProperty("event", c.getEvent().getSimpleName());
+                    t.addProperty("repeat", !(task.getContinuation() instanceof OnceContinuation));
+                }
+                default -> t.addProperty("type", "other");
+            }
+            if (task.getAction() instanceof CommandAction action) t.addProperty("command", action.getCommand());
+            tasks.add(t);
+        }
+        json.add("tasks", tasks);
+        json.addProperty("tasksEnabled", CONFIG.client.extra.tasks.enabled);
+        return json;
+    }
+
+    /** Other players the bot can see, closest first. */
+    private JsonArray nearby() {
+        var self = CACHE.getPlayerCache().getThePlayer();
+        var players = CACHE.getEntityCache().getPlayers().values().stream()
+            .filter(p -> !p.isSelfPlayer() && !p.getUuid().equals(self.getUuid()))
+            .sorted(java.util.Comparator.comparingDouble(p -> distanceSq(self, p)))
+            .toList();
+        var nearby = new JsonArray();
+        for (var p : players) {
+            var json = new JsonObject();
+            json.addProperty("name", CACHE.getTabListCache().get(p.getUuid()).map(PlayerListEntry::getName).orElse(null));
+            json.addProperty("uuid", p.getUuid().toString());
+            json.addProperty("x", p.getX());
+            json.addProperty("y", p.getY());
+            json.addProperty("z", p.getZ());
+            json.addProperty("distance", Math.sqrt(distanceSq(self, p)));
+            json.addProperty("friend", PLAYER_LISTS.getFriendsList().contains(p.getUuid()));
+            nearby.add(json);
+        }
+        return nearby;
+    }
+
+    private static double distanceSq(Entity a, Entity b) {
+        double dx = a.getX() - b.getX(), dy = a.getY() - b.getY(), dz = a.getZ() - b.getZ();
+        return dx * dx + dy * dy + dz * dz;
+    }
+
+    /** Everyone connected through the proxy, the controlling player first. */
+    private JsonArray players() {
+        var proxy = Proxy.getInstance();
+        var players = new JsonArray();
+        var controller = proxy.getActivePlayer();
+        if (controller != null) players.add(player(controller, false));
+        proxy.getSpectatorConnections().forEach(s -> players.add(player(s, true)));
+        return players;
+    }
+
+    private JsonObject player(ServerSession session, boolean spectator) {
+        var json = new JsonObject();
+        json.addProperty("name", session.getName());
+        json.addProperty("spectator", spectator);
+        var profile = session.getProfileCache().getProfile();
+        json.addProperty("uuid", profile != null ? profile.getId().toString() : null);
+        // what the controller command checks before swapping
+        json.addProperty("canPlay", profile != null && PLAYER_LISTS.getWhitelist().contains(profile.getId()));
+        json.addProperty("canSwap", session.getProtocolVersion().newerThanOrEqualTo(ProtocolVersion.v1_20_5));
+        json.addProperty("version", session.getProtocolVersion().getName());
+        return json;
+    }
+
+    /** The open container (the player's own inventory when none is open), slot by slot. */
+    private JsonObject inventory() {
+        var inventoryCache = CACHE.getPlayerCache().getInventoryCache();
+        var container = inventoryCache.getOpenContainer();
+        var json = new JsonObject();
+        boolean playerInventory = container.getContainerId() == 0;
+        json.addProperty("containerId", container.getContainerId());
+        json.addProperty("title", playerInventory ? null : ComponentSerializer.serializePlain(container.getTitle()));
+        int size = container.getSize();
+        json.addProperty("size", size);
+        int hotbarStart = playerInventory ? 36 : size - 9;
+        json.addProperty("hotbarStart", hotbarStart);
+        json.addProperty("heldSlot", hotbarStart + CACHE.getPlayerCache().getHeldItemSlot());
+        var slots = new JsonArray();
+        for (int i = 0; i < size; i++) {
+            var stack = container.getItemStack(i);
+            if (stack == Container.EMPTY_STACK) {
+                slots.add(com.google.gson.JsonNull.INSTANCE);
+                continue;
+            }
+            var item = new JsonObject();
+            var data = ItemRegistry.REGISTRY.get(stack.getId());
+            item.addProperty("id", data != null ? data.name() : "unknown");
+            item.addProperty("count", stack.getAmount());
+            var customName = stack.getDataComponentsOrEmpty().get(DataComponentTypes.CUSTOM_NAME);
+            if (customName != null) item.addProperty("name", ComponentSerializer.serializePlain(customName));
+            slots.add(item);
+        }
+        json.add("slots", slots);
         return json;
     }
 
@@ -294,6 +450,23 @@ public final class ControlServer {
         }
     }
 
+    /** Someone joined or left through the proxy, for the manager's connection history. */
+    private void onPlayer(String event, boolean spectator, GameProfile profile, String reason) {
+        if (eventSubscribers.isEmpty() || profile == null) return;
+        var json = new JsonObject();
+        json.addProperty("type", "player");
+        json.addProperty("ts", System.currentTimeMillis());
+        json.addProperty("event", event);
+        json.addProperty("name", profile.getName());
+        json.addProperty("uuid", profile.getIdAsString());
+        json.addProperty("spectator", spectator);
+        if (reason != null && !reason.isBlank()) json.addProperty("reason", reason);
+        var msg = COMPACT_GSON.toJson(json);
+        for (var queue : eventSubscribers) {
+            queue.offer(msg);
+        }
+    }
+
     private static String stripPrefix(String line) {
         return LOG_PREFIX.matcher(line).replaceFirst("").stripTrailing();
     }
@@ -305,7 +478,11 @@ public final class ControlServer {
         json.addProperty("title", embed.title());
         json.addProperty("description", embed.description());
         json.addProperty("url", embed.url());
-        if (embed.color() != null) json.addProperty("color", embed.color().getRGB() & 0xFFFFFF);
+        if (embed.color() != null) {
+            json.addProperty("color", embed.color().getRGB() & 0xFFFFFF);
+            // commands report failures with the theme's error colour; lets the web UI tell them apart
+            json.addProperty("error", (embed.color().getRGB() & 0xFFFFFF) == (CONFIG.theme.error.rgb() & 0xFFFFFF));
+        }
         if (embed.timestamp() != null) json.addProperty("timestamp", embed.timestamp().toEpochMilli());
         json.addProperty("image", embed.image());
         json.addProperty("thumbnail", embed.thumbnail());

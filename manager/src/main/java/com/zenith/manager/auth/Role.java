@@ -10,9 +10,9 @@ import static com.zenith.manager.auth.Capability.*;
  */
 public enum Role {
     VIEWER(EnumSet.of(VIEW)),
-    SPECTATOR(EnumSet.of(VIEW, SPECTATE)),
-    PLAYER(EnumSet.of(VIEW, SPECTATE, PLAY, CHAT)),
-    OPERATOR(EnumSet.of(VIEW, SPECTATE, PLAY, CHAT, CONTROL, COMMANDS)),
+    SPECTATOR(EnumSet.of(VIEW, SPECTATE, PEARLS)),
+    PLAYER(EnumSet.of(VIEW, SPECTATE, PEARLS, PLAY, CHAT)),
+    OPERATOR(EnumSet.of(VIEW, SPECTATE, PEARLS, PLAY, CHAT, CONTROL, COMMANDS)),
     ADMIN(EnumSet.allOf(Capability.class));
 
     private final Set<Capability> capabilities;

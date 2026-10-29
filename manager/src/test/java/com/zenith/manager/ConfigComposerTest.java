@@ -104,6 +104,15 @@ class ConfigComposerTest {
     }
 
     @Test
+    void alwaysForcedMatchesForcedValues() {
+        var minimal = ctx(new JsonObject(), new JsonObject(), new JsonObject(), true);
+        assertEquals(ConfigComposer.ALWAYS_FORCED, ConfigComposer.forcedValues(minimal).keySet());
+        var offline = ctx(new JsonObject(), new JsonObject(), new JsonObject(), false, true);
+        offline.account().type = State.AccountType.OFFLINE;
+        assertTrue(ConfigComposer.forcedValues(offline).keySet().containsAll(ConfigComposer.ALWAYS_FORCED));
+    }
+
+    @Test
     void diffRoundTrips() {
         var base = json("{\"a\": {\"b\": 1, \"c\": [1, 2]}, \"d\": \"x\"}");
         var actual = json("{\"a\": {\"b\": 1, \"c\": [1, 3]}, \"d\": \"y\", \"e\": true}");

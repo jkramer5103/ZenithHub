@@ -29,6 +29,7 @@ from ZenithProxy to ZenithHub on 2026-10-29: user-facing names only, code keeps 
 ```
 
 - **Manager**: a Gradle subproject (`manager/`) in the same repo, written in Java 25. It owns all state in `/data`.
+- **Local UI preview**: Vite's `/api` proxy preserves the browser's Host header, including WebSocket upgrades, so the manager's same-origin check accepts live updates. For LAN browsing, the built UI (`npm run preview -- --host 0.0.0.0`) avoids the large development module graph and its slow first render.
 - **Zenith instances**: unmodified behaviour apart from **managed mode** (`ZENITH_MANAGED=1`):
   - a localhost HTTP control API (status, commands, config defaults), authenticated with a per-process token;
   - no interactive terminal, no self-updater and no per-instance Discord bot;
@@ -97,8 +98,22 @@ No commands needed anywhere: the console only shows in developer mode (user menu
 - [x] One bot token, set on the Settings page (stored 0600 in `/data/manager/secrets`, never returned by the API); enable switch, status and invite link.
 - [x] Category per account, channel per instance, created and cleaned up automatically; member overrides synced from grants and linked users.
 - [x] Discord linking with a one-time code (`/link CODE`, 10 minutes) from the user menu; unlink in the same dialog.
-- [x] Slash commands in an instance channel (`/status`, `/start`, `/stop`, `/connect`, `/disconnect`, `/command`), checked against the linked user's capabilities.
+- [x] Slash commands in an instance channel (`/status`, `/start`, `/stop`, `/connect`, `/disconnect`, `/command`, `/pearl`), checked against the linked user's capabilities.
 - Not yet tested against a live Discord server.
+
+### Phase 5: Controls, pearls and tasks (done, 2026-10-29)
+Everything a user did with commands now has a UI, except lookups (seen, stats, …), plugins and map rendering, which aren't supported.
+- [x] Zenith control API `GET /v1/details`: inventory or open container (slot numbers as Zenith's inventory command uses them), pathfinder state, replay recording, scheduled tasks. Command results flag error embeds (`embed.error`, the theme's error colour).
+- [x] Manager `POST /api/instances/{id}/action`: structured actions (`instances/Actions`) turn into Zenith commands. Every argument is checked against a strict pattern, and each action names the capability it needs: movement, clicking, inventory and looking need PLAY; requeue, kick, transfer, recording and tasks need CONTROL; waypoints need SETTINGS; free text (`command`) needs COMMANDS and only shows in developer mode. A task wraps another action and needs CONTROL plus that action's capability.
+- [x] Instance tabs: **Control** (movement modes, waypoints, clicking, looking, respawn, inventory grid with hold/move/drop and container take/put, players with kick and transfer, requeue, recording with download), **Pearls**, **Tasks** (once later, repeating, or on an event; built from the same actions). Details are polled every 2 s while a tab is open.
+- [x] Stasis pearls: a `PEARLS` capability ("Load stasis pearls", in every role from Spectator up) loads any of the instance's pearls. The list is the PearlLoader setting; people with SETTINGS add, edit and remove pearls in the Pearls tab. Discord `/pearl <pearl>` (with autocomplete) in the instance channel.
+- [x] Pearl webhooks: in developer mode each person gets their own secret URL per pearl (`/hooks/pearl/<token>`, 192 random bits, stored 0600 in `secrets/pearl-webhooks.json`). POST loads the pearl as that person and only while they still have PEARLS; GET shows a button, so link previews load nothing. 5 s cooldown per URL. New URL replaces the old one; deleting the instance or the user drops them.
+- [x] Connected players card (Control tab, CONTROL): everyone connected through the proxy, playing or spectating, with one-click Kick, Kick everyone, **Make player** (a spectator takes over; whoever was playing starts spectating) and **Make spectator**. The managed-only Zenith command `controller set <player>` / `controller release` does the swap with the same transfers as the in-game `swap force`, and only accepts the manager as source. Make player is greyed out, with the reason shown, for spectators without play access and clients older than 1.20.5.
+- [x] Connection history (collapsible under Connected players, CONTROL): Zenith's control API sends `player` events (joined/left, player or spectator, disconnect reason) over `/v1/events`. `PlayerHistory` keeps the last 200 per instance in `manager/history/<id>.json`, merges a leave and rejoin of the same name within 15 s into one "switched" entry, and names who kicked or swapped from the web UI. Transfer reasons are dropped. `GET /api/instances/{id}/history`; deleting the instance deletes its history.
+- [x] Nearby players card (Control tab): other players in the bot's visual range from `/v1/details` (`nearby`: tab-list name, position, distance, friend), nearest first, with distance, compass direction, coordinates and, with PLAY, **Follow** and **Go to**.
+- [x] Control tab layout: an activity bar on top (what the bot is doing: moving, holding a click, recording; position; one **Stop** that ends pathing and held clicks; `/v1/details` reports `clicking`), then four views so nothing is a long scroll away on a phone: **Move** (Go to, Fly, Follow and Mine up front, the other modes behind "More"; waypoints beside it), **Players** (connected players with history, nearby players), **Inventory**, and **More** (click and look, with exact angles folded away; transfer and requeue; recording). The view is kept in `?view=`, and views the user has no capability for are hidden.
+- [x] Settings cover every Zenith setting. The rarely used ones (plus the Network and Troubleshooting sections) carry an Advanced tag and stay hidden until "Show advanced settings" is switched on (per browser, `localStorage.settingsAdvanced`). Search always finds them.
+- [x] Recordings: `/api/instances/{id}/replays` lists, downloads and deletes the `.mcpr` files in the instance's `replays` folder (CONTROL).
 
 ### Later
 - Browser notifications (queue done, low health, visual range, …).

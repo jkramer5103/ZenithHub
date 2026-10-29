@@ -6,6 +6,8 @@ import com.zenith.manager.discord.DiscordBot;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.zenith.manager.instances.ConfigComposer;
+import com.zenith.manager.instances.PearlService;
+import com.zenith.manager.instances.PlayerHistory;
 import com.zenith.manager.instances.SettingsService;
 import com.zenith.manager.lobby.LobbyServer;
 import com.zenith.manager.lobby.PlayerDirectory;
@@ -39,8 +41,11 @@ public final class ManagerMain {
         // grants decide who may join; running instances get the new lists right away
         access.onChange(id -> Thread.ofVirtual().start(() -> pushJoinLists(store, supervisor, id)));
         players.onLearned(name -> Thread.ofVirtual().start(() -> pushJoinLists(store, supervisor, null)));
-        var discord = new DiscordBot(config, store, access, supervisor, events);
-        var web = new WebServer(config, store, accounts, supervisor, events, settings, access, discord);
+        var pearls = new PearlService(config, supervisor, settings);
+        var history = new PlayerHistory(config);
+        supervisor.setPlayerEvents(history::record);
+        var discord = new DiscordBot(config, store, access, supervisor, events, pearls);
+        var web = new WebServer(config, store, accounts, supervisor, events, settings, access, discord, pearls, history);
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             LOG.info("Stopping instances...");

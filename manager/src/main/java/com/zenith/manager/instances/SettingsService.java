@@ -29,12 +29,18 @@ import java.util.concurrent.TimeUnit;
  */
 public final class SettingsService {
     private static final Logger LOG = LoggerFactory.getLogger("Settings");
-    /** Managed by the manager itself or meaningless in managed mode. */
+    /**
+     * Managed by the manager itself or meaningless in managed mode: grants replace Zenith's whitelist,
+     * the login rate limiter is forced off, the lobby needs the instance's server on and there is no database.
+     * Paths in {@link ConfigComposer#ALWAYS_FORCED} are left out too.
+     */
     private static final List<String> HIDDEN_PREFIXES = List.of(
         "authentication.", "discord.", "server.bind.", "client.server.",
-        "database.", "plugins."
+        "database.", "plugins.", "server.extra.whitelist.", "server.loginRateLimiter."
     );
-    private static final Set<String> HIDDEN = Set.of("warning", "server.upnp", "server.proxyIP", "debug.lockFile");
+    private static final Set<String> HIDDEN = Set.of(
+        "warning", "server.enabled", "debug.lockFile", "client.extra.chat.ignoreReplace2b2tChatCommandWhileDatabaseOn"
+    );
     /** What Zenith reports to Discord and when it pings; the manager's bot posts it. */
     private static final List<String> DISCORD_VISIBLE_PREFIXES = List.of(
         "discord.mentionRoleOn", "discord.mentionOn", "discord.reportCoords", "discord.clientConnectionMessages", "discord.mcVersionMismatchWarning", "discord.notifications."
@@ -132,7 +138,7 @@ public final class SettingsService {
 
     private static boolean hidden(String path) {
         if (path.startsWith("discord.") && DISCORD_VISIBLE_PREFIXES.stream().anyMatch(path::startsWith)) return false;
-        return HIDDEN.contains(path) || HIDDEN_PREFIXES.stream().anyMatch(path::startsWith);
+        return HIDDEN.contains(path) || ConfigComposer.ALWAYS_FORCED.contains(path) || HIDDEN_PREFIXES.stream().anyMatch(path::startsWith);
     }
 
     private JsonObject defaults() {
@@ -149,6 +155,13 @@ public final class SettingsService {
      * Everything a settings page needs: values in effect, what this layer inherits, this layer's own overrides,
      * which layer each value comes from, and the values the manager controls.
      */
+    /** One setting as an instance uses it: live while it runs, otherwise as composed from the layers. */
+    public synchronized JsonElement effective(String instanceId, String path) {
+        var live = supervisor.isRunning(instanceId) ? tryLiveConfig(instanceId) : null;
+        var config = live != null ? live : ConfigComposer.compose(defaults(), supervisor.context(instanceId));
+        return Json.get(config, path);
+    }
+
     public synchronized JsonObject view(Scope scope, String id) throws Exception {
         var schema = schema();
         var defaults = defaults();

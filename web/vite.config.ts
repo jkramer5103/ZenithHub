@@ -21,7 +21,8 @@ export default defineConfig({
 	],
 	server: {
 		proxy: {
-			'/api': { target: manager, ws: true, changeOrigin: true }
+			// Preserve Host so the manager can validate the browser's WebSocket Origin.
+			'/api': { target: manager, ws: true, changeOrigin: false }
 		}
 	}
 });

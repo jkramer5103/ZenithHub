@@ -225,6 +225,13 @@ public final class Supervisor {
         return status != null && status.get("connected").getAsBoolean();
     }
 
+    /** Inventory, pathfinder, replay and tasks of a running instance. */
+    public JsonObject details(String instanceId) throws IOException, InterruptedException {
+        var response = http.send(request(runtime(instanceId), "/v1/details").timeout(Duration.ofSeconds(10)).GET().build(),
+            HttpResponse.BodyHandlers.ofString());
+        return controlResponse(response);
+    }
+
     /** The config the running instance is using right now, including changes made in-game. */
     public JsonObject liveConfig(String instanceId) throws IOException, InterruptedException {
         var response = http.send(request(runtime(instanceId), "/v1/config").timeout(Duration.ofSeconds(10)).GET().build(),
@@ -440,6 +447,7 @@ public final class Supervisor {
                             case "log" -> appendLog(rt, str(json, "logger"), str(json, "level"), str(json, "text"), str(json, "ansi"), json.get("ts").getAsLong());
                             // what Zenith's own Discord bot would have posted
                             case "notification" -> events.publish(json.get("type").getAsString(), rt.instanceId, json);
+                            case "player" -> playerEvents.accept(rt.instanceId, json);
                             default -> {}
                         }
                     });
@@ -530,6 +538,13 @@ public final class Supervisor {
 
     public void setJoinLists(java.util.function.Function<String, ConfigComposer.JoinLists> provider) {
         this.joinLists = provider;
+    }
+
+    /** Players joining and leaving through the proxy (instance id, Zenith's event). */
+    private volatile java.util.function.BiConsumer<String, JsonObject> playerEvents = (id, event) -> {};
+
+    public void setPlayerEvents(java.util.function.BiConsumer<String, JsonObject> listener) {
+        this.playerEvents = listener;
     }
 
     private void setDesiredRunning(String instanceId, boolean running) {

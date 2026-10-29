@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { api } from '#lib/api.js';
 	import { app } from '#lib/app.svelte.js';
-		import { catalog, curatedPaths, humanize, humanizeEnum, type Field, type Group, type Section } from '#lib/settings-catalog.js';
+	import { catalog, curatedPaths, humanize, humanizeEnum, type Field, type Group, type Section } from '#lib/settings-catalog.js';
 	import { matchedWords, parseQuery, score, type Haystack } from '#lib/settings-search.js';
 	import { toasts } from '#lib/toast.svelte.js';
 	import type { SettingScope, SettingsView } from '#lib/types.js';
 	import { Check, Code, Lock, LoaderCircle, RotateCcw, Search, ShieldOff, X } from '@lucide/svelte';
-		import Highlight from './Highlight.svelte';
+	import Highlight from './Highlight.svelte';
 	import SettingRow from './SettingRow.svelte';
 	import Switch from './Switch.svelte';
 
@@ -17,6 +17,14 @@
 	let pending = $state(0);
 	let query = $state('');
 	let onlyChanged = $state(false);
+
+	// rarely changed settings stay out of the way until asked for, remembered per browser
+	const ADVANCED_KEY = 'settingsAdvanced';
+	let showAdvanced = $state(typeof localStorage !== 'undefined' && localStorage.getItem(ADVANCED_KEY) === '1');
+	function setShowAdvanced(on: boolean) {
+		showAdvanced = on;
+		localStorage.setItem(ADVANCED_KEY, on ? '1' : '0');
+	}
 
 	async function load() {
 		try {
@@ -80,10 +88,18 @@
 		];
 	}
 
+	/** advanced settings are hidden while the switch is off, except in search results and the changed filter */
+	const includeAdvanced = $derived(showAdvanced || searching || onlyChanged);
+	/** tag advanced settings that are only shown because of a search or the changed filter */
+	const tagAdvanced = $derived(!showAdvanced);
+
 	function fieldScore(f: Field, section: Section, group: Group) {
 		if (!view || !(f.path in view.schema)) return 0;
 		if (onlyChanged && view.sources[f.path] !== scope) return 0;
-		return score(search, [...fieldText(f), ...sectionText(group, section)]);
+		if (f.advanced && !includeAdvanced) return 0;
+		// with advanced settings hidden, common ones rank first
+		const s = score(search, [...fieldText(f), ...sectionText(group, section)]);
+		return f.advanced && tagAdvanced ? s * 0.85 : s;
 	}
 
 	function shownByCondition(f: Field) {
@@ -106,6 +122,7 @@
 		for (const group of catalog) {
 			const results: SectionResult[] = [];
 			for (const section of group.sections) {
+				if (section.advanced && !includeAdvanced) continue;
 				let scored = section.fields.map((f) => ({ f, s: fieldScore(f, section, group) })).filter((x) => x.s > 0);
 				if (searching) {
 					// when the section's name matches, keep only its settings whose own wording (not their config path) matches a word, if any do
@@ -114,8 +131,9 @@
 				}
 				if (searching) scored.sort((a, b) => b.s - a.s);
 				const hasToggle = !!section.toggle && section.toggle in v.schema;
-				const toggleScore =
+				let toggleScore =
 					hasToggle && (!onlyChanged || v.sources[section.toggle!] === scope) ? score(search, sectionText(group, section)) : 0;
+				if (section.advanced && tagAdvanced) toggleScore *= 0.85;
 				if (!scored.length && !toggleScore) continue;
 				results.push({ section, fields: scored.map((x) => x.f), score: Math.max(toggleScore, ...scored.map((x) => x.s)) });
 			}
@@ -182,18 +200,23 @@
 
 <svelte:window onkeydown={onKeydown} />
 
+{#snippet advancedTag()}
+	<span class="rounded bg-zinc-800 px-1.5 py-px text-[11px] font-medium text-zinc-400">Advanced</span>
+{/snippet}
+
 {#snippet sectionCard(section: Section, matched: Field[])}
 	{@const v = view!}
 	{@const hasToggle = !!section.toggle && section.toggle in v.schema}
 	{@const enabled = !hasToggle || v.values[section.toggle!] === true}
 	{@const toggleForced = hasToggle && v.sources[section.toggle!] === 'forced'}
 	{@const toggleChanged = hasToggle && v.sources[section.toggle!] === scope}
-		{@const fields = matched.filter(shownByCondition)}
+	{@const fields = matched.filter(shownByCondition)}
 	<section class="card" id="settings-{section.id}">
 		<div class="flex items-start gap-4 p-4">
 			<div class="min-w-0 flex-1">
 				<div class="flex flex-wrap items-center gap-2">
 					<h3 class="font-medium"><Highlight text={section.title} query={search} /></h3>
+					{#if section.advanced && tagAdvanced}{@render advancedTag()}{/if}
 					{#if toggleChanged}
 						<span class="rounded bg-emerald-950 px-1.5 py-px text-[11px] font-medium text-emerald-300">Changed</span>
 						<button
@@ -234,7 +257,8 @@
 						{scope}
 						type={v.schema[field.path]}
 						value={v.values[field.path]}
-												source={v.sources[field.path]}
+						source={v.sources[field.path]}
+						advanced={!!field.advanced && !section.advanced && tagAdvanced}
 						query={search}
 						onset={(value) => set(field.path, value)}
 						onreset={() => reset(field.path)}
@@ -279,27 +303,27 @@
 		</nav>
 
 		<div class="min-w-0 space-y-8">
-							<div class="sticky top-14 z-20 -mx-1 space-y-2 bg-zinc-950 px-1 py-2">
-					<div class="flex flex-wrap items-center gap-2">
-					<div class="relative min-w-0 flex-1">
+			<div class="sticky top-14 z-20 -mx-1 space-y-2 bg-zinc-950 px-1 py-2">
+				<div class="flex flex-wrap items-center gap-2">
+					<div class="relative min-w-0 flex-1 basis-full sm:basis-0">
 						<Search size={16} class="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-zinc-500" />
 						<input
-								bind:this={searchInput}
-								type="search"
-								class="input pr-16 pl-9 [&::-webkit-search-cancel-button]:hidden"
-								placeholder="Search settings"
-								autocomplete="off"
-								spellcheck="false"
-								bind:value={query}
-								onkeydown={onSearchKeydown}
-								aria-label="Search settings"
-							/>
-							{#if !query}
-								<kbd
-									class="pointer-events-none absolute top-1/2 right-2.5 hidden -translate-y-1/2 rounded border border-zinc-700 px-1.5 font-mono text-[11px] text-zinc-500 sm:block"
-									>/</kbd
-								>
-							{/if}
+							bind:this={searchInput}
+							type="search"
+							class="input pr-16 pl-9 [&::-webkit-search-cancel-button]:hidden"
+							placeholder="Search settings"
+							autocomplete="off"
+							spellcheck="false"
+							bind:value={query}
+							onkeydown={onSearchKeydown}
+							aria-label="Search settings"
+						/>
+						{#if !query}
+							<kbd
+								class="pointer-events-none absolute top-1/2 right-2.5 hidden -translate-y-1/2 rounded border border-zinc-700 px-1.5 font-mono text-[11px] text-zinc-500 sm:block"
+								>/</kbd
+							>
+						{/if}
 						{#if query}
 							<button
 								class="absolute top-1/2 right-2 -translate-y-1/2 rounded p-1 text-zinc-500 hover:text-zinc-200"
@@ -318,13 +342,33 @@
 							{changedCount} changed
 						</button>
 					{/if}
+					<button
+						type="button"
+						role="switch"
+						aria-checked={showAdvanced}
+						class="btn gap-2.5 border px-3 py-2 text-sm whitespace-nowrap {showAdvanced
+							? 'border-emerald-700 bg-emerald-950/60 text-emerald-200'
+							: 'border-zinc-700 text-zinc-300 hover:bg-zinc-900'}"
+						title="Also show settings that are rarely changed"
+						onclick={() => setShowAdvanced(!showAdvanced)}
+					>
+						<span
+							class="relative inline-flex h-4 w-7 shrink-0 items-center rounded-full transition-colors {showAdvanced
+								? 'bg-emerald-600'
+								: 'bg-zinc-700'}"
+							aria-hidden="true"
+						>
+							<span class="inline-block size-3 rounded-full bg-white shadow transition-transform {showAdvanced ? 'translate-x-3.5' : 'translate-x-0.5'}"></span>
+						</span>
+						Show advanced settings
+					</button>
 				</div>
-									<p class="flex items-center gap-1.5 text-xs text-zinc-500">
-						{#if searching}
-							{matchCount
-								? `${matchCount} matching setting${matchCount === 1 ? '' : 's'}. Press Enter to jump to the best match.`
-								: ''}
-						{:else if pending}
+				<p class="flex items-center gap-1.5 text-xs text-zinc-500">
+					{#if searching}
+						{matchCount
+							? `${matchCount} matching setting${matchCount === 1 ? '' : 's'}. Press Enter to jump to the best match.`
+							: ''}
+					{:else if pending}
 						<LoaderCircle size={13} class="animate-spin" /> Saving…
 					{:else}
 						<Check size={13} class="text-emerald-500" /> Saved. {applyNote}
