@@ -57,6 +57,9 @@ Run prettier only on `.ts` files. No Svelte plugin is installed, so it fails on 
 
 ## Git
 
-- `origin` is this fork (jkramer5103/ZenithProxy) and `upstream` is rfresh2/ZenithProxy. Merge
-  upstream into `1.21.4` to pick up bot fixes.
+- One branch: `main`. Zenith's native version is 1.21.4 and ViaVersion covers every other version in
+  both directions, so there are no per-version branches like upstream's.
+- `origin` is this repo (jkramer5103/ZenithProxy) and `upstream` is rfresh2/ZenithProxy. Merge
+  `upstream/1.21.4` into `main` to pick up bot fixes. If the native version ever has to move
+  (e.g. 2b2t switches versions), merge upstream's newer version branch into `main` instead.
 - Commit only when asked.
