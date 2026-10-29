@@ -4,8 +4,6 @@ import com.zenith.network.client.ClientSession;
 import com.zenith.network.codec.PacketHandler;
 import org.geysermc.mcprotocollib.protocol.packet.ingame.serverbound.ServerboundChatCommandSignedPacket;
 
-import java.util.BitSet;
-
 import static com.zenith.Globals.CACHE;
 
 public class OutgoingChatCommandSignedHandler implements PacketHandler<ServerboundChatCommandSignedPacket, ClientSession> {
@@ -17,8 +15,9 @@ public class OutgoingChatCommandSignedHandler implements PacketHandler<Serverbou
         packet.setTimeStamp(packetTime);
         CACHE.getChatCache().setLastChatTimestamp(packetTime);
         if (CACHE.getChatCache().canUseChatSigning()) {
-            var signedCommand = new ServerboundChatCommandSignedPacket(packet.getCommand(), packet.getTimeStamp(), 0, packet.getSignatures(), 0, BitSet.valueOf(new byte[20]));
-            CACHE.getChatCache().getChatSession().sign(signedCommand);
+            var lastSeen = CACHE.getChatCache().getLastSeenMessages().generateAndApplyUpdate();
+            var signedCommand = new ServerboundChatCommandSignedPacket(packet.getCommand(), packet.getTimeStamp(), OutgoingChatHandler.SALT.nextLong(), packet.getSignatures(), lastSeen.offset(), lastSeen.acknowledged());
+            CACHE.getChatCache().getChatSession().sign(signedCommand, lastSeen.signatures());
             return signedCommand;
         }
         return packet;

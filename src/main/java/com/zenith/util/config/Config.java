@@ -81,7 +81,41 @@ public final class Config {
         public final Inventory inventory = new Inventory();
         public final ChatSchemas chatSchemas = new ChatSchemas();
         public final KeepAliveHandling keepAliveHandling = new KeepAliveHandling();
+        public final Privacy privacy = new Privacy();
         public double tickRate = 1.0;
+
+        /**
+         * What the server can learn about this connection.
+         * The first block makes the bot answer like a vanilla client and is on by default.
+         * The second block filters what connected players' clients reveal (like the OpSec mod) and is off by default.
+         */
+        public static final class Privacy {
+            // settings a fresh vanilla install sends (en_us, all particles, listed), with a view distance
+            // and main hand picked once per account. Off: Zenith's old fixed settings
+            public boolean vanillaClientInfo = true;
+            public String clientLocale = "en_us";
+            // keep the bot's settings when a player connects instead of switching to theirs and back
+            public boolean steadyClientInfo = true;
+            // answer keep alives and pings after a short random delay, like a client's game thread does
+            public boolean humanResponseDelay = true;
+            // download server resource packs (with a cache) and report each step when it actually happens
+            public boolean downloadResourcePacks = true;
+            // carry the player's momentum and ground state over when the bot takes over
+            public boolean smoothHandoff = true;
+
+            // drop connected players' plugin channel messages (mod channels, brand), so the server only sees vanilla
+            public boolean vanillaSpoof = false;
+            // never store server cookies, answer every request with "not set"
+            public boolean blockCookies = false;
+            // refuse resource packs hosted on, or redirecting to, local or private addresses
+            public boolean blockLocalPackUrls = false;
+            // leave the username, UUID and client version out of resource pack downloads
+            public boolean scrubPackHeaders = false;
+            // answer sign and anvil translation probes the way a vanilla client with default keybinds would
+            public boolean translationProbeProtection = false;
+            // hide player skins and capes that aren't hosted by Mojang from connected players
+            public boolean trustedSkinHostsOnly = false;
+        }
 
         public static final class KeepAliveHandling {
             public KeepAliveMode keepAliveMode = KeepAliveMode.PASSTHROUGH;
@@ -122,6 +156,8 @@ public final class Config {
         }
 
         public static final class Ping {
+            // vanilla only sends ping requests while its debug ping chart is open; without them the ping comes from the tab list
+            public boolean sendPingRequests = false;
             public int pingIntervalSeconds = 5;
             public int pingQueueTimeoutMs = 2000;
         }

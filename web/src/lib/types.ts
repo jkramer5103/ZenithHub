@@ -318,6 +318,26 @@ export interface InstanceDetails {
 	/** the Tasks module is on; tasks only run when it is */
 	tasksEnabled?: boolean;
 	waypoints: Waypoint[];
+	/** what the server can see of the bot's client, while it's connected */
+	fingerprint?: Fingerprint;
+}
+
+export interface Fingerprint {
+	brand: string;
+	clientVersion: string;
+	serverVersion: string;
+	locale: string;
+	viewDistance: number;
+	mainHand: 'left' | 'right';
+	allowsListing: boolean;
+	chatSigning: 'signed' | 'unavailable' | 'off';
+	ping: number;
+	pingSource: 'tablist' | 'requests';
+	tickAlignedReplies: boolean;
+	knownPacks: boolean;
+	cookies: number;
+	resourcePacks: number;
+	downloadsResourcePacks: boolean;
 }
 
 export interface Pearl {

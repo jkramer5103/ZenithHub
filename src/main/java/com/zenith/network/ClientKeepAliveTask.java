@@ -28,7 +28,9 @@ public class ClientKeepAliveTask implements Runnable {
             // so at that point, this task is the only thing that can get us unstuck
             var timeout = Proxy.getInstance().hasActivePlayer()
                 ? CONFIG.client.keepAliveHandling.keepAliveQueueTimeoutMs
-                : 10; // try to get unstuck asap, can't be zero so we can account for normal responding time
+                // try to get unstuck asap, can't be zero so we can account for normal responding time
+                // with tick aligned replies the next tick sends it, this only covers the time before ticks start
+                : CONFIG.client.privacy.humanResponseDelay ? 75 : 10;
             if (elapsed >= timeout) {
                 keepAliveQueue.forEach(r -> {
                     CLIENT_LOG.debug("Sending timed out KeepAlive: {} queue size: {}", r, keepAliveQueue.size());

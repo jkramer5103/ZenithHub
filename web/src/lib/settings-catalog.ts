@@ -4,6 +4,7 @@ import {
 	Bot,
 	MapPin,
 	Cable,
+	EyeOff,
 	Heart,
 	MessageSquare,
 	Network,
@@ -1567,6 +1568,95 @@ export const catalog: Group[] = [
 		]
 	},
 	{
+		id: 'privacy',
+		title: 'Privacy',
+		icon: EyeOff,
+		sections: [
+			{
+				id: 'vanillaClient',
+				title: 'Look like a normal client',
+				description: 'What the server can tell about the account’s client. All on by default.',
+				fields: [
+					{
+						path: 'client.privacy.vanillaClientInfo',
+						label: 'Send a regular player’s game settings',
+						help: 'Language, view distance, main hand and particles like a normal install, picked once per account. Off sends the old proxy settings: 25 chunks, minimal particles, hidden from the server list.'
+					},
+					{
+						path: 'client.privacy.clientLocale',
+						label: 'Game language',
+						placeholder: 'en_us',
+						showIf: 'client.privacy.vanillaClientInfo',
+						help: 'The language the server sees, like en_us or de_de.'
+					},
+					{
+						path: 'client.privacy.steadyClientInfo',
+						label: 'Keep the account’s settings while you play',
+						help: 'Otherwise your own client’s language and view distance replace the account’s whenever you connect, a switch the server can notice.'
+					},
+					{
+						path: 'client.privacy.humanResponseDelay',
+						label: 'Answer pings on the next game tick',
+						help: 'A real client answers keep-alives and pings with its next tick, not instantly.'
+					},
+					{
+						path: 'client.privacy.downloadResourcePacks',
+						label: 'Download server resource packs',
+						help: 'Downloads packs like the game does and reports them loaded after a realistic delay. Off reports them loaded straight away without downloading.'
+					},
+					{
+						path: 'client.privacy.smoothHandoff',
+						label: 'Keep moving when the bot takes over',
+						help: 'When you leave mid-jump or mid-walk, the bot carries on with your momentum instead of stopping dead in the air.'
+					},
+					{
+						path: 'client.ping.sendPingRequests',
+						label: 'Measure ping with extra requests',
+						advanced: true,
+						help: 'The game only sends these while its debug ping chart is open. Off takes the ping from the server’s player list.'
+					}
+				]
+			},
+			{
+				id: 'extraProtection',
+				title: 'Extra protection',
+				description: 'Off by default. Ideas borrowed from the OpSec mod, mostly protecting your own client while you play through the account.',
+				fields: [
+					{
+						path: 'client.privacy.vanillaSpoof',
+						label: 'Hide your client’s mods',
+						help: 'Drops the mod channels your client announces while you play, so the server sees an unmodded game.'
+					},
+					{
+						path: 'client.privacy.blockCookies',
+						label: 'Block server cookies',
+						help: 'Servers can store cookies and read them back after a transfer to recognise a client. Blocked cookies are never stored and always read back empty.'
+					},
+					{
+						path: 'client.privacy.blockLocalPackUrls',
+						label: 'Block resource packs from private networks',
+						help: 'Refuses packs hosted on a local network address like 192.168.x.x, which servers use to scan your network. Not applied while the server itself is local.'
+					},
+					{
+						path: 'client.privacy.scrubPackHeaders',
+						label: 'Hide the account in pack downloads',
+						help: 'Pack downloads send a placeholder name and UUID instead of the account’s.'
+					},
+					{
+						path: 'client.privacy.translationProbeProtection',
+						label: 'Answer sign probes like vanilla',
+						help: 'Servers hide translation keys and keybinds in signs to spot mods and changed keys from what your client shows. The proxy sends back what an unmodded English client with default keys would.'
+					},
+					{
+						path: 'client.privacy.trustedSkinHostsOnly',
+						label: 'Only load skins from Mojang',
+						help: 'Removes skins and capes hosted anywhere else, which could log your IP.'
+					}
+				]
+			}
+		]
+	},
+	{
 		id: 'network',
 		title: 'Network',
 		icon: Network,
@@ -1598,7 +1688,13 @@ export const catalog: Group[] = [
 						placeholder: '0.0.0.0',
 						help: 'The network interface to connect from. 0.0.0.0 picks automatically.'
 					},
-					{ path: 'client.ping.pingIntervalSeconds', label: 'Measure ping every', unit: 'seconds', min: 1 },
+					{
+						path: 'client.ping.pingIntervalSeconds',
+						label: 'Measure ping every',
+						unit: 'seconds',
+						min: 1,
+						showIf: 'client.ping.sendPingRequests'
+					},
 					{ path: 'client.ping.pingQueueTimeoutMs', label: 'Ping timeout in the queue', unit: 'ms', min: 1 },
 					{
 						path: 'client.keepAliveHandling.keepAliveMode',

@@ -267,7 +267,8 @@ public class ServerSession extends TcpServerSession {
             Proxy.getInstance().getSpectatorConnections().forEach(s -> {
                 s.sendAsyncAlert("<red>" + getName() + " disconnected from controlling player");
             });
-            Proxy.getInstance().getClient().sendAsync(CACHE.getClientInfoCache().getClientInfoPacket());
+            if (!CONFIG.client.privacy.steadyClientInfo)
+                Proxy.getInstance().getClient().sendAsync(CACHE.getClientInfoCache().getClientInfoPacket());
         } else {
             SERVER_LOG.info("Spectator disconnected: UUID: {}, Username: {}, Address: {}, Reason {}",
                 getUUID(),

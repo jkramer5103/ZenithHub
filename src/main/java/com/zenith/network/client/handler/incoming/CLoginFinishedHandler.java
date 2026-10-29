@@ -19,6 +19,7 @@ public class CLoginFinishedHandler implements PacketHandler<ClientboundLoginFini
         session.send(new ServerboundLoginAcknowledgedPacket());
         session.switchOutboundState(ProtocolState.CONFIGURATION);
         session.send(new ServerboundCustomPayloadPacket(Key.key("minecraft", "brand"), BrandSerializer.serializeBrand("vanilla")));
+        CACHE.getClientInfoCache().applyDefaults();
         session.send(CACHE.getClientInfoCache().getClientInfoPacket());
         return null;
     }

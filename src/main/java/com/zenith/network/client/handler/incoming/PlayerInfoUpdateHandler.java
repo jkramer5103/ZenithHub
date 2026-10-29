@@ -7,6 +7,7 @@ import org.geysermc.mcprotocollib.protocol.packet.ingame.clientbound.Clientbound
 import org.jspecify.annotations.NonNull;
 
 import static com.zenith.Globals.CACHE;
+import static com.zenith.Globals.CONFIG;
 import static com.zenith.Globals.EVENT_BUS;
 import static org.geysermc.mcprotocollib.protocol.data.game.PlayerListEntryAction.*;
 
@@ -34,6 +35,10 @@ public class PlayerInfoUpdateHandler implements ClientEventLoopPacketHandler<Cli
                     e.setListed(entry.isListed());
                 if (packet.getActions().contains(UPDATE_LATENCY)) {
                     e.setLatency(entry.getLatency());
+                    // the server's own measurement, used when we don't send ping requests ourselves
+                    var self = CACHE.getProfileCache().getProfile();
+                    if (!CONFIG.client.ping.sendPingRequests && self != null && entry.getProfileId().equals(self.getId()))
+                        session.setPing(entry.getLatency());
                 }
                 if (packet.getActions().contains(UPDATE_DISPLAY_NAME))
                     e.setDisplayName(entry.getDisplayName());

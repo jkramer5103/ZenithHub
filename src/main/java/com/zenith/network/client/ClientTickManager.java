@@ -135,6 +135,8 @@ public class ClientTickManager {
     private void tick() {
         try {
             long before = System.currentTimeMillis();
+            var client = Proxy.getInstance().getClient();
+            if (client != null) client.flushTickAlignedReplies();
             EVENT_BUS.post(ClientTickEvent.INSTANCE);
             if (doBotTicks.get()) {
                 EVENT_BUS.post(ClientBotTick.INSTANCE);

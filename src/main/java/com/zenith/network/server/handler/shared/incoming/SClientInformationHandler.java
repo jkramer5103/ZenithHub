@@ -4,6 +4,8 @@ import com.zenith.network.codec.PacketHandler;
 import com.zenith.network.server.ServerSession;
 import org.geysermc.mcprotocollib.protocol.packet.common.serverbound.ServerboundClientInformationPacket;
 
+import static com.zenith.Globals.CONFIG;
+
 public class SClientInformationHandler implements PacketHandler<ServerboundClientInformationPacket, ServerSession> {
     public static final SClientInformationHandler INSTANCE = new SClientInformationHandler();
     @Override
@@ -17,6 +19,7 @@ public class SClientInformationHandler implements PacketHandler<ServerboundClien
             .setTextFilteringEnabled(packet.isTextFilteringEnabled())
             .setAllowsListing(packet.isAllowsListing())
             .setParticleStatus(packet.getParticleStatus());
-        return packet;
+        // the server would see the settings change the moment someone takes over
+        return CONFIG.client.privacy.steadyClientInfo ? null : packet;
     }
 }

@@ -17,14 +17,14 @@ public class CKeepAliveHandler implements PacketHandler<ClientboundKeepAlivePack
         CACHE.getPlayerCache().getKeepAliveQueue().add(new PlayerCache.KeepAliveRequest(System.nanoTime(), packet.getPingId()));
         return switch (CONFIG.client.keepAliveHandling.keepAliveMode) {
             case INDEPENDENT -> {
-                session.sendAsync(new ServerboundKeepAlivePacket(packet.getPingId()));
+                session.sendTickAligned(new ServerboundKeepAlivePacket(packet.getPingId()));
                 yield null;
             }
             case PASSTHROUGH -> {
                 if (Proxy.getInstance().hasActivePlayer()) {
                     yield packet;
                 } else {
-                    session.sendAsync(new ServerboundKeepAlivePacket(packet.getPingId()));
+                    session.sendTickAligned(new ServerboundKeepAlivePacket(packet.getPingId()));
                     yield null;
                 }
             }

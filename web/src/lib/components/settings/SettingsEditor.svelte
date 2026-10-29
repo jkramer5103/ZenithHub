@@ -4,6 +4,7 @@
 	import { catalog, curatedPaths, humanize, humanizeEnum, type Field, type Group, type Section } from '#lib/settings-catalog.js';
 	import { matchedWords, parseQuery, score, type Haystack } from '#lib/settings-search.js';
 	import { toasts } from '#lib/toast.svelte.js';
+	import { tick } from 'svelte';
 	import type { SettingScope, SettingsView } from '#lib/types.js';
 	import { Check, Code, Lock, LoaderCircle, RotateCcw, Search, ShieldOff, X } from '@lucide/svelte';
 	import Highlight from './Highlight.svelte';
@@ -34,7 +35,12 @@
 			loadError = e instanceof Error ? e.message : String(e);
 		}
 	}
-	load();
+	// a link like ?tab=settings#settings-privacy opens at that group once the settings are shown
+	load().then(async () => {
+		if (!location.hash.startsWith('#settings-')) return;
+		await tick();
+		scrollTo(location.hash.slice('#settings-'.length), 'instant');
+	});
 
 	// one request at a time, so responses can't arrive out of order
 	let queue: Promise<void> = Promise.resolve();
@@ -183,8 +189,13 @@
 		}
 	}
 
-	function scrollTo(id: string) {
-		document.getElementById(`settings-${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+	let toolbar = $state<HTMLElement>();
+	function scrollTo(id: string, behavior: ScrollBehavior = 'smooth') {
+		const el = document.getElementById(`settings-${id}`);
+		if (!el) return;
+		// just below the sticky search bar, which wraps to two rows on phones
+		const covered = toolbar ? parseFloat(getComputedStyle(toolbar).top) + toolbar.offsetHeight : 0;
+		window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - covered - 8, behavior });
 	}
 
 	const applyNote = $derived(
@@ -303,7 +314,7 @@
 		</nav>
 
 		<div class="min-w-0 space-y-8">
-			<div class="sticky top-14 z-20 -mx-1 space-y-2 bg-zinc-950 px-1 py-2">
+			<div bind:this={toolbar} class="sticky top-14 z-20 -mx-1 space-y-2 bg-zinc-950 px-1 py-2">
 				<div class="flex flex-wrap items-center gap-2">
 					<div class="relative min-w-0 flex-1 basis-full sm:basis-0">
 						<Search size={16} class="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-zinc-500" />

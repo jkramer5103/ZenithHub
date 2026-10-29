@@ -32,7 +32,7 @@ public class ChatSession {
     protected MinecraftPlayerCertificates playerCertificates;
     protected int chainIndex = 0;
 
-    public void sign(ServerboundChatPacket packet) {
+    public void sign(ServerboundChatPacket packet, List<byte[]> lastSeen) {
         try {
             Signature signature = Signature.getInstance("SHA256withRSA");
             signature.initSign(playerCertificates.getKeyPair().getPrivate());
@@ -48,8 +48,9 @@ public class ChatSession {
             var bs = packet.getMessage().getBytes(StandardCharsets.UTF_8);
             signature.update(Ints.toByteArray(bs.length));
             signature.update(bs);
-            // last seen messages list (always empty)
-            signature.update(Ints.toByteArray(0));
+            // last seen messages
+            signature.update(Ints.toByteArray(lastSeen.size()));
+            for (var seen : lastSeen) signature.update(seen);
             var sign = signature.sign();
             packet.setSignature(sign);
         } catch (Exception e) {
@@ -57,7 +58,7 @@ public class ChatSession {
         }
     }
 
-    public void sign(final ServerboundChatCommandSignedPacket packet) {
+    public void sign(final ServerboundChatCommandSignedPacket packet, List<byte[]> lastSeen) {
         try {
             var parsedSignableNode = parseSignableCommand(packet.getCommand());
             if (parsedSignableNode == null) return;
@@ -79,8 +80,9 @@ public class ChatSession {
             var bs = msg.getBytes(StandardCharsets.UTF_8);
             signature.update(Ints.toByteArray(bs.length));
             signature.update(bs);
-            // last seen messages list (always empty)
-            signature.update(Ints.toByteArray(0));
+            // last seen messages
+            signature.update(Ints.toByteArray(lastSeen.size()));
+            for (var seen : lastSeen) signature.update(seen);
             var sign = signature.sign();
             signatures.add(new ArgumentSignature(parsedSignableNode.getNode().getName(), sign));
             packet.setSignatures(signatures);

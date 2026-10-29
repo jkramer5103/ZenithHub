@@ -100,6 +100,25 @@ No commands needed anywhere: the console only shows in developer mode (user menu
 - [x] Discord linking with a one-time code (`/link CODE`, 10 minutes) from the user menu; unlink in the same dialog.
 - [x] Slash commands in an instance channel (`/status`, `/start`, `/stop`, `/connect`, `/disconnect`, `/command`, `/pearl`), checked against the linked user's capabilities.
 - Not yet tested against a live Discord server.
+- **Looking like a vanilla client** (fork changes in Zenith, 2026-10-29; settings under Settings → Privacy, `client.privacy.*`):
+  - On by default:
+    - Client settings like a fresh install (locale `client.privacy.clientLocale`, view distance 8/10/12/16 and main hand picked once per account from its name, particles all, server listing on). The bot's settings stay put while a player is connected (`steadyClientInfo`).
+    - Chat signing like vanilla: a random session ID, a random salt per message, and last-seen tracking (`cache/data/chat/LastSeenMessages`). Signed messages and commands include the acknowledgements, and a chat ack goes out every 64 messages. Before this, busy secure-chat servers could kick the bot for never acknowledging. Players' own chat acks are dropped, because Zenith re-signs their messages with its own session.
+    - Known packs: Zenith claims `minecraft:core:<native version>` when the server offers it and fills the entries the server leaves out from `mcdata/core-registries.bin.gz` (captured from Paper 1.21.4; `CoreRegistryData`). Through ViaVersion the server offers its own version's pack, so the reply stays empty, as from a vanilla client of our version.
+    - Cookies are stored and answered (`ClientCookies`), and a transfer reconnects with the TRANSFER intent and keeps them.
+    - Ping requests are off (`client.ping.sendPingRequests`), and the ping comes from the server's tab list.
+    - Keep-alive and ping replies go out at the start of the next client tick, not instantly.
+    - Resource packs are really downloaded (`ResourcePackDownloader`): vanilla's headers, redirects, a SHA-1 check, a 250 MB cap and a cache of the last 8 packs in `resource-packs/`. The statuses are spaced out like a download plus reload.
+    - When the bot takes over from a player it keeps their ground state and momentum (`PlayerCache.recordMove`, `smoothHandoff`).
+  - Off by default (ideas from the OpSec mod; `com.zenith.control.Privacy`):
+    - drop players' custom payloads (`vanillaSpoof`)
+    - block cookies
+    - refuse packs from private networks, also after redirects and in packs sent on to players, unless the server itself is local
+    - placeholder name and UUID in pack downloads
+    - answer sign translation/keybind probes with what an unmodded en_us client with default keys renders (`VanillaText`, using vanilla's full `mcdata/en_us.json.gz`)
+    - strip skins and capes not hosted on textures.minecraft.net from the tab list sent to players
+  - Not done: anvil rename probes.
+  - The Control tab's More view has a **What the server sees** card (CONTROL) from `/v1/details` → `fingerprint`, with a link to the Privacy settings (`?tab=settings#settings-privacy` scrolls to the group).
 
 ### Phase 5: Controls, pearls and tasks (done, 2026-10-29)
 Everything a user did with commands now has a UI, except lookups (seen, stats, …), plugins and map rendering, which aren't supported.

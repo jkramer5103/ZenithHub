@@ -11,10 +11,7 @@ public class PostOutgoingPlayerPositionHandler implements ClientEventLoopPacketH
 
     @Override
     public boolean applyAsync(ServerboundMovePlayerPosPacket packet, ClientSession session) {
-        CACHE.getPlayerCache()
-                .setX(packet.getX())
-                .setY(packet.getY())
-                .setZ(packet.getZ());
+        CACHE.getPlayerCache().recordMove(packet.getX(), packet.getY(), packet.getZ(), packet.isOnGround());
         SpectatorSync.syncPlayerPositionWithSpectators();
         return true;
     }

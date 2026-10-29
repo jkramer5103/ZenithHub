@@ -27,11 +27,12 @@ import org.geysermc.mcprotocollib.protocol.MinecraftProtocol;
 import org.geysermc.mcprotocollib.protocol.codec.MinecraftCodec;
 import org.geysermc.mcprotocollib.protocol.data.ProtocolState;
 import org.geysermc.mcprotocollib.protocol.data.game.chunk.PalettedWorldState;
-import org.geysermc.mcprotocollib.protocol.data.handshake.HandshakeIntent;
 import org.geysermc.mcprotocollib.protocol.packet.handshake.serverbound.ClientIntentionPacket;
 import org.geysermc.mcprotocollib.protocol.packet.login.serverbound.ServerboundHelloPacket;
 
 import java.time.Duration;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
 
 import static com.zenith.Globals.*;
@@ -63,6 +64,8 @@ public class ClientSession extends TcpClientSession {
     private int protocolVersionId;
     private static final ClientTickManager clientTickManager = new ClientTickManager();
     private PalettedWorldState palettedWorldState = createPalettedWorldState(1);
+    // keep alive and pong replies held until the next client tick, when a vanilla client's game thread would send them
+    private final Queue<Packet> tickAlignedReplies = new ConcurrentLinkedQueue<>();
 
     public ClientSession(String host, int port, String bindAddress, MinecraftProtocol protocol, ProxyInfo proxyInfo, TcpConnectionManager tcpManager) {
         super(host, port, bindAddress, 0, protocol, proxyInfo, tcpManager);
@@ -81,6 +84,20 @@ public class ClientSession extends TcpClientSession {
             wasOnline = true;
         }
         else clientTickManager.stopClientTicks();
+    }
+
+    /**
+     * Replies to the server's keep alives and pings like a vanilla client: on the next tick, or right away if
+     * {@code client.privacy.humanResponseDelay} is off.
+     */
+    public void sendTickAligned(final Packet packet) {
+        if (CONFIG.client.privacy.humanResponseDelay) tickAlignedReplies.add(packet);
+        else sendAsync(packet);
+    }
+
+    public void flushTickAlignedReplies() {
+        Packet packet;
+        while ((packet = tickAlignedReplies.poll()) != null) send(packet);
     }
 
     public void setDisconnected(final boolean disconnected) {
@@ -190,12 +207,13 @@ public class ClientSession extends TcpClientSession {
         CLIENT_LOG.info("Connected to {}!", getRemoteAddress());
         this.setDisconnected(false);
         switchInboundState(ProtocolState.LOGIN);
-        send(new ClientIntentionPacket(getPacketProtocol().getCodec().getProtocolVersion(), getHost(), getPort(), HandshakeIntent.LOGIN));
+        send(new ClientIntentionPacket(getPacketProtocol().getCodec().getProtocolVersion(), getHost(), getPort(), ClientCookies.startConnection(getHost(), getPort())));
         switchOutboundState(ProtocolState.LOGIN);
         updateClientProtocolVersion();
         EVENT_BUS.postAsync(new ClientConnectEvent());
         send(new ServerboundHelloPacket(profile.getName(), profile.getId()));
-        clientEventLoop.scheduleAtFixedRate(new ClientPacketPingTask(this), 0, CONFIG.client.ping.pingIntervalSeconds, TimeUnit.SECONDS);
+        if (CONFIG.client.ping.sendPingRequests)
+            clientEventLoop.scheduleAtFixedRate(new ClientPacketPingTask(this), 0, CONFIG.client.ping.pingIntervalSeconds, TimeUnit.SECONDS);
         clientEventLoop.scheduleAtFixedRate(new ClientKeepAliveTask(this), 0, 50, TimeUnit.MILLISECONDS);
         clientEventLoop.scheduleAtFixedRate(new ClientPongTask(this), 0, 50, TimeUnit.MILLISECONDS);
     }

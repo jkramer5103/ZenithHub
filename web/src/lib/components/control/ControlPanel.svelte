@@ -9,6 +9,7 @@
 	import { Backpack, Circle, Download, Ellipsis, HeartCrack, Navigation, Plug, Trash2, Users, Video } from '@lucide/svelte';
 	import ActivityBar from './ActivityBar.svelte';
 	import ConnectedPlayers from './ConnectedPlayers.svelte';
+	import FingerprintCard from './FingerprintCard.svelte';
 	import InteractCard from './InteractCard.svelte';
 	import InventoryGrid from './InventoryGrid.svelte';
 	import MovementCard from './MovementCard.svelte';
@@ -164,9 +165,14 @@
 			</section>
 		{:else}
 			<div class="grid items-start gap-4 lg:grid-cols-2">
-				{#if canPlay}
-					<InteractCard {instanceId} {details} onchanged={() => poller.refresh()} />
-				{/if}
+				<div class="space-y-4">
+					{#if canPlay}
+						<InteractCard {instanceId} {details} onchanged={() => poller.refresh()} />
+					{/if}
+					{#if canControl && details?.fingerprint}
+						<FingerprintCard fingerprint={details.fingerprint} />
+					{/if}
+				</div>
 				{#if canControl}
 					<div class="space-y-4">
 						<section class="card p-4">

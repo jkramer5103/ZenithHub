@@ -28,10 +28,15 @@ import com.zenith.feature.tasks.OnceContinuation;
 import com.zenith.mc.item.ItemRegistry;
 import com.zenith.module.impl.ReplayMod;
 import com.zenith.module.impl.Tasks;
+import com.zenith.network.client.ClientCookies;
+import com.zenith.network.client.ClientSession;
+import com.zenith.network.client.CoreRegistryData;
 import com.zenith.network.server.ServerSession;
 import com.zenith.util.ComponentSerializer;
 import org.geysermc.mcprotocollib.auth.GameProfile;
+import org.geysermc.mcprotocollib.protocol.codec.MinecraftCodec;
 import org.geysermc.mcprotocollib.protocol.data.game.PlayerListEntry;
+import org.geysermc.mcprotocollib.protocol.data.game.entity.player.HandPreference;
 import org.geysermc.mcprotocollib.protocol.data.game.item.component.DataComponentTypes;
 
 import java.io.IOException;
@@ -243,6 +248,32 @@ public final class ControlServer {
         }
         json.add("tasks", tasks);
         json.addProperty("tasksEnabled", CONFIG.client.extra.tasks.enabled);
+        var client = proxy.getClient();
+        if (proxy.isConnected() && client != null) json.add("fingerprint", fingerprint(client));
+        return json;
+    }
+
+    /** What the server can see of the client the bot pretends to be, for the web UI's privacy card. */
+    private JsonObject fingerprint(final ClientSession client) {
+        var privacy = CONFIG.client.privacy;
+        var json = new JsonObject();
+        json.addProperty("brand", "vanilla");
+        json.addProperty("clientVersion", MinecraftCodec.CODEC.getMinecraftVersion());
+        json.addProperty("serverVersion", client.getProtocolVersion().getName());
+        var info = CACHE.getClientInfoCache();
+        json.addProperty("locale", info.getLocale());
+        json.addProperty("viewDistance", info.getRenderDistance());
+        json.addProperty("mainHand", info.getHandPreference() == HandPreference.LEFT_HAND ? "left" : "right");
+        json.addProperty("allowsListing", info.isAllowsListing());
+        var chat = CACHE.getChatCache();
+        json.addProperty("chatSigning", chat.canUseChatSigning() ? "signed" : chat.isEnforcesSecureChat() ? "unavailable" : "off");
+        json.addProperty("ping", client.getPing());
+        json.addProperty("pingSource", CONFIG.client.ping.sendPingRequests ? "requests" : "tablist");
+        json.addProperty("tickAlignedReplies", privacy.humanResponseDelay);
+        json.addProperty("knownPacks", CoreRegistryData.available());
+        json.addProperty("cookies", ClientCookies.count());
+        json.addProperty("resourcePacks", CACHE.getConfigurationCache().getResourcePacks().size());
+        json.addProperty("downloadsResourcePacks", privacy.downloadResourcePacks);
         return json;
     }
 

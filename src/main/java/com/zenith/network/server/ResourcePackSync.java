@@ -1,6 +1,8 @@
 package com.zenith.network.server;
 
+import com.zenith.Proxy;
 import com.zenith.cache.data.config.ResourcePack;
+import com.zenith.network.client.ResourcePackDownloader;
 import com.zenith.event.player.PlayerConfigurationEvent;
 import lombok.Getter;
 import org.geysermc.mcprotocollib.protocol.packet.common.clientbound.ClientboundResourcePackPushPacket;
@@ -53,6 +55,12 @@ public class ResourcePackSync {
             EVENT_BUS.post(new PlayerConfigurationEvent.Exiting(session));
             session.sendAsync(new ClientboundFinishConfigurationPacket());
         } else {
+            var client = Proxy.getInstance().getClient();
+            if (client != null && ResourcePackDownloader.isBlockedLocalUrl(pack.url(), client)) {
+                SERVER_LOG.info("Not sending a resource pack from a private network to {}", session);
+                sendNext();
+                return;
+            }
             currentPackId = pack.id();
             session.sendAsync(new ClientboundResourcePackPushPacket(pack.id(), pack.url(), pack.hash(), false, pack.prompt()));
         }

@@ -33,6 +33,7 @@ public class ChatCache implements CachedData {
     protected boolean enforcesSecureChat = false;
     protected ChatSession chatSession = new ChatSession(UUID.randomUUID());
     protected @Nullable MinecraftPlayerCertificates playerCertificates;
+    protected LastSeenMessages lastSeenMessages = new LastSeenMessages();
 
     @Override
     public void getPackets(@NonNull final Consumer<Packet> consumer, final @NonNull TcpSession session) {
@@ -50,6 +51,7 @@ public class ChatCache implements CachedData {
         if (type == CacheResetType.FULL) {
             this.enforcesSecureChat = false;
             this.lastChatTimestamp = System.currentTimeMillis();
+            this.lastSeenMessages = new LastSeenMessages();
         }
     }
 
@@ -63,7 +65,9 @@ public class ChatCache implements CachedData {
     }
 
     public ChatSession startNewChatSession() {
-        this.chatSession = new ChatSession(UUID.fromString("00000000-0000-0000-0000-000000000000"));
+        // vanilla picks a random session id; a zero one gives Zenith away
+        this.chatSession = new ChatSession(UUID.randomUUID());
+        this.lastSeenMessages = new LastSeenMessages();
         if (this.playerCertificates == null) {
             CACHE_LOG.error("Initializing chat session without player certificates");
         }

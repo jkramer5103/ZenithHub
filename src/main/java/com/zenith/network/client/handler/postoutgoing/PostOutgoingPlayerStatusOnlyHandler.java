@@ -4,10 +4,12 @@ import com.zenith.network.client.ClientSession;
 import com.zenith.network.codec.ClientEventLoopPacketHandler;
 import org.geysermc.mcprotocollib.protocol.packet.ingame.serverbound.player.ServerboundMovePlayerStatusOnlyPacket;
 
+import static com.zenith.Globals.CACHE;
+
 public class PostOutgoingPlayerStatusOnlyHandler implements ClientEventLoopPacketHandler<ServerboundMovePlayerStatusOnlyPacket, ClientSession> {
     @Override
     public boolean applyAsync(final ServerboundMovePlayerStatusOnlyPacket packet, final ClientSession session) {
-        // todo: cache onground
+        CACHE.getPlayerCache().setOnGround(packet.isOnGround());
         return true;
     }
 }

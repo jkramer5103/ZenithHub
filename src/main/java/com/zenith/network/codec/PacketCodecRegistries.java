@@ -1,5 +1,6 @@
 package com.zenith.network.codec;
 
+import com.zenith.control.Privacy;
 import com.zenith.network.client.handler.incoming.*;
 import com.zenith.network.client.handler.incoming.entity.*;
 import com.zenith.network.client.handler.incoming.inventory.*;
@@ -27,6 +28,7 @@ import org.geysermc.mcprotocollib.protocol.codec.MinecraftPacket;
 import org.geysermc.mcprotocollib.protocol.data.ProtocolState;
 import org.geysermc.mcprotocollib.protocol.packet.common.clientbound.*;
 import org.geysermc.mcprotocollib.protocol.packet.common.serverbound.ServerboundClientInformationPacket;
+import org.geysermc.mcprotocollib.protocol.packet.common.serverbound.ServerboundCustomPayloadPacket;
 import org.geysermc.mcprotocollib.protocol.packet.common.serverbound.ServerboundKeepAlivePacket;
 import org.geysermc.mcprotocollib.protocol.packet.common.serverbound.ServerboundPongPacket;
 import org.geysermc.mcprotocollib.protocol.packet.common.serverbound.ServerboundResourcePackPacket;
@@ -53,6 +55,7 @@ import org.geysermc.mcprotocollib.protocol.packet.ingame.serverbound.inventory.S
 import org.geysermc.mcprotocollib.protocol.packet.ingame.serverbound.inventory.ServerboundSetCreativeModeSlotPacket;
 import org.geysermc.mcprotocollib.protocol.packet.ingame.serverbound.level.ServerboundAcceptTeleportationPacket;
 import org.geysermc.mcprotocollib.protocol.packet.ingame.serverbound.level.ServerboundMoveVehiclePacket;
+import org.geysermc.mcprotocollib.protocol.packet.ingame.serverbound.level.ServerboundSignUpdatePacket;
 import org.geysermc.mcprotocollib.protocol.packet.ingame.serverbound.level.ServerboundTeleportToEntityPacket;
 import org.geysermc.mcprotocollib.protocol.packet.ingame.serverbound.player.*;
 import org.geysermc.mcprotocollib.protocol.packet.login.clientbound.*;
@@ -267,6 +270,9 @@ public final class PacketCodecRegistries {
                 .inbound(ServerboundCommandSuggestionPacket.class, new CommandSuggestionHandler())
                 .inbound(ServerboundKeepAlivePacket.class, SPlayerKeepAliveHandler.INSTANCE)
                 .inbound(ServerboundSetCarriedItemPacket.class, new SSetCarriedItemHandler())
+                .inbound(ServerboundChatAckPacket.class, Privacy.DROP_CHAT_ACK)
+                .inbound(ServerboundCustomPayloadPacket.class, Privacy.VANILLA_SPOOF)
+                .inbound(ServerboundSignUpdatePacket.class, Privacy.SIGN_UPDATE)
                 .outbound(ClientboundCommandsPacket.class, new ClientCommandsOutgoingHandler())
                 .postOutbound(ClientboundLoginPacket.class, new LoginPostHandler())
                 .build())
@@ -340,6 +346,7 @@ public final class PacketCodecRegistries {
                 .outbound(ClientboundTabListPacket.class, new ServerTablistDataOutgoingHandler())
                 .outbound(ClientboundKeepAlivePacket.class, KeepAliveOutgoingHandler.INSTANCE)
                 .outbound(ClientboundPlayerChatPacket.class, new SPlayerChatOutgoingHandler())
+                .outbound(ClientboundPlayerInfoUpdatePacket.class, Privacy.TRUSTED_SKINS)
                 .outbound(ClientboundDeleteChatPacket.class, new SDeleteChatOutgoingHandler())
                 .outbound(ClientboundRespawnPacket.class, new SRespawnOutgoingHandler())
                 .postOutbound(ClientboundStartConfigurationPacket.class, new ClientStartConfigurationPostOutgoingHandler())

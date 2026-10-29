@@ -77,6 +77,10 @@ public class PlayerCache implements CachedData {
     protected float walkSpeed;
     protected boolean isSneaking = false;
     protected boolean isSprinting = false;
+    // from the last movement packets, so the bot can carry on moving when it takes over from a player
+    protected boolean onGround = true;
+    protected double lastMoveX, lastMoveY, lastMoveZ;
+    protected long lastMoveTime;
     protected EntityEvent opLevel = EntityEvent.PLAYER_OP_PERMISSION_LEVEL_0;
 //    protected AtomicInteger actionId = new AtomicInteger(0);
     private static final MutableVec3i DEFAULT_SPAWN_POSITION = new MutableVec3i(0, 0, 0);
@@ -123,6 +127,8 @@ public class PlayerCache implements CachedData {
     public void reset(CacheResetType type) {
         if (type == CacheResetType.FULL || type == CacheResetType.PROTOCOL_SWITCH) {
             this.thePlayer = (EntityPlayer) new EntityPlayer(true).setEntityId(-1);
+            this.onGround = true;
+            this.lastMoveTime = 0;
             this.hardcore = this.reducedDebugInfo = false;
             this.maxPlayers = -1;
             // server should reset our inventory contents through packets automatically on respawn?
@@ -215,6 +221,18 @@ public class PlayerCache implements CachedData {
 
     public void setInventorySlot(final int containerId, ItemStack newItemStack, int slot) {
         this.inventoryCache.setItemStack(containerId, slot, newItemStack);
+    }
+
+    public PlayerCache recordMove(final double x, final double y, final double z, final boolean onGround) {
+        double dx = x - getX(), dy = y - getY(), dz = z - getZ();
+        // a jump this big is a teleport, not movement
+        boolean teleport = dx * dx + dy * dy + dz * dz > 100;
+        this.lastMoveX = teleport ? 0 : dx;
+        this.lastMoveY = teleport ? 0 : dy;
+        this.lastMoveZ = teleport ? 0 : dz;
+        this.lastMoveTime = System.currentTimeMillis();
+        this.onGround = onGround;
+        return setX(x).setY(y).setZ(z);
     }
 
     public double getX() {

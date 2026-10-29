@@ -11,6 +11,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import org.geysermc.mcprotocollib.protocol.data.game.PlayerListEntry;
 import org.geysermc.mcprotocollib.protocol.packet.ingame.clientbound.ClientboundPlayerChatPacket;
+import org.geysermc.mcprotocollib.protocol.packet.ingame.serverbound.ServerboundChatAckPacket;
 
 import java.util.Optional;
 
@@ -21,6 +22,11 @@ public class PlayerChatHandler implements PacketHandler<ClientboundPlayerChatPac
 
     @Override
     public ClientboundPlayerChatPacket apply(ClientboundPlayerChatPacket packet, ClientSession session) {
+        // acknowledge signed messages like vanilla does, or busy secure chat servers kick us
+        if (packet.getMessageSignature() != null) {
+            int ack = CACHE.getChatCache().getLastSeenMessages().addPending(packet.getMessageSignature());
+            if (ack > 0) session.sendAsync(new ServerboundChatAckPacket(ack));
+        }
         var senderPlayerEntry = CACHE.getTabListCache().get(packet.getSender());
         var chatType = ChatTypeRegistry.REGISTRY.get(packet.getChatType().id());
         if (chatType != null) {

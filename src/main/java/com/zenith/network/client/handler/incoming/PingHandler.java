@@ -28,7 +28,7 @@ public class PingHandler implements ClientEventLoopPacketHandler<ClientboundPing
             // 2. controlling player enters the logged in state
             // 3. ping handler is executed and pong is now not sent by either the player or this handler
             // this is solved by the ping queue and handlers
-            session.sendAsync(new ServerboundPongPacket(packet.getId()));
+            session.sendTickAligned(new ServerboundPongPacket(packet.getId()));
         }
         return true;
     }

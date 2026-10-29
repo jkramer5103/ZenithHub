@@ -11,6 +11,7 @@ public class PostOutgoingPlayerRotationHandler implements ClientEventLoopPacketH
     @Override
     public boolean applyAsync(ServerboundMovePlayerRotPacket packet, ClientSession session) {
         CACHE.getPlayerCache()
+                .setOnGround(packet.isOnGround())
                 .setYaw(packet.getYaw())
                 .setPitch(packet.getPitch());
         SpectatorSync.syncPlayerPositionWithSpectators();

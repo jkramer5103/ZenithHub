@@ -7,11 +7,13 @@ import org.geysermc.mcprotocollib.protocol.packet.ingame.serverbound.Serverbound
 import org.geysermc.mcprotocollib.protocol.packet.ingame.serverbound.ServerboundChatCommandSignedPacket;
 import org.geysermc.mcprotocollib.protocol.packet.ingame.serverbound.ServerboundChatPacket;
 
-import java.util.BitSet;
+import java.security.SecureRandom;
 
 import static com.zenith.Globals.*;
 
 public class OutgoingChatHandler implements PacketHandler<ServerboundChatPacket, ClientSession> {
+    static final SecureRandom SALT = new SecureRandom();
+
     @Override
     public ServerboundChatPacket apply(final ServerboundChatPacket packet, final ClientSession session) {// allow us to dispatch commands just with chat packets
         if (!packet.getMessage().isEmpty() && packet.getMessage().charAt(0) == '/') {
@@ -33,9 +35,9 @@ public class OutgoingChatHandler implements PacketHandler<ServerboundChatPacket,
         packet.setTimeStamp(packetTime);
         CACHE.getChatCache().setLastChatTimestamp(packetTime);
         if (CACHE.getChatCache().canUseChatSigning()) {
-            int offset = 0;
-            var signedChat = new ServerboundChatPacket(packet.getMessage(), packetTime, 0, null, offset, BitSet.valueOf(new byte[20]));
-            CACHE.getChatCache().getChatSession().sign(signedChat);
+            var lastSeen = CACHE.getChatCache().getLastSeenMessages().generateAndApplyUpdate();
+            var signedChat = new ServerboundChatPacket(packet.getMessage(), packetTime, SALT.nextLong(), null, lastSeen.offset(), lastSeen.acknowledged());
+            CACHE.getChatCache().getChatSession().sign(signedChat, lastSeen.signatures());
             return signedChat;
         } else {
             return packet;

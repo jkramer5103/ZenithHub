@@ -12,9 +12,7 @@ public class PostOutgoingPlayerPositionRotationHandler implements ClientEventLoo
     @Override
     public boolean applyAsync(ServerboundMovePlayerPosRotPacket packet, ClientSession session) {
         CACHE.getPlayerCache()
-                .setX(packet.getX())
-                .setY(packet.getY())
-                .setZ(packet.getZ())
+                .recordMove(packet.getX(), packet.getY(), packet.getZ(), packet.isOnGround())
                 .setYaw(packet.getYaw())
                 .setPitch(packet.getPitch());
         SpectatorSync.syncPlayerPositionWithSpectators();

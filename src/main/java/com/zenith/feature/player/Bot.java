@@ -155,6 +155,22 @@ public final class Bot extends ModuleUtils {
 
     private void handleClientTickStarting(final ClientBotTick.Starting event) {
         syncFromCache(false);
+        if (CONFIG.client.privacy.smoothHandoff) carryOnMoving();
+    }
+
+    /**
+     * Keeps the momentum and ground state a player left with, so the movement doesn't stop dead in mid air when the
+     * bot takes over. The velocity is what the last move would be after one tick of friction and gravity.
+     */
+    private void carryOnMoving() {
+        var cache = CACHE.getPlayerCache();
+        this.onGround = this.lastOnGround = cache.isOnGround();
+        if (System.currentTimeMillis() - cache.getLastMoveTime() > 100) return; // the player stood still
+        double friction = this.onGround ? 0.546 : 0.91;
+        this.velocity.set(
+            cache.getLastMoveX() * friction,
+            this.onGround ? 0 : (cache.getLastMoveY() - 0.08) * 0.98,
+            cache.getLastMoveZ() * friction);
     }
 
     private void handleClientTickStopped(final ClientBotTick.Stopped event) {

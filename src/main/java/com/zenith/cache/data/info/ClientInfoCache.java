@@ -14,6 +14,8 @@ import org.geysermc.mcprotocollib.protocol.packet.common.serverbound.Serverbound
 import org.jspecify.annotations.NonNull;
 
 import java.util.List;
+import java.util.Locale;
+import java.util.Random;
 import java.util.function.Consumer;
 
 import static com.zenith.Globals.CONFIG;
@@ -50,7 +52,28 @@ public class ClientInfoCache implements CachedData {
 
     @Override
     public void reset(final CacheResetType type) {
-        if (type == CacheResetType.FULL) {
+        if (type == CacheResetType.FULL) applyDefaults();
+    }
+
+    /**
+     * The bot's own settings. With {@code client.privacy.vanillaClientInfo} these are a fresh vanilla install's,
+     * with a view distance and main hand that real players commonly use, picked once per account so they don't
+     * change between sessions and aren't the same for every account.
+     */
+    public void applyDefaults() {
+        if (CONFIG.client.privacy.vanillaClientInfo) {
+            var random = new Random(CONFIG.authentication.username.toLowerCase(Locale.ROOT).hashCode());
+            int roll = random.nextInt(100);
+            locale = CONFIG.client.privacy.clientLocale;
+            renderDistance = roll < 15 ? 8 : roll < 70 ? 10 : roll < 90 ? 12 : 16;
+            chatVisibility = ChatVisibility.FULL;
+            chatColors = true;
+            skinParts = List.of(SkinPart.values());
+            handPreference = random.nextInt(10) == 0 ? HandPreference.LEFT_HAND : HandPreference.RIGHT_HAND;
+            textFilteringEnabled = false;
+            allowsListing = true;
+            particleStatus = ParticleStatus.ALL;
+        } else {
             locale = "en_US";
             renderDistance = CONFIG.client.defaultClientRenderDistance;
             chatVisibility = ChatVisibility.FULL;
