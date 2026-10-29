@@ -2,7 +2,6 @@ package com.zenith.network.server.handler.player;
 
 import com.zenith.command.api.CommandContext;
 import com.zenith.command.api.CommandOutputHelper;
-import com.zenith.command.api.CommandSources;
 import com.zenith.network.server.ServerSession;
 import org.jspecify.annotations.NonNull;
 
@@ -59,15 +58,8 @@ public class InGameCommandManager {
                 }
                 return;
             }
-            if (CONFIG.inGameCommands.logToDiscord && DISCORD.isRunning() && !commandContext.isSensitiveInput()) {
-                // will also log to terminal
-                CommandOutputHelper.logInputToDiscord(command, CommandSources.PLAYER, commandContext);
-                CommandOutputHelper.logEmbedOutputToDiscord(embed);
-                CommandOutputHelper.logMultiLineOutputToDiscord(commandContext.getMultiLineOutput());
-            } else {
-                CommandOutputHelper.logEmbedOutputToTerminal(embed);
-                CommandOutputHelper.logMultiLineOutputToTerminal(commandContext.getMultiLineOutput());
-            }
+            CommandOutputHelper.logEmbedOutputToTerminal(embed);
+            CommandOutputHelper.logMultiLineOutputToTerminal(commandContext.getMultiLineOutput());
         });
         return true;
     }
@@ -88,14 +80,7 @@ public class InGameCommandManager {
             }
             return;
         }
-        if (CONFIG.inGameCommands.logToDiscord && DISCORD.isRunning() && !commandContext.isSensitiveInput()) {
-            // will also log to terminal
-            CommandOutputHelper.logInputToDiscord(message, CommandSources.SPECTATOR, commandContext);
-            CommandOutputHelper.logEmbedOutputToDiscord(embed);
-            CommandOutputHelper.logMultiLineOutputToDiscord(commandContext.getMultiLineOutput());
-        } else {
-            CommandOutputHelper.logEmbedOutputToTerminal(embed);
-            CommandOutputHelper.logMultiLineOutputToTerminal(commandContext.getMultiLineOutput());
-        }
+        CommandOutputHelper.logEmbedOutputToTerminal(embed);
+        CommandOutputHelper.logMultiLineOutputToTerminal(commandContext.getMultiLineOutput());
     }
 }

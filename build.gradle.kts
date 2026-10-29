@@ -81,7 +81,6 @@ dependencies {
     api("com.viaversion:viaversion-common:5.12.2")
     api("com.viaversion:viabackwards-common:5.12.2")
     api("com.viaversion:viarewind-common:4.2.0")
-    api("org.jline:jline:4.4.6")
     api("ar.com.hjg:pngj:2.1.0")
     api("com.zaxxer:HikariCP:7.1.0")
     api("org.postgresql:postgresql:42.7.13")

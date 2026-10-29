@@ -3,8 +3,6 @@ package com.zenith.discord;
 import com.zenith.util.Color;
 import lombok.Data;
 import lombok.experimental.Accessors;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -127,27 +125,6 @@ public class Embed {
         return this;
     }
 
-    public MessageEmbed toJDAEmbed() {
-        var builder = new EmbedBuilder();
-        if (!truncateEmbed(this)) {
-            return builder.build();
-        }
-        builder
-            .setTitle(title)
-            .setDescription(description)
-            .setUrl(url)
-            .setTimestamp(timestamp)
-            .setColor(color != null ? color.getRGB() : 0)
-            .setImage(image)
-            .setThumbnail(thumbnail)
-            .setFooter(footer != null ? footer.text() : null, footer != null ? footer.iconUrl() : null)
-            .setAuthor(author != null ? author.name() : null, author != null ? author.url() : null, author != null ? author.iconUrl() : null);
-        for (var field : fields) {
-            builder.addField(field.name(), field.value(), field.inline());
-        }
-        return builder.build();
-
-    }
 
     public static Embed builder() {
         return new Embed();

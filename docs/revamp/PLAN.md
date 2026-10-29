@@ -101,4 +101,9 @@ No commands needed anywhere: the console only shows in developer mode (user menu
 - Browser notifications (queue done, low health, visual range, …).
 
 ## Removed in the fork
-- The Python launcher and its interactive setup, `scripts/init.sh` / `cloud-init.yaml` (oh-my-zsh), the per-instance Discord bot setup, and the self-updater.
+Deleted from the code, not just switched off (2026-10-29):
+- Zenith's own Discord bot (JDA login, presence, nickname/avatar, buttons, Discord command input). `com.zenith.discord.DiscordBot` only posts `MainChannelMessageSentEvent`s, which the control API forwards to the manager's bot. The `discord` and `chatRelay` commands and their config are gone.
+- The Discord chat relay (listener, events, config).
+- The interactive JLine terminal and the `terminal` command. `TerminalManager` only prints logs to stdout.
+- The self-updater, its events and the `update`, `autoUpdate`, `channel` and `jvmArgs` commands. `LaunchConfig` keeps only version information.
+- The Python launcher (`src/launcher`), `scripts/` install and run helpers, the launcher/release/prerelease workflows, and the wiki setup guides.

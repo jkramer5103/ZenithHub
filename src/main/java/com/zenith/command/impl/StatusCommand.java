@@ -188,8 +188,6 @@ public class StatusCommand extends Command {
                 }
                 if (CONFIG.discord.reportCoords)
                     embed.addField("Coordinates", getCoordinates(CACHE.getPlayerCache().getThePlayer()), true);
-                embed
-                    .addField("AutoUpdate", toggleStr(LAUNCH_CONFIG.auto_update), true);
                  return OK;
             });
     }

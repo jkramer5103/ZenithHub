@@ -8,14 +8,10 @@ import com.zenith.event.module.*;
 import com.zenith.event.player.*;
 import com.zenith.event.plugin.PluginLoadFailureEvent;
 import com.zenith.event.plugin.PluginLoadedEvent;
-import com.zenith.event.queue.QueueCompleteEvent;
-import com.zenith.event.queue.QueuePositionUpdateEvent;
 import com.zenith.event.queue.QueueStartEvent;
 import com.zenith.event.server.ServerPlayerConnectedEvent;
 import com.zenith.event.server.ServerPlayerDisconnectedEvent;
 import com.zenith.event.server.ServerRestartingEvent;
-import com.zenith.event.update.UpdateAvailableEvent;
-import com.zenith.event.update.UpdateStartEvent;
 import com.zenith.feature.api.fileio.FileIOApi;
 import com.zenith.feature.player.World;
 import com.zenith.feature.queue.Queue;
@@ -24,27 +20,18 @@ import com.zenith.module.impl.SessionTimeLimit;
 import com.zenith.util.ChatUtil;
 import com.zenith.util.DisconnectReasonInfo;
 import com.zenith.util.math.MathHelper;
-import net.dv8tion.jda.api.OnlineStatus;
-import net.dv8tion.jda.api.components.buttons.Button;
-import net.dv8tion.jda.api.entities.Activity;
-import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.time.Duration;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 
 import static com.github.rfresh2.EventConsumer.of;
 import static com.zenith.Globals.*;
 import static com.zenith.command.impl.StatusCommand.getCoordinates;
 import static com.zenith.discord.DiscordBot.*;
 import static com.zenith.util.math.MathHelper.formatDuration;
-import static java.util.Arrays.asList;
 import static java.util.Objects.nonNull;
 
 public class NotificationEventListener {
@@ -57,10 +44,8 @@ public class NotificationEventListener {
             of(ClientOnlineEvent.class, this::handlePlayerOnlineEvent),
             of(ClientConfigurationEvent.Entering.class, this::handleClientConfigurationEnteringEvent),
             of(ClientDisconnectEvent.class, this::handleDisconnectEvent),
-            of(QueuePositionUpdateEvent.class, this::handleQueuePositionUpdateEvent),
             of(QueueWarningEvent.class, this::handleQueueWarning),
             of(AutoEatOutOfFoodEvent.class, this::handleAutoEatOutOfFoodEvent),
-            of(QueueCompleteEvent.class, this::handleQueueCompleteEvent),
             of(QueueStartEvent.class, this::handleStartQueueEvent),
             of(ClientDeathEvent.class, this::handleDeathEvent),
             of(ClientDeathMessageEvent.class, this::handleSelfDeathMessageEvent),
@@ -79,14 +64,12 @@ public class NotificationEventListener {
             of(DeathMessageChatEvent.class, this::handleDeathMessageChatEventKillMessage),
             of(ServerPlayerConnectedEvent.class, this::handleServerPlayerConnectedEventStalk),
             of(ServerPlayerDisconnectedEvent.class, this::handleServerPlayerDisconnectedEventStalk),
-            of(UpdateStartEvent.class, this::handleUpdateStartEvent),
             of(ServerRestartingEvent.class, this::handleServerRestartingEvent),
             of(ClientLoginFailedEvent.class, this::handleProxyLoginFailedEvent),
             of(ClientStartConnectEvent.class, this::handleStartConnectEvent),
             of(PrioStatusUpdateEvent.class, this::handlePrioStatusUpdateEvent),
             of(AutoReconnectEvent.class, this::handleAutoReconnectEvent),
             of(MsaDeviceCodeLoginEvent.class, this::handleMsaDeviceCodeLoginEvent),
-            of(UpdateAvailableEvent.class, this::handleUpdateAvailableEvent),
             of(ReplayStartedEvent.class, this::handleReplayStartedEvent),
             of(ReplayStoppedEvent.class, this::handleReplayStoppedEvent),
             of(PlayerTotemPopAlertEvent.class, this::handleTotemPopEvent),
@@ -166,7 +149,6 @@ public class NotificationEventListener {
         } else {
             sendEmbedMessage(embed);
         }
-        updatePresence();
     }
 
     public void handlePlayerOnlineEvent(ClientOnlineEvent event) {
@@ -251,7 +233,6 @@ public class NotificationEventListener {
         } else {
             sendEmbedMessage(embed);
         }
-        EXECUTOR.execute(this::updatePresence);
     }
 
     public void handleQueueWarning(QueueWarningEvent event) {
@@ -262,9 +243,6 @@ public class NotificationEventListener {
             .inQueueColor());
     }
 
-    public void handleQueuePositionUpdateEvent(QueuePositionUpdateEvent event) {
-        updatePresence();
-    }
 
     public void handleAutoEatOutOfFoodEvent(final AutoEatOutOfFoodEvent event) {
         var embed = Embed.builder()
@@ -278,9 +256,6 @@ public class NotificationEventListener {
         }
     }
 
-    public void handleQueueCompleteEvent(QueueCompleteEvent event) {
-        updatePresence();
-    }
 
     public void handleStartQueueEvent(QueueStartEvent event) {
         if (!CONFIG.discord.notifications.queueStarted) return;
@@ -299,7 +274,6 @@ public class NotificationEventListener {
         } else {
             sendEmbedMessage(embed);
         }
-        updatePresence();
     }
 
     public void handleDeathEvent(ClientDeathEvent event) {
@@ -381,24 +355,7 @@ public class NotificationEventListener {
                 .title("MC Version Mismatch")
                 .description(desc)
                 .errorColor();
-            var buttonId = "via-" + ThreadLocalRandom.current().nextInt(1000000);
-            var button = Button.primary(buttonId, "Auto-Configure ViaVersion");
-            Consumer<ButtonInteractionEvent> mapper = e -> {
-                if (e.getComponentId().equals(buttonId)) {
-                    CONFIG.client.viaversion.protocolVersion = playerProtocolVersion.getVersion();
-                    CONFIG.client.viaversion.disableOn2b2t = false;
-                    CONFIG.client.viaversion.enabled = true;
-                    saveConfigAsync();
-                    e.replyEmbeds(Embed.builder()
-                            .title("ViaVersion Configured")
-                            .description("Changes will take effect on next connect")
-                            .addField("MC Version", playerProtocolVersion.getName())
-                            .primaryColor()
-                            .toJDAEmbed())
-                        .complete();
-                }
-            };
-            sendEmbedMessageWithButtons(embed, List.of(button), mapper, Duration.ofHours(1L));
+            sendEmbedMessage(embed);
         }
     }
 
@@ -450,36 +407,8 @@ public class NotificationEventListener {
                 + (int) event.playerEntity().getZ()
                 + "]||", false);
         }
-        final String buttonId = "addFriend" + ThreadLocalRandom.current().nextInt(1000000);
-        final List<Button> buttons = asList(Button.primary(buttonId, "Add Friend"));
-        final Consumer<ButtonInteractionEvent> mapper = e -> {
-            if (e.getComponentId().equals(buttonId)) {
-                DISCORD_LOG.info("{} added friend: {} [{}]",
-                    Optional.ofNullable(e.getInteraction().getMember())
-                        .map(m -> m.getUser().getName())
-                        .orElse("Unknown"),
-                    event.playerEntry().getName(),
-                    event.playerEntry().getProfileId());
-                PLAYER_LISTS.getFriendsList().add(event.playerEntry().getName());
-                e.replyEmbeds(Embed.builder()
-                        .title("Friend Added")
-                        .successColor()
-                        .addField("Player Name", escape(event.playerEntry().getName()), true)
-                        .addField("Player UUID", ("[" + event.playerEntry().getProfileId() + "](https://namemc.com/profile/" + event.playerEntry().getProfileId() + ")"), true)
-                        .thumbnail(Proxy.getInstance().getPlayerBodyURL(event.playerEntry().getProfileId()).toString())
-                        .toJDAEmbed())
-                    .complete();
-                saveConfigAsync();
-            }
-        };
-        if (CONFIG.client.extra.visualRange.enterAlertMention)
-            if (!event.isFriend())
-                sendEmbedMessageWithButtons(notificationMention(), embedCreateSpec, buttons, mapper, Duration.ofHours(1));
-            else
-                sendEmbedMessage(embedCreateSpec);
-        else
-        if (!event.isFriend())
-            sendEmbedMessageWithButtons(embedCreateSpec, buttons, mapper, Duration.ofHours(1));
+        if (CONFIG.client.extra.visualRange.enterAlertMention && !event.isFriend())
+            sendEmbedMessage(notificationMention(), embedCreateSpec);
         else
             sendEmbedMessage(embedCreateSpec);
     }
@@ -533,40 +462,7 @@ public class NotificationEventListener {
                 .addField("Username", escape(event.gameProfile().getName()), false)
                 .addField("Player UUID", ("[" + event.gameProfile().getId().toString() + "](https://namemc.com/profile/" + event.gameProfile().getId().toString() + ")"), true)
                 .thumbnail(Proxy.getInstance().getPlayerBodyURL(event.gameProfile().getId()).toString());
-            final String buttonId = "whitelist" + ThreadLocalRandom.current().nextInt(10000000);
-            final List<Button> buttons = asList(Button.primary(buttonId, "Whitelist Player"));
-            final Consumer<ButtonInteractionEvent> mapper = e -> {
-                if (e.getComponentId().equals(buttonId)) {
-                    if (validateButtonInteractionEventFromAccountOwner(e)) {
-                        DISCORD_LOG.info("{} whitelisted {} [{}]",
-                            Optional.ofNullable(e.getInteraction().getMember()).map(m -> m.getUser().getName()).orElse("Unknown"),
-                            event.gameProfile().getName(),
-                            event.gameProfile().getId().toString());
-                        PLAYER_LISTS.getWhitelist().add(event.gameProfile().getName());
-                        e.replyEmbeds(Embed.builder()
-                            .title("Player Whitelisted")
-                            .successColor()
-                            .addField("Player Name", escape(event.gameProfile().getName()), true)
-                            .addField("Player UUID", ("[" + event.gameProfile().getId().toString() + "](https://namemc.com/profile/" + event.gameProfile().getId().toString() + ")"), true)
-                            .thumbnail(Proxy.getInstance().getPlayerBodyURL(event.gameProfile().getId()).toString())
-                            .toJDAEmbed()).complete();
-                        saveConfigAsync();
-                    } else {
-                        DISCORD_LOG.error("{} attempted to whitelist {} [{}] but was not authorized to do so!",
-                            Optional.ofNullable(e.getInteraction().getMember()).map(m -> m.getUser().getName()).orElse("Unknown"),
-                            event.gameProfile().getName(),
-                            event.gameProfile().getId().toString());
-                        e.replyEmbeds(Embed.builder()
-                            .title("Not Authorized!")
-                            .errorColor()
-                            .addField("Error",
-                                "User: " + Optional.ofNullable(e.getInteraction().getMember()).map(m -> m.getUser().getName()).orElse("Unknown")
-                                    + " is not authorized to execute this command! Contact the account owner", true)
-                            .toJDAEmbed()).complete();
-                    }
-                }
-            };
-            sendEmbedMessageWithButtons(embed, buttons, mapper, Duration.ofHours(1L));
+            sendEmbedMessage(embed);
         } else { // shouldn't be possible if verifyUsers is enabled
             if (nonNull(event.gameProfile())) {
                 embed
@@ -664,22 +560,6 @@ public class NotificationEventListener {
             .thumbnail(Proxy.getInstance().getPlayerBodyURL(event.playerEntry().getProfileId()).toString()));
     }
 
-    public void handleUpdateStartEvent(UpdateStartEvent event) {
-        if (!CONFIG.discord.notifications.updates) return;
-        String verString = "Current Version: `" + escape(LAUNCH_CONFIG.version) + "`";
-        var newVersion = event.newVersion();
-        if (newVersion.isPresent()) verString += "\nNew Version: `" + escape(newVersion.get()) + "`";
-        var embed = Embed.builder()
-            .title("Updating and restarting...")
-            .description(verString)
-            .primaryColor();
-        if (!LAUNCH_CONFIG.auto_update) {
-            embed
-                .title("Restarting...")
-                .addField("Error", "`autoUpdate` must be enabled for new updates to apply");
-        };
-        sendEmbedMessage(embed);
-    }
 
     public void handleServerRestartingEvent(ServerRestartingEvent event) {
         if (!CONFIG.discord.notifications.serverRestart) return;
@@ -763,20 +643,6 @@ public class NotificationEventListener {
             sendEmbedMessage(embed);
     }
 
-    public void handleUpdateAvailableEvent(final UpdateAvailableEvent event) {
-        if (!CONFIG.discord.notifications.updates) return;
-        var embed = Embed.builder()
-            .title("Update Available!")
-            .primaryColor();
-        event.getVersion().ifPresent(v -> embed
-            .addField("Current", "`" + escape(LAUNCH_CONFIG.version) + "`", false)
-            .addField("New", "`" + escape(v) + "`", false));
-        embed.addField(
-            "Info",
-            "Update will be applied after the next disconnect.\nOr apply now: `update`",
-            false);
-        sendEmbedMessage(embed);
-    }
 
     public void handleReplayStartedEvent(final ReplayStartedEvent event) {
         if (!CONFIG.discord.notifications.replays) return;
@@ -885,19 +751,5 @@ public class NotificationEventListener {
     public void sendMessage(final String message) {
         DISCORD.sendMessage(message);
         EVENT_BUS.postAsync(new NotificationSentEvent(null, message));
-    }
-    public void sendEmbedMessageWithButtons(String message, Embed embed, List<Button> buttons, Consumer<ButtonInteractionEvent> mapper, Duration timeout) {
-        DISCORD.sendEmbedMessageWithButtons(message, embed, buttons, mapper, timeout);
-        EVENT_BUS.postAsync(new NotificationSentEvent(embed, message));
-    }
-    public void sendEmbedMessageWithButtons(Embed embed, List<Button> buttons, Consumer<ButtonInteractionEvent> mapper, Duration timeout) {
-        DISCORD.sendEmbedMessageWithButtons(embed, buttons, mapper, timeout);
-        EVENT_BUS.postAsync(new NotificationSentEvent(embed, null));
-    }
-    public void updatePresence(final OnlineStatus onlineStatus, final Activity activity) {
-        DISCORD.setPresence(onlineStatus, activity);
-    }
-    public void updatePresence() {
-        DISCORD.tickPresence();
     }
 }

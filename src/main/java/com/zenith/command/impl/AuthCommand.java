@@ -16,7 +16,6 @@ import static com.zenith.command.brigadier.CustomStringArgumentType.wordWithChar
 import static com.zenith.command.brigadier.ToggleArgumentType.getToggle;
 import static com.zenith.command.brigadier.ToggleArgumentType.toggle;
 import static com.zenith.discord.DiscordBot.escape;
-import static java.util.Arrays.asList;
 
 public class AuthCommand extends Command {
     @Override
@@ -247,7 +246,7 @@ public class AuthCommand extends Command {
     }
 
     private boolean validateDiscordOrTerminalSource(CommandContext c) {
-        return Command.validateCommandSource(c, asList(CommandSources.TERMINAL, CommandSources.DISCORD));
+        return Command.validateCommandSource(c, CommandSources.TERMINAL);
     }
 
     @Override

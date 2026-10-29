@@ -6,9 +6,12 @@ records what is done. Keep it up to date when you change behaviour.
 
 ## Layout
 
-- `src/`: ZenithProxy (the bot). Upstream code. Keep fork changes small and contained so upstream
-  merges stay easy. Fork-specific code lives in `com.zenith.control` (managed mode and control API)
-  and `command/impl/LobbyCommand.java`.
+- `src/`: ZenithProxy (the bot). Upstream code, minus the parts listed under "Removed in the fork"
+  in PLAN.md (its own Discord bot, chat relay, terminal input, self-updater, launcher). Don't bring
+  those back. Otherwise keep fork changes small so upstream merges stay easy. Fork-specific code
+  lives in `com.zenith.control` (managed mode and control API) and `command/impl/LobbyCommand.java`.
+  `discord/DiscordBot.java` no longer logs in to Discord: it posts events that the control API
+  forwards to the manager's central bot.
 - `manager/`: the manager (Java 25, Javalin, MCProtocolLib, ViaVersion). Packages: `accounts`
   (MSA login, token refresh), `auth` (users, grants, capabilities), `instances` (supervisor,
   settings layering, config composer), `lobby` (router, lobby server, player

@@ -299,6 +299,8 @@ public final class ControlServer {
     }
 
     private static JsonObject embedToJson(Embed embed) {
+        // keep within Discord's limits, the manager posts these as they are
+        Embed.truncateEmbed(embed);
         var json = new JsonObject();
         json.addProperty("title", embed.title());
         json.addProperty("description", embed.description());

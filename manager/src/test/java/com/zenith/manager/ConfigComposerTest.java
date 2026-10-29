@@ -22,9 +22,7 @@ class ConfigComposerTest {
                      "connectionProxy": {"enabled": false, "host": "127.0.0.1"},
                      "extra": {"autoEat": {"enabled": true, "hunger": 10}, "antiafk": {"enabled": true}}},
           "server": {"bind": {"address": "0.0.0.0", "port": 25565}, "upnp": false, "proxyIP": "localhost"},
-          "authentication": {"accountType": "device_code", "username": "Unknown", "openBrowserOnLogin": true},
-          "discord": {"enable": false},
-          "interactiveTerminal": {"enable": true, "logToDiscord": true}
+          "authentication": {"accountType": "device_code", "username": "Unknown", "openBrowserOnLogin": true}
         }
         """);
 
@@ -43,7 +41,7 @@ class ConfigComposerTest {
         var settings = new State.ManagerSettings();
         settings.publicAddress = "proxy.example.com";
         settings.outboundProxiesEnabled = proxies;
-        return new ConfigComposer.Context(instance, server, account, global, settings);
+        return new ConfigComposer.Context(instance, server, account, global, settings, ConfigComposer.JoinLists.EMPTY);
     }
 
     @Test
@@ -63,7 +61,7 @@ class ConfigComposerTest {
         assertEquals("127.0.0.1", config.getAsJsonObject("server").getAsJsonObject("bind").get("address").getAsString());
         assertEquals("constantiam.net", config.getAsJsonObject("client").getAsJsonObject("server").get("address").getAsString());
         assertEquals("Steve", config.getAsJsonObject("authentication").get("username").getAsString());
-        assertFalse(config.getAsJsonObject("interactiveTerminal").get("enable").getAsBoolean());
+        assertFalse(config.getAsJsonObject("authentication").get("openBrowserOnLogin").getAsBoolean());
     }
 
     @Test

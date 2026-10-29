@@ -31,7 +31,7 @@ public final class SettingsService {
     private static final Logger LOG = LoggerFactory.getLogger("Settings");
     /** Managed by the manager itself or meaningless in managed mode. */
     private static final List<String> HIDDEN_PREFIXES = List.of(
-        "authentication.", "discord.", "interactiveTerminal.", "autoUpdater.", "server.bind.", "client.server.",
+        "authentication.", "discord.", "server.bind.", "client.server.",
         "database.", "plugins."
     );
     private static final Set<String> HIDDEN = Set.of("warning", "server.upnp", "server.proxyIP", "debug.lockFile");

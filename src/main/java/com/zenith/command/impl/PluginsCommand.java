@@ -61,7 +61,7 @@ public class PluginsCommand extends Command {
         return command("plugins")
             .requires(c -> Command.validateAccountOwner(c)
                     // todo: consider blocking discord source by default, overridable by config
-                    && Command.validateCommandSource(c, List.of(CommandSources.TERMINAL, CommandSources.DISCORD)))
+                    && Command.validateCommandSource(c, List.of(CommandSources.TERMINAL)))
             .then(argument("toggle", toggle()).executes(c -> {
                 CONFIG.plugins.enabled = getToggle(c, "toggle");
                 c.getSource().getEmbed()

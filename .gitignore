@@ -13,14 +13,12 @@
 /*.json*
 *.tmp
 /.vscode
-/launcher
 /ViaLoader/
 dist/
 /*.spec
 __pycache__/
 *.exe
 *.zip
-/launcher-python*
 maps/
 replays/
 /plugins
@@ -36,7 +34,5 @@ buildSrc/.gradle
 buildSrc/.kotlin
 buildSrc/build
 .python-version
-src/launcher/uv.lock
-src/launcher/pyproject.toml
 /data/
 /manager/build/

@@ -15,7 +15,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class LogSourceFilter extends Filter<ILoggingEvent> {
     private static final Map<String, Level> SOURCE_MAP = new HashMap<>();
     static {
-        SOURCE_MAP.put("org.jline", Level.WARN);
         SOURCE_MAP.put("net.dv8tion.jda", Level.INFO);
         SOURCE_MAP.put("org.geysermc", Level.DEBUG);
         SOURCE_MAP.put("ViaVersion", Level.INFO);

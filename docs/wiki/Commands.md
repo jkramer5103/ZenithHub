@@ -117,17 +117,6 @@ Prints the current status of ZenithProxy, the in-game player, and modules.
   ```status modules```
 
 
-### update
-
-Restarts and updates ZenithProxy if `autoUpdate` is enabled
-
-**Aliases:** `restart` / `reboot`
-
-**Usage**
-
-  ```update```
-
-
 ### whitelist
 
 Manages the list of players allowed to login.
@@ -223,80 +212,6 @@ If this still fails, try one of the alternate auth types.
   ```auth chatSigning commands on/off```
 
 
-### autoUpdate
-
-Configures the AutoUpdater.
-
-
-
-Updates are not immediately applied while the client is connected.
-
-When an update is found, it will be applied 30 seconds after the next disconnect, or immediately if already disconnected.
-
-**Usage**
-
-  ```autoUpdate on/off```
-
-  ```autoUpdate launcher on/off```
-
-
-### chatRelay
-
-Configures the Discord ChatRelay feature.
-
-
-
-The ChatRelay is a live feed of chat messages and/or connection messages from the server to a Discord channel.
-
-
-
-Mentions can be configured when a whisper is received or your name is seen in chat.
-
-
-
-Messages typed in the ChatRelay discord channel will be sent as chat messages in-game
-
-Discord message replies will be sent as whispers in-game.
-
-
-
-Ignore regex will filter out messages, see here for help writing regex: https://regex101.com/ (Java flavor)
-
-**Usage**
-
-  ```chatRelay on/off```
-
-  ```chatRelay channel <channelId>```
-
-  ```chatRelay connectionMessages on/off```
-
-  ```chatRelay whispers on/off```
-
-  ```chatRelay publicChat on/off```
-
-  ```chatRelay deathMessages on/off```
-
-  ```chatRelay serverMessages on/off```
-
-  ```chatRelay whisperMentions on/off```
-
-  ```chatRelay nameMentions on/off```
-
-  ```chatRelay mentionsWhileConnected on/off```
-
-  ```chatRelay ignoreQueue on/off```
-
-  ```chatRelay sendMessages on/off```
-
-  ```chatRelay ignoreRegex add <regex>```
-
-  ```chatRelay ignoreRegex del <index>```
-
-  ```chatRelay ignoreRegex list```
-
-  ```chatRelay ignoreRegex clear```
-
-
 ### chatSchema
 
 Configure how ZenithProxy parses public chats and whispers.
@@ -386,8 +301,6 @@ Manages the connection configuration from ZenithProxy to the destination MC serv
 Configures ZenithProxy command prefixes and settings.
 
 **Usage**
-
-  ```commandConfig discord prefix <string>```
 
   ```commandConfig ingame on/off```
 
@@ -484,41 +397,6 @@ Debug settings for features in testing or for use in development.
   ```debug passthroughResourcePacks on/off```
 
 
-### discord
-
-Manages the Discord bot's configuration.
-
-
-
-The relay is configured using the `chatRelay` command
-
-**Usage**
-
-  ```discord on/off```
-
-  ```discord channel <channel ID>```
-
-  ```discord token <token>```
-
-  ```discord role <role ID>```
-
-  ```discord relayChannel <channelId>```
-
-  ```discord manageProfileImage on/off```
-
-  ```discord manageNickname on/off```
-
-  ```discord manageDescription on/off```
-
-  ```discord managePresence on/off```
-
-  ```discord showNonWhitelistIP on/off```
-
-  ```discord ignoreOtherBots on/off```
-
-  ```discord ignoreWebhooks on/off```
-
-
 ### displayCoords
 
 Configures whether the discord bot's messages should display coordinates. Only usable by account owner(s).
@@ -547,47 +425,6 @@ Friends change behavior for various modules like VisualRange, KillAura, and Auto
   ```friend list```
 
   ```friend clear```
-
-
-### jvmArgs
-
-Configures ZenithProxy's JVM arguments used by the launcher.
-
-
-
-By default, this is empty and a set of default JVM arguments are used.
-
-
-
-The primary arg to configure is `-Xmx` which sets the maximum memory heap size.
-
-
-
-The default `-Xmx` used by the launcher depends on the `java` or `linux` release channel:
-
-* `java`: 300M
-
-* `linux`: 225M
-
-
-
-You should only need to increase this if the server view distance is > 15.
-
-
-
-Be warned, changing this setting can cause ZenithProxy to be unable to restart. You will need to manually
-
-edit the `launch_config.json` to fix this if that happens.
-
-**Usage**
-
-  ```jvmArgs reset```
-
-  ```jvmArgs get```
-
-  ```jvmArgs setXmx <megabytes>```
-
-  ```jvmArgs set <args>```
 
 
 ### kick
@@ -641,25 +478,6 @@ Can be used to perform a reconnect "queue skip" on 2b2t
 **Usage**
 
   ```reconnect```
-
-
-### channel
-
-Configures the current AutoUpdater release channel.
-
-
-
-The release channel is a combination of a platform (java or linux) and a Minecraft protocol version.
-
-**Aliases:** `release` / `releaseChannel`
-
-**Usage**
-
-  ```channel list```
-
-  ```channel set <platform> <minecraft version>```
-
-  ```channel set <platform> <minecraft version> pre```
 
 
 ### server
@@ -784,25 +602,6 @@ Toggles spectators between player and entity cameras. Only usable by spectators
 **Usage**
 
   ```playerCam```
-
-
-### terminal
-
-Configures the ZenithProxy interactive terminal.
-
-
-
-All subcommands only usable from the terminal.
-
-**Usage**
-
-  ```terminal autoCompletions on/off```
-
-  ```terminal logToDiscord on/off```
-
-  ```terminal logChatMessages on/off```
-
-  ```terminal logOnlyQueuePositionUpdates on/off```
 
 
 ### theme

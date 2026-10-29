@@ -44,12 +44,7 @@ public final class ManagedMode {
      */
     public static void applyOverrides() {
         if (!MANAGED) return;
-        CONFIG.interactiveTerminal.enable = false;
-        CONFIG.interactiveTerminal.logToDiscord = false;
-        CONFIG.discord.enable = false;
         CONFIG.authentication.openBrowserOnLogin = false;
-        LAUNCH_CONFIG.auto_update = false;
-        LAUNCH_CONFIG.auto_update_launcher = false;
         writeDefaults();
     }
 

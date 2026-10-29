@@ -26,12 +26,10 @@ public final class Config {
     public final Debug debug = new Debug();
     public final Server server = new Server();
     public final Plugins plugins = new Plugins();
-    public final InteractiveTerminal interactiveTerminal = new InteractiveTerminal();
     public final InGameCommands inGameCommands = new InGameCommands();
     public final Theme theme = new Theme();
     public final Discord discord = new Discord();
     public final Database database = new Database();
-    public final AutoUpdater autoUpdater = new AutoUpdater();
 
     public static final class Authentication {
         public AccountType accountType = AccountType.DEVICE_CODE;
@@ -901,32 +899,19 @@ public final class Config {
         public boolean blockCommandsUntilLoaded = false;
     }
 
-    public static final class InteractiveTerminal {
-        public boolean enable = true;
-        public boolean logToDiscord = true;
-        public boolean alwaysOnCompletions = true;
-    }
-
     public static final class InGameCommands {
         public boolean enable = true;
         public boolean slashCommands = true;
         public boolean slashCommandsReplacesServerCommands = false;
         public boolean suggestions = true;
         public String prefix = "!";
-        public boolean logToDiscord = true;
         public boolean allowWhitelistedToUseAccountOwnerCommands = false;
     }
 
     public static final class Discord {
         public final Notifications notifications = new Notifications();
-        public boolean enable = false;
-        public String token = "";
-        public String channelId = "";
         public String accountOwnerRoleId = "";
         public String notificationMentionRoleId = "";
-        public String prefix = ".";
-        public boolean ignoreOtherBots = true;
-        public boolean ignoreWebhooks = true;
         public boolean reportCoords = true;
         public boolean mentionRoleOnConnect = false;
         public boolean mentionRoleOnPlayerOnline = false;
@@ -944,13 +929,7 @@ public final class Config {
         public boolean mentionOnSpectatorDisconnected = false;
         public boolean mentionRoleOnPrioUpdate = true;
         public boolean mentionRoleOnDeviceCodeAuth = true;
-        public boolean manageProfileImage = true;
-        public boolean manageNickname = true;
-        public boolean manageDescription = true;
-        public boolean managePresence = true;
         public boolean showNonWhitelistLoginIP = true;
-        public int maxQueuedRequestsPerBucket = 100;
-        public boolean isUpdating = false; // internal use for update command state persistence
         /** Which notifications are posted at all; mentions are configured separately. */
         public static final class Notifications {
             public boolean connecting = true;
@@ -970,26 +949,7 @@ public final class Config {
             public boolean blockedLogins = true;
             public boolean spawnPatrol = true;
             public boolean replays = true;
-            public boolean updates = true;
             public boolean plugins = true;
-        }
-
-        public final ChatRelay chatRelay = new ChatRelay();
-
-        public static class ChatRelay {
-            public boolean enable = false;
-            public boolean ignoreQueue = true;
-            public boolean mentionRoleOnWhisper = true;
-            public boolean mentionRoleOnNameMention = true;
-            public boolean mentionWhileConnected = false;
-            public boolean connectionMessages = false;
-            public boolean publicChats = true;
-            public boolean whispers = true;
-            public boolean serverMessages = true;
-            public boolean deathMessages = true;
-            public boolean sendMessages = true;
-            public String channelId = "";
-            public ArrayList<String> ignoreRegex = new ArrayList<>();
         }
     }
 
@@ -1020,9 +980,4 @@ public final class Config {
         }
     }
 
-    public static final class AutoUpdater {
-        public int autoUpdateCheckIntervalSeconds = 300;
-        // internal config, don't set this manually
-        public boolean shouldReconnectAfterAutoUpdate = false;
-    }
 }

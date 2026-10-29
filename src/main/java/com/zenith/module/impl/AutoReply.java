@@ -14,7 +14,6 @@ import java.util.List;
 
 import static com.github.rfresh2.EventConsumer.of;
 import static com.zenith.Globals.CONFIG;
-import static com.zenith.Globals.DISCORD;
 import static java.util.Objects.isNull;
 
 public class AutoReply extends Module {
@@ -48,9 +47,7 @@ public class AutoReply extends Module {
         if (Proxy.getInstance().hasActivePlayer()) return;
         if (event.outgoing()) return;
         if (!event.sender().getName().equalsIgnoreCase(CONFIG.authentication.username)
-            && Instant.now().minus(Duration.ofSeconds(1)).isAfter(lastReply)
-            && (DISCORD.lastRelayMessage.isEmpty()
-            || Instant.now().minus(Duration.ofSeconds(CONFIG.client.extra.autoReply.cooldownSeconds)).isAfter(DISCORD.lastRelayMessage.get()))) {
+            && Instant.now().minus(Duration.ofSeconds(1)).isAfter(lastReply)) {
             if (isNull(repliedPlayersCache.getIfPresent(event.sender().getName()))) {
                 repliedPlayersCache.put(event.sender().getName(), event.sender().getName());
                 sendClientPacketAsync(ChatUtil.getWhisperChatPacket(event.sender().getName(), CONFIG.client.extra.autoReply.message));

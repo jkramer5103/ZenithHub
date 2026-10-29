@@ -4,7 +4,6 @@ import ar.com.hjg.pngj.PngReader;
 import ch.qos.logback.classic.LoggerContext;
 import com.zenith.cache.CacheResetType;
 import com.zenith.control.ManagedMode;
-import com.zenith.discord.ChatRelayEventListener;
 import com.zenith.discord.Embed;
 import com.zenith.discord.NotificationEventListener;
 import com.zenith.event.client.*;
@@ -16,9 +15,6 @@ import com.zenith.event.queue.QueueStartEvent;
 import com.zenith.event.server.ServerIconBuildEvent;
 import com.zenith.event.system.ProxyLaunchedEvent;
 import com.zenith.feature.api.mcstatus.MCStatusApi;
-import com.zenith.feature.autoupdater.AutoUpdater;
-import com.zenith.feature.autoupdater.NoOpAutoUpdater;
-import com.zenith.feature.autoupdater.RestAutoUpdater;
 import com.zenith.feature.chatschema.ChatSchemaParser;
 import com.zenith.feature.queue.Queue;
 import com.zenith.feature.skin.SkinRetriever;
@@ -39,7 +35,6 @@ import com.zenith.via.ZenithServerChannelInitializer;
 import dev.omega24.upnp4j.UPnP4J;
 import dev.omega24.upnp4j.util.Protocol;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.SneakyThrows;
 import net.kyori.adventure.key.Key;
 import net.raphimc.minecraftauth.bedrock.exception.MinecraftRequestException;
@@ -100,7 +95,6 @@ public class Proxy {
     private OptionalLong prevOnlineSeconds = OptionalLong.empty();
     private Optional<Boolean> isPrio = Optional.empty();
     private final AtomicBoolean loggingIn = new AtomicBoolean(false);
-    @Setter @NonNull private AutoUpdater autoUpdater = NoOpAutoUpdater.INSTANCE;
     private LanBroadcaster lanBroadcaster;
     private TcpConnectionManager tcpManager;
     private FileLock fileLock;
@@ -168,7 +162,7 @@ public class Proxy {
             }
             if (inDevEnv()) CONFIG.debug.debugLogs = true;
             if (CONFIG.debug.clearOldLogs) EXECUTOR.schedule(Proxy::clearOldLogs, 10L, TimeUnit.SECONDS);
-            TerminalConsoleAppender.setPrintStdout(false); // cut-over to jline console
+            TerminalConsoleAppender.setPrintStdout(false); // TerminalManager prints from here on
             TERMINAL.start();
             ManagedMode.startControlServer();
             if (CONFIG.debug.lockFile) tryOpenLockFile();
@@ -188,18 +182,8 @@ public class Proxy {
                     DATABASE_LOG.error("Database start timeout", e);
                 }
             }
-            if (CONFIG.discord.enable) {
-                try {
-                    DISCORD.start();
-                    DISCORD_LOG.info("Started Discord Bot");
-                } catch (final Throwable e) {
-                    DISCORD_LOG.error("Failed starting discord bot: {}", e.getMessage());
-                    DISCORD_LOG.debug("Failed starting discord bot", e);
-                }
-            }
             BootstrapMessageConsumer.drain();
             NotificationEventListener.INSTANCE.subscribeEvents();
-            ChatRelayEventListener.INSTANCE.subscribeEvents();
             if (CONFIG.plugins.enabled) PLUGIN_MANAGER.initialize();
             Queue.start();
             saveConfigAsync();
@@ -208,8 +192,6 @@ public class Proxy {
             }
             loadServerIcon();
             startServer();
-            EXECUTOR.execute(DISCORD::updateBotInfo);
-            EXECUTOR.execute(DISCORD::updateBotAvatar);
             CACHE.reset(CacheResetType.FULL);
             EXECUTOR.scheduleAtFixedRate(this::serverHealthCheck, 1L, 5L, TimeUnit.MINUTES);
             EXECUTOR.scheduleAtFixedRate(this::tablistUpdate, 20L, 3L, TimeUnit.SECONDS);
@@ -220,35 +202,7 @@ public class Proxy {
                 connectAndCatchExceptions();
                 connected = true;
             }
-            if (!connected && CONFIG.autoUpdater.shouldReconnectAfterAutoUpdate) {
-                CONFIG.autoUpdater.shouldReconnectAfterAutoUpdate = false;
-                saveConfigAsync();
-                if (!CONFIG.client.extra.utility.actions.autoDisconnect.autoClientDisconnect && !isConnected()) {
-                    connectAndCatchExceptions();
-                    connected = true;
-                }
-            }
-            if (LAUNCH_CONFIG.auto_update && !inDevEnv() && !ManagedMode.isManaged()) {
-                autoUpdater = LAUNCH_CONFIG.release_channel.equals("git")
-                    ? NoOpAutoUpdater.INSTANCE
-                    : new RestAutoUpdater();
-                autoUpdater.start();
-                DEFAULT_LOG.info("Started AutoUpdater");
-            }
             DEFAULT_LOG.info("ZenithProxy started!");
-            if (LAUNCH_CONFIG.release_channel.endsWith(".pre")) {
-                DISCORD.sendEmbedMessage(
-                    Embed.builder()
-                        .title("ZenithProxy Prerelease")
-                        .description(
-                            """
-                            You are currently using a ZenithProxy prerelease
-
-                            Prereleases include experiments that may contain bugs and are not always updated with fixes
-
-                            Switch to a stable release with the `channel` command
-                            """));
-            }
             if (!connected) {
                 DEFAULT_LOG.info("Commands Help: https://wiki.2b2t.vc/Commands");
                 DEFAULT_LOG.info("Proxy IP: {}", CONFIG.server.getProxyAddress());
@@ -416,7 +370,6 @@ public class Proxy {
                 if (nonNull(tcpManager)) tcpManager.close();
                 saveConfig();
                 if (CONFIG.database.enabled) DATABASE.stop();
-                DISCORD.stop(true);
             }).get(10L, TimeUnit.SECONDS);
         } catch (final Exception e) {
             DEFAULT_LOG.error("Error shutting down gracefully", e);
@@ -647,13 +600,7 @@ public class Proxy {
                 SERVER_LOG.info("Auto added {} [{}] to whitelist", username, uuid);
         if (CONFIG.server.updateServerIcon) {
             final GameProfile profile = minecraftProtocol.getProfile();
-            EXECUTOR.execute(() -> {
-                updateServerIcon(profile);
-                DISCORD.updateBotAvatar();
-            });
-        }
-        if (CONFIG.discord.manageNickname) {
-            EXECUTOR.execute(DISCORD::updateBotNickname);
+            EXECUTOR.execute(() -> updateServerIcon(profile));
         }
         return minecraftProtocol;
     }

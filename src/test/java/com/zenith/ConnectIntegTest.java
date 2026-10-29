@@ -36,7 +36,6 @@ public class ConnectIntegTest {
         var launchThread = new AtomicReference<Thread>();
         try {
             var config = new Config();
-            config.interactiveTerminal.enable = false;
             config.server.bind.port = 0;
             config.client.server.address = "localhost";
             config.client.server.port = minecraftServer.getFirstMappedPort();
@@ -45,8 +44,6 @@ public class ConnectIntegTest {
             TestUtils.setConfigFile(config);
 
             var launchConfig = new LaunchConfig();
-            launchConfig.auto_update = false;
-            launchConfig.auto_update_launcher = false;
             TestUtils.setLaunchConfigFile(launchConfig);
 
             launchThread.set(Thread.ofPlatform().daemon().start(Proxy::main));

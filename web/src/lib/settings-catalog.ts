@@ -646,7 +646,6 @@ export const catalog: Group[] = [
 					{ path: 'client.extra.tasks.taskCommandExecutedNotification', label: 'Scheduled tasks ran' },
 					{ path: 'discord.notifications.spawnPatrol', label: 'Spawn patrol targets' },
 					{ path: 'discord.notifications.replays', label: 'Replay recordings' },
-					{ path: 'discord.notifications.updates', label: 'Updates' },
 					{ path: 'discord.notifications.plugins', label: 'Plugins' }
 				]
 			},

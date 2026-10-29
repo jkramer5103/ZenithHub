@@ -42,14 +42,9 @@ public class MultiCommand extends Command {
                 var commandsList = asList(getString(c, "commands").split(",,"));
                 for (int i = 0; i < commandsList.size(); i++) {
                     final var command = commandsList.get(i);
-                    CommandContext ctx;
-                    if (c.getSource() instanceof DiscordCommandContext dc) {
-                        ctx = DiscordCommandContext.create(command, dc.getMessageReceivedEvent());
-                    } else {
-                        ctx = CommandContext.create(command, c.getSource().getSource());
-                        if (c.getSource().getInGamePlayerInfo() != null) {
-                            ctx.setInGamePlayerInfo(c.getSource().getInGamePlayerInfo());
-                        }
+                    var ctx = CommandContext.create(command, c.getSource().getSource());
+                    if (c.getSource().getInGamePlayerInfo() != null) {
+                        ctx.setInGamePlayerInfo(c.getSource().getInGamePlayerInfo());
                     }
                     c.getSource().getSource().logEmbed(c.getSource(), Embed.builder()
                         .title("Executing Command " + (i+1))

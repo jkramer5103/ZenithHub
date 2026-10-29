@@ -65,14 +65,9 @@ public final class ConfigComposer {
         forced.put("client.server.port", new JsonPrimitive(ctx.server().port));
         // restore previous state: reconnect if it was connected when last observed
         forced.put("client.autoConnect", new JsonPrimitive(instance.lastConnected || instance.autostart == State.Autostart.ALWAYS));
-        // Zenith's own bot stays off; its notifications and chat relay reach the manager's bot through the control API
-        forced.put("discord.enable", new JsonPrimitive(false));
-        forced.put("discord.chatRelay.enable", new JsonPrimitive(false));
-        // any role mention means "ping the account owner"
+        // Zenith's notifications reach the manager's bot through the control API; any role mention means "ping the account owner"
         forced.put("discord.accountOwnerRoleId", new JsonPrimitive("1"));
         forced.put("discord.notificationMentionRoleId", new JsonPrimitive(""));
-        forced.put("interactiveTerminal.enable", new JsonPrimitive(false));
-        forced.put("interactiveTerminal.logToDiscord", new JsonPrimitive(false));
         forced.put("authentication.openBrowserOnLogin", new JsonPrimitive(false));
         var account = ctx.account();
         forced.put("authentication.username", new JsonPrimitive(account.username));

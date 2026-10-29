@@ -50,15 +50,6 @@ edit_uri = "edit/1.21.4/docs/wiki"
 # Read more: https://zensical.org/docs/setup/navigation/
  nav = [
      { "Home" = "index.md" },
-     { "Getting Started" = [
-         { "Setup" = "Setup.md" },
-         { "DigitalOcean Setup Guide" = "DigitalOcean-Setup-Guide.md" },
-         { "Windows Launcher Guide" = "Windows-Python-Launcher-Guide.md" },
-         { "Hosting Providers" = "Hosting-Providers.md" },
-         { "Discord Bot Guide" = "Discord-Bot-Guide.md" },
-         { "Linux Guide" = "Linux-Guide.md" },
-         { "Docker" = "Docker.md" }
-     ]},
      { "Usage" = [
          { "Commands" = "Commands.md" },
          { "Plugins" = "Plugins.md" },

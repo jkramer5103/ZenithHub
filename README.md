@@ -30,8 +30,10 @@ connecting it to a server, sharing it and changing settings all happen in the br
 - **Per-instance outbound proxy** (SOCKS/HTTP).
 - Instances return to their previous state after a restart and are restarted with backoff if they crash.
 
-Removed compared to upstream: the per-instance Discord bot, the interactive terminal, the
-self-updater and the Discord chat relay. Updates come from new Docker images.
+Deleted compared to upstream: Zenith's own per-instance Discord bot and its Discord commands, the
+Discord chat relay, the interactive terminal, the self-updater and its commands, the Python
+launcher, the VPS install scripts, the release workflows and the setup guides in the wiki. Updates
+come from new Docker images.
 
 ## Running it
 

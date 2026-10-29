@@ -24,16 +24,12 @@ public class CommandConfigCommand extends Command {
             Configures ZenithProxy command prefixes and settings.
             """)
             .usageLines(
-                "discord prefix <string>",
                 "ingame on/off",
                 "ingame slashCommands on/off",
                 "ingame slashCommands replaceServerCommands on/off",
                 "ingame slashCommands suggestions on/off",
                 "ingame prefix <string>",
                 "ingame allowWhitelistedToUseAccountOwnerCommands on/off"
-                // todo: might add command to config these at some point. But I think these should always be on
-//                "ingame logToDiscord on/off",
-//                "terminal logToDiscord on/off"
             )
             .build();
     }
@@ -41,21 +37,6 @@ public class CommandConfigCommand extends Command {
     @Override
     public LiteralArgumentBuilder<CommandContext> register() {
         return command("commandConfig").requires(Command::validateAccountOwner)
-            .then(literal("discord").then(literal("prefix").then(argument("prefix", wordWithChars())
-                .executes(c -> {
-                    final String newPrefix = c.getArgument("prefix", String.class);
-                    if (newPrefix.isBlank()) {
-                        c.getSource().getEmbed()
-                            .title("Error")
-                            .description("Prefix must be at least one character");
-                        return OK;
-                    }
-                    CONFIG.discord.prefix = newPrefix;
-                    c.getSource().getEmbed()
-                        .title("Command Config")
-                        .description("Set discord prefix to " + CONFIG.discord.prefix);
-                    return OK;
-                }))))
             .then(literal("ingame")
                 .then(argument("toggle", toggle()).executes(c -> {
                     CONFIG.inGameCommands.enable = getToggle(c, "toggle");
@@ -111,7 +92,6 @@ public class CommandConfigCommand extends Command {
     @Override
     public void defaultEmbed(final Embed builder) {
         builder
-            .addField("Discord Prefix", CONFIG.discord.prefix)
             .addField("Ingame Commands", toggleStr(CONFIG.inGameCommands.enable))
             .addField("Ingame Slash Commands", toggleStr(CONFIG.inGameCommands.slashCommands))
             .addField("Ingame Slash Commands Replace Server Commands", toggleStr(CONFIG.inGameCommands.slashCommandsReplacesServerCommands))
