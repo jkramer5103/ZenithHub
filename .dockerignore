@@ -1,0 +1,12 @@
+.git
+.gradle
+**/build
+**/.gradle
+run
+log
+web/node_modules
+web/.svelte-kit
+web/build
+*.json
+!web/*.json
+!web/**/*.json

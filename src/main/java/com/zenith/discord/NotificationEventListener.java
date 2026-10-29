@@ -117,6 +117,7 @@ public class NotificationEventListener {
     }
 
     public void handleSessionTimeLimitEvent(SessionTimeLimitWarningEvent event) {
+        if (!CONFIG.discord.notifications.sessionTimeLimit) return;
         var embed = Embed.builder()
             .title("Session Time Limit Warning")
             .description(event.sessionTimeLimit().toHoursPart() + "h kick in: " + event.durationUntilKick().toMinutes() + "m")
@@ -129,6 +130,7 @@ public class NotificationEventListener {
     }
 
     public void handleSpawnPatrolTargetKilledEvent(SpawnPatrolTargetKilledEvent event) {
+        if (!CONFIG.discord.notifications.spawnPatrol) return;
         var embed = Embed.builder()
             .title("Target Killed")
             .addField("Target", "[" + event.profile().getName() + "](https://namemc.com/profile/" + event.profile().getId() + ")", false)
@@ -139,6 +141,7 @@ public class NotificationEventListener {
     }
 
     public void handleSpawnPatrolTargetAcquiredEvent(SpawnPatrolTargetAcquiredEvent event) {
+        if (!CONFIG.discord.notifications.spawnPatrol) return;
         var profile = event.targetProfile();
         var embed = Embed.builder()
             .title("Target Acquired")
@@ -152,6 +155,7 @@ public class NotificationEventListener {
     }
 
     public void handleConnectEvent(ClientConnectEvent event) {
+        if (!CONFIG.discord.notifications.connected) return;
         var embed = Embed.builder()
             .title("Connected")
             .inQueueColor()
@@ -166,6 +170,7 @@ public class NotificationEventListener {
     }
 
     public void handlePlayerOnlineEvent(ClientOnlineEvent event) {
+        if (!CONFIG.discord.notifications.online) return;
         var embedBuilder = Embed.builder()
             .title("Online")
             .successColor();
@@ -187,6 +192,7 @@ public class NotificationEventListener {
     }
 
     public void handleDisconnectEvent(ClientDisconnectEvent event) {
+        if (!CONFIG.discord.notifications.disconnected) return;
         var category = DisconnectReasonInfo.getDisconnectCategory(event.reason());
         var embed = Embed.builder()
             .title("Disconnected")
@@ -249,6 +255,7 @@ public class NotificationEventListener {
     }
 
     public void handleQueueWarning(QueueWarningEvent event) {
+        if (!CONFIG.discord.notifications.queueWarning) return;
         sendEmbedMessage((event.mention() ? notificationMention() : ""), Embed.builder()
             .title("Queue Warning")
             .addField("Queue Position", "[" + Queue.queuePositionStr() + "]", false)
@@ -276,6 +283,7 @@ public class NotificationEventListener {
     }
 
     public void handleStartQueueEvent(QueueStartEvent event) {
+        if (!CONFIG.discord.notifications.queueStarted) return;
         var embed = Embed.builder()
             .title("Started Queuing")
             .inQueueColor()
@@ -295,6 +303,7 @@ public class NotificationEventListener {
     }
 
     public void handleDeathEvent(ClientDeathEvent event) {
+        if (!CONFIG.discord.notifications.death) return;
         var embed = Embed.builder()
             .title("Player Death")
             .errorColor()
@@ -308,6 +317,7 @@ public class NotificationEventListener {
     }
 
     public void handleSelfDeathMessageEvent(ClientDeathMessageEvent event) {
+        if (!CONFIG.discord.notifications.deathMessage) return;
         sendEmbedMessage(Embed.builder()
             .title("Death Message")
             .errorColor()
@@ -315,6 +325,7 @@ public class NotificationEventListener {
     }
 
     public void handleHealthAutoDisconnectEvent(HealthAutoDisconnectEvent event) {
+        if (!CONFIG.discord.notifications.healthDisconnect) return;
         var embed = Embed.builder()
             .title("Health AutoDisconnect Triggered")
             .addField("Health", CACHE.getPlayerCache().getThePlayer().getHealth(), true)
@@ -510,6 +521,7 @@ public class NotificationEventListener {
     }
 
     public void handleNonWhitelistedPlayerConnectedEvent(NonWhitelistedPlayerConnectedEvent event) {
+        if (!CONFIG.discord.notifications.blockedLogins) return;
         var embed = Embed.builder()
             .title("Non-Whitelisted Login Blocked")
             .errorColor();
@@ -569,6 +581,7 @@ public class NotificationEventListener {
     }
 
     public void handleBlacklistedPlayerConnectedEvent(BlacklistedPlayerConnectedEvent event) {
+        if (!CONFIG.discord.notifications.blockedLogins) return;
         var embed = Embed.builder()
             .title("Blacklisted Player Disconnected")
             .errorColor();
@@ -604,6 +617,7 @@ public class NotificationEventListener {
     }
 
     public void handleActiveHoursConnectEvent(ActiveHoursConnectEvent event) {
+        if (!CONFIG.discord.notifications.activeHours) return;
         int queueLength;
         if (Proxy.getInstance().isPrio()) {
             queueLength = Queue.getQueueStatus().prio();
@@ -651,6 +665,7 @@ public class NotificationEventListener {
     }
 
     public void handleUpdateStartEvent(UpdateStartEvent event) {
+        if (!CONFIG.discord.notifications.updates) return;
         String verString = "Current Version: `" + escape(LAUNCH_CONFIG.version) + "`";
         var newVersion = event.newVersion();
         if (newVersion.isPresent()) verString += "\nNew Version: `" + escape(newVersion.get()) + "`";
@@ -667,6 +682,7 @@ public class NotificationEventListener {
     }
 
     public void handleServerRestartingEvent(ServerRestartingEvent event) {
+        if (!CONFIG.discord.notifications.serverRestart) return;
         var embed = Embed.builder()
             .title("Server Restarting")
             .errorColor()
@@ -679,6 +695,7 @@ public class NotificationEventListener {
     }
 
     public void handleProxyLoginFailedEvent(ClientLoginFailedEvent event) {
+        if (!CONFIG.discord.notifications.loginFailed) return;
         var description = """
         [Help]
         Try waiting and connecting again.
@@ -702,6 +719,7 @@ public class NotificationEventListener {
     }
 
     public void handleStartConnectEvent(ClientStartConnectEvent event) {
+        if (!CONFIG.discord.notifications.connecting) return;
         sendEmbedMessage(Embed.builder()
             .title("Connecting...")
             .inQueueColor());
@@ -728,6 +746,7 @@ public class NotificationEventListener {
     }
 
     public void handleAutoReconnectEvent(final AutoReconnectEvent event) {
+        if (!CONFIG.discord.notifications.autoReconnect) return;
         sendEmbedMessage(Embed.builder()
             .title("AutoReconnecting in " + event.delaySeconds() + "s")
             .inQueueColor());
@@ -745,6 +764,7 @@ public class NotificationEventListener {
     }
 
     public void handleUpdateAvailableEvent(final UpdateAvailableEvent event) {
+        if (!CONFIG.discord.notifications.updates) return;
         var embed = Embed.builder()
             .title("Update Available!")
             .primaryColor();
@@ -759,12 +779,14 @@ public class NotificationEventListener {
     }
 
     public void handleReplayStartedEvent(final ReplayStartedEvent event) {
+        if (!CONFIG.discord.notifications.replays) return;
         sendEmbedMessage(Embed.builder()
             .title("Replay Recording Started")
             .primaryColor());
     }
 
     public void handleReplayStoppedEvent(final ReplayStoppedEvent event) {
+        if (!CONFIG.discord.notifications.replays) return;
         var embed = Embed.builder()
             .title("Replay Recording Stopped")
             .primaryColor();
@@ -802,6 +824,7 @@ public class NotificationEventListener {
     }
 
     public void handleTotemPopEvent(final PlayerTotemPopAlertEvent event) {
+        if (!CONFIG.client.extra.autoTotem.totemPopAlert) return;
         var embed = Embed.builder()
             .title("Player Totem Popped")
             .addField("Totems Left", event.totemsRemaining(), false)
@@ -823,6 +846,7 @@ public class NotificationEventListener {
     }
 
     public void handlePluginLoadFailure(PluginLoadFailureEvent event) {
+        if (!CONFIG.discord.notifications.plugins) return;
         String id = event.id() != null ? event.id() : "?";
         var embed = Embed.builder()
             .title("Plugin Load Failure")
@@ -834,6 +858,7 @@ public class NotificationEventListener {
     }
 
     public void handlePluginLoadedEvent(PluginLoadedEvent event) {
+        if (!CONFIG.discord.notifications.plugins) return;
         var embed = Embed.builder()
             .title("Plugin Loaded")
             .successColor()

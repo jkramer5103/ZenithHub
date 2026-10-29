@@ -111,7 +111,7 @@ public final class Config {
         }
 
         public static final class ClientViaVersion {
-            public boolean enabled = false;
+            public boolean enabled = true;
             public boolean disableOn2b2t = true;
             public boolean autoProtocolVersion = true;
             public int protocolVersion = 765;
@@ -918,6 +918,7 @@ public final class Config {
     }
 
     public static final class Discord {
+        public final Notifications notifications = new Notifications();
         public boolean enable = false;
         public String token = "";
         public String channelId = "";
@@ -950,6 +951,29 @@ public final class Config {
         public boolean showNonWhitelistLoginIP = true;
         public int maxQueuedRequestsPerBucket = 100;
         public boolean isUpdating = false; // internal use for update command state persistence
+        /** Which notifications are posted at all; mentions are configured separately. */
+        public static final class Notifications {
+            public boolean connecting = true;
+            public boolean connected = true;
+            public boolean online = true;
+            public boolean disconnected = true;
+            public boolean autoReconnect = true;
+            public boolean loginFailed = true;
+            public boolean serverRestart = true;
+            public boolean queueStarted = true;
+            public boolean queueWarning = true;
+            public boolean sessionTimeLimit = true;
+            public boolean activeHours = true;
+            public boolean death = true;
+            public boolean deathMessage = true;
+            public boolean healthDisconnect = true;
+            public boolean blockedLogins = true;
+            public boolean spawnPatrol = true;
+            public boolean replays = true;
+            public boolean updates = true;
+            public boolean plugins = true;
+        }
+
         public final ChatRelay chatRelay = new ChatRelay();
 
         public static class ChatRelay {

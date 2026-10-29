@@ -3,6 +3,7 @@ package com.zenith;
 import ar.com.hjg.pngj.PngReader;
 import ch.qos.logback.classic.LoggerContext;
 import com.zenith.cache.CacheResetType;
+import com.zenith.control.ManagedMode;
 import com.zenith.discord.ChatRelayEventListener;
 import com.zenith.discord.Embed;
 import com.zenith.discord.NotificationEventListener;
@@ -115,6 +116,7 @@ public class Proxy {
         setPropertySafe("io.netty.allocator.numDirectArenas", "2");
         setPropertySafe("io.netty.leakDetection.level", "disabled");
         setPropertySafe("io.netty.noUnsafe", "false");
+        ManagedMode.dumpSchemaIfRequested();
         instance.start();
     }
 
@@ -155,6 +157,7 @@ public class Proxy {
             saveLaunchConfig();
             DEFAULT_LOG.warn("Updated version to match embedded ZenithProxy version: {}", exeReleaseVersion);
         }
+        ManagedMode.applyOverrides();
         initEventHandlers();
         try {
             var configVerifyResult = ConfigVerifier.verifyConfigs();
@@ -167,6 +170,7 @@ public class Proxy {
             if (CONFIG.debug.clearOldLogs) EXECUTOR.schedule(Proxy::clearOldLogs, 10L, TimeUnit.SECONDS);
             TerminalConsoleAppender.setPrintStdout(false); // cut-over to jline console
             TERMINAL.start();
+            ManagedMode.startControlServer();
             if (CONFIG.debug.lockFile) tryOpenLockFile();
             MODULE.init();
             this.tcpManager = new TcpConnectionManager();
@@ -224,7 +228,7 @@ public class Proxy {
                     connected = true;
                 }
             }
-            if (LAUNCH_CONFIG.auto_update && !inDevEnv()) {
+            if (LAUNCH_CONFIG.auto_update && !inDevEnv() && !ManagedMode.isManaged()) {
                 autoUpdater = LAUNCH_CONFIG.release_channel.equals("git")
                     ? NoOpAutoUpdater.INSTANCE
                     : new RestAutoUpdater();

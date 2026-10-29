@@ -1,0 +1,45 @@
+@import 'tailwindcss';
+
+:root {
+	color-scheme: dark;
+}
+
+@theme {
+	--font-mono: ui-monospace, 'JetBrains Mono', 'Cascadia Code', Menlo, Consolas, monospace;
+}
+
+@utility btn {
+	@apply inline-flex items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors select-none disabled:pointer-events-none disabled:opacity-50;
+}
+@utility btn-primary {
+	@apply btn bg-emerald-600 text-white hover:bg-emerald-500;
+}
+@utility btn-secondary {
+	@apply btn border border-zinc-700 bg-zinc-900 text-zinc-200 hover:bg-zinc-800;
+}
+@utility btn-danger {
+	@apply btn border border-red-900/60 bg-red-950/40 text-red-300 hover:bg-red-900/50;
+}
+@utility btn-ghost {
+	@apply btn text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100;
+}
+@utility input {
+	@apply w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 placeholder-zinc-500 outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500;
+}
+@utility label {
+	@apply mb-1 block text-sm font-medium text-zinc-300;
+}
+@utility card {
+	@apply rounded-xl border border-zinc-800 bg-zinc-900/60;
+}
+
+/* spoiler text from Discord-style embeds */
+.spoiler {
+	background: rgb(63 63 70);
+	color: transparent;
+	border-radius: 0.25rem;
+	cursor: pointer;
+}
+.spoiler.revealed {
+	color: inherit;
+}

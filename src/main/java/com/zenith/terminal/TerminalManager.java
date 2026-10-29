@@ -4,6 +4,7 @@ import com.zenith.Proxy;
 import com.zenith.command.api.CommandContext;
 import com.zenith.command.api.CommandOutputHelper;
 import com.zenith.command.api.CommandSources;
+import com.zenith.control.ControlServer;
 import com.zenith.event.console.ConsoleLogEvent;
 import org.jline.reader.EndOfFileException;
 import org.jline.reader.LineReader;
@@ -75,6 +76,7 @@ public class TerminalManager {
 
     private void writeTerminalOutput(ConsoleLogEvent event) {
         if (lineReader == null) {
+            if (ControlServer.INSTANCE.hasSubscribers()) return;
             var str = event.ansi();
             // default case if we did not initialize an interactive terminal
             if (str.endsWith("\n") || str.endsWith("\n\033[m") || str.endsWith("\n\033[0m")) {

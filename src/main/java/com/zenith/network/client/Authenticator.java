@@ -1,6 +1,7 @@
 package com.zenith.network.client;
 
 import com.google.gson.JsonObject;
+import com.zenith.control.ManagedMode;
 import com.zenith.event.client.MsaDeviceCodeLoginEvent;
 import com.zenith.util.WebBrowserHelper;
 import lombok.Getter;
@@ -49,6 +50,10 @@ public class Authenticator {
     public static final File AUTH_CACHE_FILE = new File("mc_auth_cache.json");
 
     public void clearAuthCache() {
+        if (ManagedMode.isManaged()) {
+            AUTH_LOG.warn("Auth cache is managed by the web UI, not clearing it");
+            return;
+        }
         try {
             Files.deleteIfExists(AUTH_CACHE_FILE.toPath());
         } catch (IOException ex) {
@@ -83,6 +88,10 @@ public class Authenticator {
 
     @SneakyThrows
     private JavaAuthManager loginJavaAuthManager() {
+        if (ManagedMode.isManaged()) {
+            // the manager owns interactive logins, never prompt for device codes inside an instance
+            throw new IllegalStateException("No valid login for this account. Log in again from the web UI.");
+        }
         var builder = JavaAuthManager.create(createHttpClient());
         return switch (CONFIG.authentication.accountType) {
             case MSA -> builder

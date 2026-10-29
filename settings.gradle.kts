@@ -10,3 +10,5 @@ plugins {
 }
 
 rootProject.name = "ZenithProxy"
+
+include("manager")
