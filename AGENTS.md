@@ -20,7 +20,8 @@ records what is done. Keep it up to date when you change behaviour.
   defined in `src/lib/settings-catalog.ts`, and search lives in `src/lib/settings-search.ts`.
 - `Dockerfile`, `docker-compose.yml` (builds from the checkout), `quickstart/docker-compose.yml`
   (pulls the published image): the only supported ways to deploy. `.github/workflows/ci.yml`
-  runs the checks below on every push and PR and publishes the image from `main`.
+  runs the checks below on every push and PR (docs-only changes skip it). The image builds in
+  parallel and is tagged `latest` on `main` only once the checks pass.
 
 ## Build and check
 

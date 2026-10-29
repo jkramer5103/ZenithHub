@@ -34,7 +34,7 @@ from ZenithProxy to ZenithHub on 2026-10-29: user-facing names only, code keeps 
   - no interactive terminal, no self-updater and no per-instance Discord bot;
   - logs go to stdout, where the manager captures and streams them;
   - no device-code prompts inside instances: the manager owns MSA login, refreshes tokens and syncs `mc_auth_cache.json`.
-- **Updates**: Docker image tags only. CI (`.github/workflows/ci.yml`) publishes `ghcr.io/jkramer5103/zenithhub` (`latest`, `sha-<commit>`) from `main`. There is no self-update.
+- **Updates**: Docker image tags only. CI (`.github/workflows/ci.yml`) publishes `ghcr.io/jkramer5103/zenithhub` (`latest`, `sha-<commit>`) from `main`. The image builds while the tests run, and `latest` only moves once they pass. Docs-only changes skip CI. There is no self-update.
 
 ## Data model (`/data/manager/state.json`)
 
