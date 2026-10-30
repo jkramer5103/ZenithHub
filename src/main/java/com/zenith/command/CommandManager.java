@@ -123,6 +123,7 @@ public class CommandManager {
         if (com.zenith.control.ManagedMode.isManaged()) {
             commandsList.add(new com.zenith.command.impl.LobbyCommand());
             commandsList.add(new com.zenith.command.impl.ControllerCommand());
+            commandsList.add(new com.zenith.command.impl.AfkZoneCommand());
         }
         commandsList.removeIf(com.zenith.control.Cheats::blocks);
         registerCommands();

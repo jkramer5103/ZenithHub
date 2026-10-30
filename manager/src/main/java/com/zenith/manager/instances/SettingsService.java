@@ -237,6 +237,12 @@ public final class SettingsService {
                 }
             }
         }
+        // so is the proxy pool's
+        if (scope == Scope.INSTANCE && forced.containsKey(ConfigComposer.PROXY + "password") && store.read(s -> s.proxyPool.enabled)) {
+            for (var shown : List.of(values, inheritedValues)) {
+                if (shown.has(ConfigComposer.PROXY + "password")) shown.addProperty(ConfigComposer.PROXY + "password", "");
+            }
+        }
         var forcedPaths = new JsonArray();
         forced.keySet().stream().filter(schema::has).forEach(forcedPaths::add);
 
@@ -367,6 +373,15 @@ public final class SettingsService {
      */
     public synchronized void setUserProxiesAllowed(boolean allowed) throws Exception {
         if (store.read(s -> s.settings.userProxiesAllowed == allowed)) return;
+        changeProxyRules(() -> store.update(s -> s.settings.userProxiesAllowed = allowed));
+    }
+
+    /**
+     * Changes what decides the instances' proxy (the proxy pool, who may set their own). Running instances get
+     * the new proxy right away and use it from their next connection; in-game changes are captured first,
+     * against the old rules.
+     */
+    public synchronized void changeProxyRules(Runnable change) throws Exception {
         var defaults = defaults();
         var liveConfigs = new LinkedHashMap<String, JsonObject>();
         for (var instanceId : store.read(s -> s.instances.stream().map(i -> i.id).toList())) {
@@ -380,7 +395,7 @@ public final class SettingsService {
             var overrides = ConfigComposer.extractInstanceOverrides(defaults, supervisor.context(instanceId), e.getValue(), supervisor.stalePaths(instanceId));
             store.update(s -> s.instances.stream().filter(i -> i.id.equals(instanceId)).forEach(i -> i.settings = overrides));
         }
-        store.update(s -> s.settings.userProxiesAllowed = allowed);
+        change.run();
         for (var instanceId : liveConfigs.keySet()) {
             var composed = ConfigComposer.compose(defaults, supervisor.context(instanceId));
             var patch = new JsonObject();

@@ -270,6 +270,10 @@ public final class Supervisor {
     private void spawn(InstanceRuntime rt) throws IOException {
         stalePaths.remove(rt.instanceId);
         var ctx = context(rt.instanceId);
+        // never connect from this machine's IP, or share another account's, while the pool is on
+        if (ctx.poolProxy() != null && ctx.poolProxy().missing()) {
+            throw new IllegalStateException("The proxy pool has no free proxy for this account. Add proxies or turn the pool off.");
+        }
         var dir = config.instanceDir(rt.instanceId);
         Files.createDirectories(dir);
         SecureFiles.writeString(dir.resolve("config.json"), Json.GSON.toJson(ConfigComposer.compose(zenithDefaults(dir), ctx)));
@@ -454,6 +458,7 @@ public final class Supervisor {
                             // what Zenith's own Discord bot would have posted
                             case "notification" -> events.publish(json.get("type").getAsString(), rt.instanceId, json);
                             case "player" -> playerEvents.accept(rt.instanceId, json);
+                            case "afk" -> afkEvents.accept(rt.instanceId, json);
                             default -> {}
                         }
                     });
@@ -569,7 +574,15 @@ public final class Supervisor {
                 .orElseThrow(() -> new IllegalStateException("Instance account was deleted"));
             return new ConfigComposer.Context(instance, server, account, s.globalSettings, s.settings, null, config.cheatsDisabled());
         });
-        return new ConfigComposer.Context(ctx.instance(), ctx.server(), ctx.account(), ctx.globalSettings(), ctx.managerSettings(), joinLists.apply(instanceId), ctx.cheatsDisabled());
+        return new ConfigComposer.Context(ctx.instance(), ctx.server(), ctx.account(), ctx.globalSettings(), ctx.managerSettings(),
+            joinLists.apply(instanceId), ctx.cheatsDisabled(), poolProxy.apply(ctx.account().id));
+    }
+
+    /** The proxy pool's proxy for an account, or null while the pool is off. */
+    private volatile java.util.function.Function<String, ConfigComposer.@org.jspecify.annotations.Nullable PoolProxy> poolProxy = accountId -> null;
+
+    public void setPoolProxy(java.util.function.Function<String, ConfigComposer.@org.jspecify.annotations.Nullable PoolProxy> provider) {
+        this.poolProxy = provider;
     }
 
     /** Called once a new process answers, to push what it couldn't be started with (the join lists). */
@@ -590,6 +603,13 @@ public final class Supervisor {
 
     public void setPlayerEvents(java.util.function.BiConsumer<String, JsonObject> listener) {
         this.playerEvents = listener;
+    }
+
+    /** AFK zone state and rewards (instance id, Zenith's event). */
+    private volatile java.util.function.BiConsumer<String, JsonObject> afkEvents = (id, event) -> {};
+
+    public void setAfkEvents(java.util.function.BiConsumer<String, JsonObject> listener) {
+        this.afkEvents = listener;
     }
 
     private void setDesiredRunning(String instanceId, boolean running) {

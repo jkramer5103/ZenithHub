@@ -8,6 +8,8 @@ import com.google.gson.JsonPrimitive;
 import com.zenith.manager.state.State;
 import com.zenith.manager.util.Json;
 
+import org.jspecify.annotations.Nullable;
+
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,8 +28,22 @@ public final class ConfigComposer {
         JsonObject globalSettings,
         State.ManagerSettings managerSettings,
         JoinLists joinLists,
-        boolean cheatsDisabled
-    ) {}
+        boolean cheatsDisabled,
+        /** null while the proxy pool is off */
+        @Nullable PoolProxy poolProxy
+    ) {
+        public Context(State.Instance instance, State.ServerProfile server, State.Account account, JsonObject globalSettings,
+                       State.ManagerSettings managerSettings, JoinLists joinLists, boolean cheatsDisabled) {
+            this(instance, server, account, globalSettings, managerSettings, joinLists, cheatsDisabled, null);
+        }
+    }
+
+    /** The proxy pool's proxy for the instance's account; {@code host} null while the pool has none free for it. */
+    public record PoolProxy(String type, @Nullable String host, int port, String user, String password) {
+        public boolean missing() {
+            return host == null;
+        }
+    }
 
     /** Zenith player entries derived from grants; the lobby is the only way in, so these replace Zenith's own lists. */
     public record JoinLists(JsonArray players, JsonArray spectators) {
@@ -98,7 +114,9 @@ public final class ConfigComposer {
         } else {
             forced.put("authentication.accountType", new JsonPrimitive("device_code"));
         }
-        forced.putAll(proxyForcedValues(ctx.managerSettings(), ctx.globalSettings()));
+        var pool = ctx.poolProxy();
+        if (pool != null && !pool.missing()) forced.putAll(poolForcedValues(pool));
+        else forced.putAll(proxyForcedValues(ctx.managerSettings(), ctx.globalSettings()));
         if (ctx.cheatsDisabled()) forced.putAll(Cheats.forcedValues());
         return forced;
     }
@@ -136,6 +154,18 @@ public final class ConfigComposer {
         } else if (globalProxyOn(global)) {
             forced.put(PROXY + "enabled", new JsonPrimitive(true));
         }
+        return forced;
+    }
+
+    /** While the proxy pool is on, each account's own proxy from the pool replaces every other proxy setting. */
+    public static Map<String, JsonElement> poolForcedValues(PoolProxy pool) {
+        var forced = new LinkedHashMap<String, JsonElement>();
+        forced.put(PROXY + "enabled", new JsonPrimitive(true));
+        forced.put(PROXY + "type", new JsonPrimitive(pool.type()));
+        forced.put(PROXY + "host", new JsonPrimitive(pool.host()));
+        forced.put(PROXY + "port", new JsonPrimitive(pool.port()));
+        forced.put(PROXY + "user", new JsonPrimitive(pool.user()));
+        forced.put(PROXY + "password", new JsonPrimitive(pool.password()));
         return forced;
     }
 

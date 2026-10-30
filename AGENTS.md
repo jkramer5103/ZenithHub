@@ -32,7 +32,9 @@ records what is done. Keep it up to date when you change behaviour.
 cd web && npm run build && npm run check
 ```
 
-Run prettier only on `.ts` files. No Svelte plugin is installed, so it fails on `.svelte` files.
+Run prettier only on `.ts` files. No Svelte plugin is installed, so it fails on `.svelte` files. There's no
+prettier config either: use `npx prettier --use-tabs --single-quote --print-width 160 --trailing-comma none
+--no-editorconfig`, or it reformats the whole file.
 
 ## Product rules
 

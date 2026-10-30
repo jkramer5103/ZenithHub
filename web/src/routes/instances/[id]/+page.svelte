@@ -10,11 +10,12 @@
 	import SharingPanel from '#lib/components/SharingPanel.svelte';
 	import ControlPanel from '#lib/components/control/ControlPanel.svelte';
 	import PearlsPanel from '#lib/components/PearlsPanel.svelte';
+	import AfkPanel from '#lib/components/AfkPanel.svelte';
 	import TasksPanel from '#lib/components/TasksPanel.svelte';
 	import CopyField from '#lib/components/CopyField.svelte';
 	import { duration } from '#lib/format.js';
 	import { page } from '$app/state';
-	import { Activity, ArrowLeft, CalendarClock, Gamepad2, Joystick, Settings2, Share2, SlidersHorizontal, Orbit, Terminal } from '@lucide/svelte';
+	import { Activity, ArrowLeft, CalendarClock, Gamepad2, Joystick, Settings2, Share2, SlidersHorizontal, Orbit, Terminal, MapPinned } from '@lucide/svelte';
 
 	const id = $derived(page.params.id ?? '');
 	const instance = $derived(app.instance(id));
@@ -24,11 +25,12 @@
 	let showSettings = $state(false);
 	const can = (c: Capability) => !!instance?.capabilities.includes(c);
 
-	type Tab = 'overview' | 'control' | 'pearls' | 'tasks' | 'settings' | 'sharing' | 'console';
+	type Tab = 'overview' | 'control' | 'afk' | 'pearls' | 'tasks' | 'settings' | 'sharing' | 'console';
 	const tabs = $derived(
 		[
 			{ id: 'overview' as Tab, label: 'Overview', icon: Activity, show: true },
 			{ id: 'control' as Tab, label: 'Control', icon: Joystick, show: !!instance && (can('PLAY') || can('CONTROL')) },
+			{ id: 'afk' as Tab, label: 'AFK', icon: MapPinned, show: !!instance && (can('PLAY') || can('CONTROL')) },
 			{ id: 'pearls' as Tab, label: 'Pearls', icon: Orbit, show: can('PEARLS') },
 			{ id: 'tasks' as Tab, label: 'Tasks', icon: CalendarClock, show: can('CONTROL') },
 			{ id: 'settings' as Tab, label: 'Settings', icon: SlidersHorizontal, show: !!instance?.capabilities.includes('SETTINGS') },
@@ -141,6 +143,10 @@
 	{#if tab === 'control'}
 		{#key id}
 			<ControlPanel instanceId={id} capabilities={instance.capabilities} {status} running={runtime.phase === 'RUNNING'} />
+		{/key}
+	{:else if tab === 'afk'}
+		{#key id}
+			<AfkPanel instanceId={id} capabilities={instance.capabilities} running={runtime.phase === 'RUNNING'} />
 		{/key}
 	{:else if tab === 'pearls'}
 		{#key id}

@@ -3,6 +3,7 @@ package com.zenith;
 import ar.com.hjg.pngj.PngReader;
 import ch.qos.logback.classic.LoggerContext;
 import com.zenith.cache.CacheResetType;
+import com.zenith.control.HostResolver;
 import com.zenith.control.ManagedMode;
 import com.zenith.control.OutboundProxy;
 import com.zenith.discord.Embed;
@@ -36,6 +37,7 @@ import com.zenith.via.ZenithClientChannelInitializer;
 import com.zenith.via.ZenithServerChannelInitializer;
 import dev.omega24.upnp4j.UPnP4J;
 import dev.omega24.upnp4j.util.Protocol;
+import io.netty.bootstrap.Bootstrap;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import net.kyori.adventure.key.Key;
@@ -43,6 +45,7 @@ import net.raphimc.minecraftauth.bedrock.exception.MinecraftRequestException;
 import org.geysermc.mcprotocollib.auth.GameProfile;
 import org.geysermc.mcprotocollib.auth.SessionService;
 import org.geysermc.mcprotocollib.network.ProxyInfo;
+import org.geysermc.mcprotocollib.network.tcp.TcpClientBootstrapInitializer;
 import org.geysermc.mcprotocollib.network.tcp.TcpConnectionManager;
 import org.geysermc.mcprotocollib.network.tcp.TcpServer;
 import org.geysermc.mcprotocollib.protocol.MinecraftConstants;
@@ -471,6 +474,13 @@ public class Proxy {
         this.client = new ClientSession(address, port, CONFIG.client.bindAddress, minecraftProtocol, getClientProxyInfo(), tcpManager);
         this.client.setReadTimeout(CONFIG.client.timeout.enable ? CONFIG.client.timeout.seconds : 0);
         this.client.setFlag(MinecraftConstants.CLIENT_CHANNEL_INITIALIZER, ZenithClientChannelInitializer.FACTORY);
+        // ZenithHub: falls back to following the CNAME when the system resolver answers with nothing
+        this.client.setFlag(MinecraftConstants.CLIENT_BOOTSTRAP_INITIALIZER, (client, initializer) -> new TcpClientBootstrapInitializer(client, initializer) {
+            @Override
+            public Bootstrap initBootstrap() {
+                return super.initBootstrap().resolver(HostResolver.RESOLVER_GROUP);
+            }
+        });
         // ZenithHub: the session server join goes through the proxy too
         var sessionService = new SessionService();
         sessionService.setProxy(OutboundProxy.sessionServiceProxy());

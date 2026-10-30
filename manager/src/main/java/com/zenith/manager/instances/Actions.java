@@ -95,6 +95,11 @@ public final class Actions {
             case "replayStart" -> new Command(Capability.CONTROL, "replay start");
             case "replayStop" -> new Command(Capability.CONTROL, "replay stop");
 
+            // --- AFK zone ---
+            case "afkKeep" -> new Command(Capability.CONTROL, "afkZone keep " + (bool(body, "keep") ? "on" : "off"));
+            case "afkEnter" -> play("afkZone enter");
+            case "afkLeave" -> play("afkZone leave");
+
             // --- pearls ---
             case "loadPearl" -> new Command(Capability.PEARLS, "pearlLoader load " + id(body, "pearl"));
 

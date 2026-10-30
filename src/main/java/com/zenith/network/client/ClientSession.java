@@ -2,6 +2,7 @@ package com.zenith.network.client;
 
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.zenith.Proxy;
+import com.zenith.control.ServerScreen;
 import com.zenith.event.client.ClientConnectEvent;
 import com.zenith.event.client.ClientDisconnectEvent;
 import com.zenith.mc.biome.BiomeRegistry;
@@ -151,6 +152,7 @@ public class ClientSession extends TcpClientSession {
     public void callPacketReceived(Packet packet) {
         try {
             var state = this.getPacketProtocol().getInboundState();
+            if (state == ProtocolState.GAME) ServerScreen.onPacket(packet);
             final Packet p = PacketCodecRegistries.CLIENT_REGISTRY.handleInbound(packet, this);
             if (p != null && (state == ProtocolState.GAME || state == ProtocolState.CONFIGURATION)) {
                 // sends on each connection's own event loop

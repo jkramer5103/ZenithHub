@@ -222,6 +222,7 @@ public final class ControlServer {
         if (online) {
             json.add("inventory", inventory());
             json.add("nearby", nearby());
+            json.add("screen", ServerScreen.json());
         }
         var pathfinder = new JsonObject();
         boolean pathing = online && BARITONE.isActive();
@@ -231,6 +232,7 @@ public final class ControlServer {
                 .ifPresent(process -> pathfinder.addProperty("process", process.displayName()));
         }
         json.add("pathfinder", pathfinder);
+        json.add("afkZone", MODULE.get(AfkZone.class).json());
         json.addProperty("recording", MODULE.get(ReplayMod.class).isEnabled());
         var click = CONFIG.client.extra.click;
         if (click.holdLeftClick || click.holdRightClick) json.addProperty("clicking", click.holdLeftClick ? "left" : "right");
@@ -495,6 +497,15 @@ public final class ControlServer {
             var text = message.replaceAll("<@[&!]?\\d+>", "").strip();
             if (!text.isEmpty()) json.addProperty("text", text);
         }
+        var msg = COMPACT_GSON.toJson(json);
+        for (var queue : eventSubscribers) {
+            queue.offer(msg);
+        }
+    }
+
+    /** A structured event for the manager; {@code json} carries its own "type". */
+    public void publish(JsonObject json) {
+        if (eventSubscribers.isEmpty()) return;
         var msg = COMPACT_GSON.toJson(json);
         for (var queue : eventSubscribers) {
             queue.offer(msg);

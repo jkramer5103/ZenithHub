@@ -17,6 +17,8 @@ import com.zenith.manager.auth.Permissions;
 import com.zenith.manager.auth.Sessions;
 import com.zenith.manager.instances.Actions;
 import com.zenith.manager.instances.PearlService;
+import com.zenith.manager.instances.AfkHistory;
+import com.zenith.manager.instances.ProxyPool;
 import com.zenith.manager.instances.PlayerHistory;
 import com.zenith.manager.instances.SettingsService;
 import com.zenith.manager.instances.Supervisor;
@@ -74,13 +76,17 @@ public final class WebServer {
     private final DiscordBot discord;
     private final PearlService pearls;
     private final PlayerHistory history;
+    private final AfkHistory afkHistory;
+    private final ProxyPool proxyPool;
     private final Map<WsContext, WsClient> wsClients = new ConcurrentHashMap<>();
     private Javalin app;
 
-    public WebServer(ManagerConfig config, StateStore store, AccountService accounts, Supervisor supervisor, EventHub events, SettingsService settings, AccessService access, DiscordBot discord, PearlService pearls, PlayerHistory history) {
+    public WebServer(ManagerConfig config, StateStore store, AccountService accounts, Supervisor supervisor, EventHub events, SettingsService settings, AccessService access, DiscordBot discord, PearlService pearls, PlayerHistory history, AfkHistory afkHistory, ProxyPool proxyPool) {
         this.config = config;
         this.pearls = pearls;
         this.history = history;
+        this.afkHistory = afkHistory;
+        this.proxyPool = proxyPool;
         this.discord = discord;
         this.access = access;
         this.settings = settings;
@@ -296,6 +302,7 @@ public final class WebServer {
             var account = requireAccount(requireUser(ctx), ctx.pathParam("id"));
             var categoryId = account.discordCategoryId;
             accounts.delete(ctx.pathParam("id"));
+            proxyPool.forgetAccount(ctx.pathParam("id"));
             discord.deleteCategory(categoryId);
             changed();
             send(ctx, ok());
@@ -436,6 +443,7 @@ public final class WebServer {
             supervisor.forget(id);
             pearls.forget(id, null);
             history.forget(id);
+            afkHistory.forget(id);
             store.update(s -> s.instances.removeIf(i -> i.id.equals(id)));
             SecureFiles.deleteRecursively(config.instanceDir(id));
             changed();
@@ -551,6 +559,10 @@ public final class WebServer {
         app.get("/api/instances/{id}/history", ctx -> {
             var instance = requireCapability(ctx, Capability.CONTROL);
             send(ctx, history.list(instance.id));
+        });
+        app.get("/api/instances/{id}/afk", ctx -> {
+            var instance = requireCapability(ctx, Capability.VIEW);
+            send(ctx, afkHistory.get(instance.id));
         });
 
         app.get("/api/instances/{id}/pearls", ctx -> {
@@ -722,6 +734,70 @@ public final class WebServer {
         app.patch("/api/instances/{id}/settings", ctx -> {
             var id = requireCapability(ctx, Capability.SETTINGS).id;
             updateSettings(ctx, SettingsService.Scope.INSTANCE, id);
+        });
+        // proxy pool (admin): the list URL goes in, never out
+        app.get("/api/proxy-pool", ctx -> {
+            requireAdmin(ctx);
+            send(ctx, proxyPool.status());
+        });
+        app.put("/api/proxy-pool", ctx -> {
+            requireAdmin(ctx);
+            var body = body(ctx);
+            var url = optString(body, "url");
+            if (url != null) {
+                try {
+                    proxyPool.setUrl(url);
+                } catch (IllegalArgumentException | java.io.IOException e) {
+                    throw ApiException.badRequest("Couldn't load the list: " + e.getMessage());
+                }
+            }
+            Boolean enabled = body.has("enabled") ? body.get("enabled").getAsBoolean() : null;
+            var type = optString(body, "type");
+            if (type != null && !ProxyPool.TYPES.contains(type)) throw ApiException.badRequest("Unknown proxy type");
+            if (Boolean.TRUE.equals(enabled) && proxyPool.status().get("size").getAsInt() == 0) throw ApiException.badRequest("Add a proxy list first");
+            // a new list can drop proxies accounts were using, so they get new ones too
+            if (enabled != null || type != null || url != null) settings.changeProxyRules(() -> proxyPool.configure(enabled, type));
+            changed();
+            send(ctx, proxyPool.status());
+        });
+        app.post("/api/proxy-pool/refresh", ctx -> {
+            requireAdmin(ctx);
+            try {
+                proxyPool.refresh();
+            } catch (java.io.IOException | IllegalStateException e) {
+                throw ApiException.badRequest("Couldn't load the list: " + e.getMessage());
+            }
+            settings.changeProxyRules(() -> {});
+            send(ctx, proxyPool.status());
+        });
+        app.post("/api/proxy-pool/reassign/{accountId}", ctx -> {
+            requireAdmin(ctx);
+            var accountId = ctx.pathParam("accountId");
+            settings.changeProxyRules(() -> proxyPool.reassign(accountId));
+            send(ctx, proxyPool.status());
+        });
+        // connected instances keep their old connection until they reconnect; this restarts them one by one
+        app.post("/api/proxy-pool/reconnect", ctx -> {
+            requireAdmin(ctx);
+            var ids = store.read(s -> s.instances.stream().map(i -> i.id).toList()).stream()
+                .filter(supervisor::isConnected).toList();
+            Thread.ofVirtual().name("proxy-pool-reconnect").start(() -> {
+                for (var id : ids) {
+                    try {
+                        supervisor.restart(id);
+                        // in case the shutdown counted as a disconnect
+                        supervisor.connect(id, "proxy pool");
+                        Thread.sleep(5_000);
+                    } catch (InterruptedException e) {
+                        return;
+                    } catch (Exception e) {
+                        LOG.warn("Couldn't reconnect instance {} through its new proxy", id, e);
+                    }
+                }
+            });
+            var json = new JsonObject();
+            json.addProperty("reconnecting", ids.size());
+            send(ctx, json);
         });
         app.put("/api/settings/manager", ctx -> {
             requireAdmin(ctx);

@@ -82,7 +82,33 @@ public final class Config {
         public final ChatSchemas chatSchemas = new ChatSchemas();
         public final KeepAliveHandling keepAliveHandling = new KeepAliveHandling();
         public final Privacy privacy = new Privacy();
+        public final AfkZone afkZone = new AfkZone();
         public double tickRate = 1.0;
+
+        /**
+         * ZenithHub: the server's AFK zone, where servers like HugoSMP pay for idling.
+         * The defaults match HugoSMP; set the others per server.
+         */
+        public static final class AfkZone {
+            // go to the zone after joining and whenever the bot ends up outside it
+            public boolean keep = false;
+            // sent as a command, without the slash
+            public String enterCommand = "afk";
+            public String leaveCommand = "spawn";
+            // the server shows this in a title, subtitle or the action bar once the bot is in the zone
+            public String confirmText = "AFK";
+            // the sidebar line that counts what the zone pays
+            public String rewardLabel = "Stars";
+            // the server shows this while the account can't earn (HugoSMP: "you must be verified on Discord")
+            public String notEarningText = "verifiziert";
+            // wait a random time in this range after joining or leaving the zone, like a person would
+            public int enterDelayMinSeconds = 8;
+            public int enterDelayMaxSeconds = 30;
+            // tries before giving up until the next connection
+            public int maxAttempts = 4;
+            // moved further than this from where it entered: it's out of the zone
+            public int leaveDistance = 128;
+        }
 
         /**
          * What the server can learn about this connection.

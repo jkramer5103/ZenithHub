@@ -589,6 +589,32 @@ export const catalog: Group[] = [
 		icon: Bot,
 		sections: [
 			{
+				id: 'afkZone',
+				title: 'AFK zone',
+				description: 'Servers that pay for idling in a zone, like HugoSMP’s /afk. The AFK tab shows whether it pays.',
+				toggle: 'client.afkZone.keep',
+				fields: [
+					{ path: 'client.afkZone.enterCommand', label: 'Command to get in', placeholder: 'afk', help: 'Without the slash.' },
+					{ path: 'client.afkZone.leaveCommand', label: 'Command to get out', placeholder: 'spawn', help: 'Without the slash.' },
+					{
+						path: 'client.afkZone.confirmText',
+						label: 'Server confirms with',
+						help: 'Text in the title, subtitle or action bar the server shows on entering.'
+					},
+					{ path: 'client.afkZone.rewardLabel', label: 'Reward on the sidebar', help: 'The sidebar line with the counter, e.g. Stars.' },
+					{
+						path: 'client.afkZone.notEarningText',
+						label: 'Not earning when it says',
+						help: 'Text in the server’s zone message that means the account earns nothing, e.g. a Discord verification hint.',
+						advanced: true
+					},
+					{ path: 'client.afkZone.enterDelayMinSeconds', label: 'Wait at least', unit: 'seconds before going in', min: 0, advanced: true },
+					{ path: 'client.afkZone.enterDelayMaxSeconds', label: 'Wait at most', unit: 'seconds before going in', min: 0, advanced: true },
+					{ path: 'client.afkZone.maxAttempts', label: 'Give up after', unit: 'attempts', min: 1, advanced: true },
+					{ path: 'client.afkZone.leaveDistance', label: 'Counts as left after', unit: 'blocks from the zone', min: 1, advanced: true }
+				]
+			},
+			{
 				id: 'antiafk',
 				title: 'Anti-AFK',
 				description: 'Small movements so the server doesn’t kick the account for being idle.',

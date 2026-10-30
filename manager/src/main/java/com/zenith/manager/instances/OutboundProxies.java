@@ -47,6 +47,9 @@ public final class OutboundProxies {
             // its server was deleted, so it can't run
             return global();
         }
+        if (ctx.poolProxy() != null && ctx.poolProxy().missing()) {
+            throw new IllegalStateException("The proxy pool has no free proxy for this account");
+        }
         return relay(upstream(ConfigComposer.compose(supervisor.zenithDefaults(config.instanceDir(instanceId)), ctx)));
     }
 

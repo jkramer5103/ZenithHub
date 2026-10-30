@@ -45,7 +45,10 @@ settings all happen in the browser.
   has `/status`, `/connect`, `/disconnect`, `/pearl` and `/command`, and every notification can be
   switched off. There is no chat relay.
 - **Outbound proxy** (SOCKS/HTTP) for all traffic: the server connection, Microsoft and Xbox sign-in,
-  skins and every other request. One global proxy, optionally with per-user proxies.
+  skins and every other request. One global proxy, optionally with per-user proxies, or a proxy pool
+  that gives every account its own IP from a provider's list (Webshare and the like).
+- **AFK zones** on plugin servers like HugoSMP: keeps the bot in the zone, and shows whether it's
+  actually earning, the reward over time and every stay.
 - **Optional cheat lock:** `ZENITH_DISABLE_CHEATS=true` removes combat and automation modules for
   servers that don't allow them.
 - Instances return to their previous state after a restart and are restarted with backoff if they crash.

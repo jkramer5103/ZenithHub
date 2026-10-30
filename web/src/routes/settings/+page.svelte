@@ -3,6 +3,7 @@
 	import { app } from '#lib/app.svelte.js';
 	import DiscordBotCard from '#lib/components/DiscordBotCard.svelte';
 	import ProxyCard from '#lib/components/ProxyCard.svelte';
+	import ProxyPoolCard from '#lib/components/ProxyPoolCard.svelte';
 	import SettingsEditor from '#lib/components/settings/SettingsEditor.svelte';
 	import { toasts } from '#lib/toast.svelte.js';
 	import { page } from '$app/state';
@@ -65,5 +66,6 @@
 	<button class="btn-primary" disabled={saving || !publicAddress.trim()}>Save</button>
 </form>
 <div class="mt-6"><ProxyCard /></div>
+<div class="mt-6"><ProxyPoolCard /></div>
 <div class="mt-6"><DiscordBotCard /></div>
 {/if}

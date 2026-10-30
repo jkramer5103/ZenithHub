@@ -44,7 +44,8 @@ public class ModuleManager {
             new Spook(),
             new SpawnPatrol(),
             new Tasks(),
-            new VisualRange()
+            new VisualRange(),
+            new com.zenith.control.AfkZone()
         ).forEach(m -> {
             addModule(m);
             m.syncEnabledFromConfig();

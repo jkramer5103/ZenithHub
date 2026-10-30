@@ -1,5 +1,6 @@
 package com.zenith.feature.queue.mcping;
 
+import com.zenith.control.HostResolver;
 import com.zenith.feature.queue.mcping.data.MCResponse;
 import com.zenith.feature.queue.mcping.rawData.Player;
 import com.zenith.feature.queue.mcping.rawData.Players;
@@ -94,7 +95,7 @@ public class MCPing {
             }
         }
         try {
-            InetAddress resolved = InetAddress.getByName(resolvedHostname);
+            InetAddress resolved = HostResolver.resolve(resolvedHostname);
             return new InetSocketAddress(resolved, resolvedPort);
         } catch (UnknownHostException e) {
             return InetSocketAddress.createUnresolved(resolvedHostname, resolvedPort);

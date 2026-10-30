@@ -327,6 +327,55 @@ export interface InstanceDetails {
 	waypoints: Waypoint[];
 	/** what the server can see of the bot's client, while it's connected */
 	fingerprint?: Fingerprint;
+	/** what the server shows besides chat, while the bot is in the game */
+	screen?: ServerScreen;
+	afkZone?: AfkZoneStatus;
+}
+
+export interface ServerScreen {
+	sidebar?: { title: string; lines: string[] };
+	bossBars: { title: string; progress: number; color: string | null }[];
+	actionBar?: string | null;
+	title?: string;
+	subtitle?: string;
+	tabHeader?: string;
+	tabFooter?: string;
+}
+
+export type AfkZoneState = 'OFFLINE' | 'OUTSIDE' | 'WAITING' | 'ENTERING' | 'IN_ZONE' | 'PLAYING' | 'FAILED';
+
+export interface AfkZoneStatus {
+	state: AfkZoneState;
+	/** go back in whenever it's outside */
+	keep: boolean;
+	enterCommand: string;
+	leaveCommand: string;
+	rewardLabel: string;
+	/** in the zone since */
+	since?: number;
+	nextAttemptAt?: number;
+	sentAt?: number;
+	attempts: number;
+	maxAttempts: number;
+	failure?: string;
+	leftAt?: number;
+	leftReason?: string;
+	/** absent while it can't tell yet */
+	earning?: boolean;
+	/** the zone's last action bar or title text */
+	serverMessage?: string;
+	/** the message says it earns nothing */
+	serverMessageBlocks?: boolean;
+	reward?: number;
+	rewardText?: string;
+	rewardAtEntry?: number;
+}
+
+export interface AfkHistory {
+	/** [timestamp, reward], oldest first */
+	samples: [number, number][];
+	/** newest first */
+	sessions: { start: number; end?: number; startReward?: number; endReward?: number; endReason?: string }[];
 }
 
 export interface Fingerprint {
@@ -360,4 +409,16 @@ export interface Replay {
 	name: string;
 	size: number;
 	modified: number;
+}
+
+export interface ProxyPoolStatus {
+	enabled: boolean;
+	type: 'SOCKS5' | 'SOCKS4' | 'HTTP';
+	/** a list URL is saved; it's never sent back */
+	hasUrl: boolean;
+	size: number;
+	free: number;
+	refreshedAt?: number;
+	error?: string;
+	accounts: { accountId: string; username: string; proxy?: string; inPool?: boolean }[];
 }

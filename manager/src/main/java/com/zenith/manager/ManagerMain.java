@@ -8,6 +8,8 @@ import com.google.gson.JsonObject;
 import com.zenith.manager.instances.ConfigComposer;
 import com.zenith.manager.instances.OutboundProxies;
 import com.zenith.manager.instances.PearlService;
+import com.zenith.manager.instances.AfkHistory;
+import com.zenith.manager.instances.ProxyPool;
 import com.zenith.manager.instances.PlayerHistory;
 import com.zenith.manager.instances.SettingsService;
 import com.zenith.manager.lobby.LobbyServer;
@@ -40,6 +42,8 @@ public final class ManagerMain {
         var proxies = new OutboundProxies(config, store, supervisor);
         accounts.setProxies(proxies);
         MojangProfiles.setProxy(proxies::global);
+        var proxyPool = new ProxyPool(config, store, proxies::global);
+        supervisor.setPoolProxy(proxyPool::forAccount);
         var access = new AccessService(store);
         var players = new PlayerDirectory(config.dataDir().resolve("manager").resolve("players.json"));
         supervisor.setJoinLists(id -> joinLists(access.joinNames(id), players));
@@ -51,8 +55,10 @@ public final class ManagerMain {
         var pearls = new PearlService(config, supervisor, settings);
         var history = new PlayerHistory(config);
         supervisor.setPlayerEvents(history::record);
+        var afkHistory = new AfkHistory(config);
+        supervisor.setAfkEvents(afkHistory::record);
         var discord = new DiscordBot(config, store, access, supervisor, events, pearls);
-        var web = new WebServer(config, store, accounts, supervisor, events, settings, access, discord, pearls, history);
+        var web = new WebServer(config, store, accounts, supervisor, events, settings, access, discord, pearls, history, afkHistory, proxyPool);
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             LOG.info("Stopping instances...");
@@ -70,6 +76,7 @@ public final class ManagerMain {
         discord.start();
         accounts.startBackgroundRefresh();
         supervisor.startBackgroundTasks();
+        proxyPool.startBackgroundRefresh();
         // instances are composed from the Zenith defaults, so read them first in case the image was updated
         Thread.ofVirtual().name("startup").start(() -> {
             settings.refreshSchema();

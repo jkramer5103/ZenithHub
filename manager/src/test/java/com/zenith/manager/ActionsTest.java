@@ -33,6 +33,10 @@ class ActionsTest {
         assertEquals("transfer play.example.net 25566 Steve", command("{\"action\":\"transfer\",\"address\":\"play.example.net\",\"port\":25566,\"player\":\"Steve\"}"));
         assertEquals("controller set Alex", command("{\"action\":\"makePlayer\",\"player\":\"Alex\"}"));
         assertEquals("controller release", command("{\"action\":\"makeSpectator\"}"));
+        assertEquals("afkZone keep on", command("{\"action\":\"afkKeep\",\"keep\":true}"));
+        assertEquals("afkZone keep off", command("{\"action\":\"afkKeep\",\"keep\":false}"));
+        assertEquals("afkZone enter", command("{\"action\":\"afkEnter\"}"));
+        assertEquals("afkZone leave", command("{\"action\":\"afkLeave\"}"));
     }
 
     @Test
@@ -40,6 +44,8 @@ class ActionsTest {
         assertEquals(Capability.PLAY, Actions.parse(json("{\"action\":\"stop\"}")).capability());
         assertEquals(Capability.CONTROL, Actions.parse(json("{\"action\":\"kick\"}")).capability());
         assertEquals(Capability.PEARLS, Actions.parse(json("{\"action\":\"loadPearl\",\"pearl\":\"Steve\"}")).capability());
+        assertEquals(Capability.CONTROL, Actions.parse(json("{\"action\":\"afkKeep\",\"keep\":true}")).capability());
+        assertEquals(Capability.PLAY, Actions.parse(json("{\"action\":\"afkEnter\"}")).capability());
         assertEquals(Capability.COMMANDS, Actions.parse(json("{\"action\":\"command\",\"command\":\"help\"}")).capability());
     }
 

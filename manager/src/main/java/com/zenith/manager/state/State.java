@@ -23,6 +23,19 @@ public final class State {
     /** Global settings layer, applied on top of Zenith's defaults for every instance. */
     public JsonObject globalSettings = new JsonObject();
     public ManagerSettings settings = new ManagerSettings();
+    public ProxyPoolSettings proxyPool = new ProxyPoolSettings();
+
+    /** A list of proxies from a provider's download URL (a secret file); each account gets one of its own. */
+    public static final class ProxyPoolSettings {
+        public boolean enabled = false;
+        /** SOCKS5, SOCKS4 or HTTP */
+        public String type = "SOCKS5";
+        /** account id to the proxy's "host:port"; kept while the proxy stays in the list */
+        public java.util.Map<String, String> assignments = new java.util.LinkedHashMap<>();
+        public long refreshedAt;
+        /** the last refresh's failure, cleared on success */
+        public String error;
+    }
 
     public static final class ManagerSettings {
         /** Address players use to reach the lobby; shown in the UI and passed to instances as proxyIP. */
