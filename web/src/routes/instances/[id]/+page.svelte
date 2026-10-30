@@ -114,18 +114,24 @@
 	{/if}
 
 	{#if tabs.length > 1}
-		<!-- scrolls sideways on phones instead of wrapping -->
-		<div class="-mx-4 mb-4 flex gap-1 overflow-x-auto border-b border-zinc-800 px-4 [scrollbar-width:none] sm:mx-0 sm:px-0">
+		<!-- phones: a grid of full-size buttons, three across; wider screens: the usual underlined tab row -->
+		<div
+			class="mb-4 grid gap-1 rounded-xl border border-zinc-800 bg-zinc-900 p-1 {tabs.length === 2 || tabs.length === 4
+				? 'grid-cols-2'
+				: 'grid-cols-3'} sm:flex sm:gap-1 sm:rounded-none sm:border-0 sm:border-b sm:bg-transparent sm:p-0"
+		>
 			{#each tabs as t (t.id)}
 				<a
 					href="?tab={t.id}"
 					data-sveltekit-replacestate
 					data-sveltekit-noscroll
-					class="-mb-px flex shrink-0 items-center gap-1.5 border-b-2 px-3 py-2 text-sm font-medium transition-colors {tab === t.id
-						? 'border-emerald-500 text-zinc-100'
-						: 'border-transparent text-zinc-400 hover:text-zinc-200'}"
+					aria-current={tab === t.id ? 'page' : undefined}
+					class="flex items-center justify-center gap-1.5 rounded-lg px-2 py-2.5 text-sm font-medium transition-colors sm:-mb-px sm:rounded-none sm:border-b-2 sm:bg-transparent sm:px-3 sm:py-2 {tab ===
+					t.id
+						? 'bg-zinc-800 text-zinc-100 sm:border-emerald-500'
+						: 'text-zinc-400 hover:text-zinc-200 sm:border-transparent'}"
 				>
-					<t.icon size={15} />
+					<t.icon size={15} class="shrink-0 {tab === t.id ? 'text-emerald-400 sm:text-current' : ''}" />
 					{t.label}
 				</a>
 			{/each}
