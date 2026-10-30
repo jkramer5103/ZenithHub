@@ -15,25 +15,28 @@ public class EntityPositionSyncHandler implements ClientEventLoopPacketHandler<C
     public boolean applyAsync(final ClientboundEntityPositionSyncPacket packet, final ClientSession session) {
         Entity entity = CACHE.getEntityCache().get(packet.getId());
         if (entity != null) {
+            var pos = packet.isStepped()
+                ? packet.getSteps().getLast().position()
+                : packet.getEndPosition();
             entity
-                .setBaseX(packet.getX())
-                .setBaseY(packet.getY())
-                .setBaseZ(packet.getZ())
-                .setVelX(packet.getDeltaX())
-                .setVelY(packet.getDeltaY())
-                .setVelZ(packet.getDeltaZ());
+                .setBaseX(pos.getX())
+                .setBaseY(pos.getY())
+                .setBaseZ(pos.getZ());
             var isControlledByLocalInstance = entity.isControlledByLocalInstance();
             if (!isControlledByLocalInstance) {
                 var tickable = World.isChunkLoadedBlockPos(MathHelper.floorI(entity.getX()), MathHelper.floorI(entity.getZ()));
-                var tooFar = entity.position().distanceSquared(packet.getX(), packet.getY(), packet.getZ()) > 4096.0;
+                var tooFar = entity.position().distanceSquared(pos.getX(), pos.getY(), pos.getZ()) > 4096.0;
                 if (tickable && !tooFar) {
-                    entity.lerpTo(packet.getX(), packet.getY(), packet.getZ(), packet.getYaw(), packet.getPitch(), 3);
+                    // todo: this is no longer correct in 26.3
+                    //  interpolation is no longer hardcoded to 3 ticks
+                    //  and each entity type has an interval over which they step through interpolations
+                    entity.lerpTo(pos.getX(), pos.getY(), pos.getZ(), packet.getYaw(), packet.getPitch(), 3);
                 } else {
                     entity.cancelLerp();
                     entity
-                        .setX(packet.getX())
-                        .setY(packet.getY())
-                        .setZ(packet.getZ())
+                        .setX(pos.getX())
+                        .setY(pos.getY())
+                        .setZ(pos.getZ())
                         .setYaw(packet.getYaw())
                         .setPitch(packet.getPitch());
                 }

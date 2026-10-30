@@ -155,6 +155,7 @@ public class McplBrigadierConverter {
         return new CommandNode(
             commandType,
             isExecutable,
+            true,
             childrenIndeces,
             redirectIndex,
             name,

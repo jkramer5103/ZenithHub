@@ -5,7 +5,7 @@ import com.zenith.event.module.EntityFishHookSpawnEvent;
 import com.zenith.network.client.ClientSession;
 import com.zenith.network.codec.ClientEventLoopPacketHandler;
 import org.geysermc.mcprotocollib.protocol.data.game.entity.type.EntityType;
-import org.geysermc.mcprotocollib.protocol.packet.ingame.clientbound.entity.spawn.ClientboundAddEntityPacket;
+import org.geysermc.mcprotocollib.protocol.packet.ingame.clientbound.entity.ClientboundAddEntityPacket;
 
 import static com.zenith.Globals.CACHE;
 import static com.zenith.Globals.EVENT_BUS;

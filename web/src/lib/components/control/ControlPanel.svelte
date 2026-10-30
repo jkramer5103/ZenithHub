@@ -95,6 +95,11 @@
 {#if !running}
 	<div class="card p-6 text-center text-sm text-zinc-400">Connect the instance to control the bot.</div>
 {:else}
+	{#if poller.error}
+		<div class="mb-4 rounded-lg border border-red-900/60 bg-red-950/30 px-4 py-3 text-sm text-red-200">
+			Couldn't reach the bot{details ? ', showing what it last reported' : ''}: {poller.error}
+		</div>
+	{/if}
 	{#if details && !online}
 		<div class="mb-4 rounded-lg border border-zinc-800 bg-zinc-900 px-4 py-3 text-sm text-zinc-300">
 			The bot isn't in the game yet{status?.inQueue ? ', it is in the queue' : ''}. Most controls work once it's online.
@@ -160,7 +165,7 @@
 				{#if details?.inventory}
 					<InventoryGrid {instanceId} inventory={details.inventory} canAct={!busy} onchanged={() => poller.refresh()} />
 				{:else}
-					<p class="text-sm text-zinc-500">{details ? 'Shows up once the bot is in the game.' : 'Loading…'}</p>
+					<p class="text-sm text-zinc-500">{details ? 'Shows up once the bot is in the game.' : poller.error ? 'Unavailable right now.' : 'Loading…'}</p>
 				{/if}
 			</section>
 		{:else}
@@ -170,7 +175,7 @@
 						<InteractCard {instanceId} {details} onchanged={() => poller.refresh()} />
 					{/if}
 					{#if canControl && details?.fingerprint}
-						<FingerprintCard fingerprint={details.fingerprint} />
+						<FingerprintCard fingerprint={details.fingerprint} canEditSettings={capabilities.includes('SETTINGS')} />
 					{/if}
 				</div>
 				{#if canControl}

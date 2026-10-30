@@ -2,6 +2,7 @@
 	import { api, errorMessage } from '#lib/api.js';
 	import { app } from '#lib/app.svelte.js';
 	import DiscordBotCard from '#lib/components/DiscordBotCard.svelte';
+	import ProxyCard from '#lib/components/ProxyCard.svelte';
 	import SettingsEditor from '#lib/components/settings/SettingsEditor.svelte';
 	import { toasts } from '#lib/toast.svelte.js';
 	import { page } from '$app/state';
@@ -10,7 +11,6 @@
 
 	const current = app.overview?.settings;
 	let publicAddress = $state(current?.publicAddress ?? '');
-	let outboundProxiesEnabled = $state(current?.outboundProxiesEnabled ?? false);
 	let saving = $state(false);
 	let error = $state('');
 
@@ -19,7 +19,7 @@
 		saving = true;
 		error = '';
 		try {
-			await api.put('/settings/manager', { publicAddress: publicAddress.trim(), outboundProxiesEnabled });
+			await api.put('/settings/manager', { publicAddress: publicAddress.trim() });
 			await app.refresh();
 			toasts.success('Settings saved. Running instances pick them up on restart.');
 		} catch (e) {
@@ -61,17 +61,9 @@
 			The address players type in Minecraft to reach the lobby. Add <span class="font-mono">:port</span> if it isn’t 25565.
 		</p>
 	</div>
-	<label class="flex cursor-pointer items-start gap-3">
-		<input type="checkbox" class="mt-1 size-4 accent-emerald-600" bind:checked={outboundProxiesEnabled} />
-		<span>
-			<span class="block text-sm font-medium">Allow outbound proxies</span>
-			<span class="block text-xs text-zinc-400">
-				Lets instances connect to their server through a SOCKS/HTTP proxy. When off, every instance connects directly.
-			</span>
-		</span>
-	</label>
 	{#if error}<p class="text-sm text-red-400">{error}</p>{/if}
 	<button class="btn-primary" disabled={saving || !publicAddress.trim()}>Save</button>
 </form>
+<div class="mt-6"><ProxyCard /></div>
 <div class="mt-6"><DiscordBotCard /></div>
 {/if}

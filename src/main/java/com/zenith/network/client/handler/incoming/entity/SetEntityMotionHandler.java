@@ -14,12 +14,12 @@ public class SetEntityMotionHandler implements ClientEventLoopPacketHandler<Clie
         var entity = CACHE.getEntityCache().get(packet.getEntityId());
         if (entity != null && packet.getEntityId() != CACHE.getPlayerCache().getEntityId()) {
             entity
-                .setVelX(packet.getMotionX())
-                .setVelY(packet.getMotionY())
-                .setVelZ(packet.getMotionZ());
+                .setVelX(packet.getMovement().getX())
+                .setVelY(packet.getMovement().getY())
+                .setVelZ(packet.getMovement().getZ());
         }
         if (!Proxy.getInstance().hasActivePlayer() && packet.getEntityId() == CACHE.getPlayerCache().getEntityId()) {
-            BOT.handleSetMotion(packet.getMotionX(), packet.getMotionY(), packet.getMotionZ());
+            BOT.handleSetMotion(packet.getMovement().getX(), packet.getMovement().getY(), packet.getMovement().getZ());
         }
         return true;
     }

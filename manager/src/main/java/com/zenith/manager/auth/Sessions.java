@@ -62,6 +62,12 @@ public final class Sessions {
         if (sessions.values().removeIf(s -> s.userId().equals(userId))) save();
     }
 
+    /** Signs the user out everywhere except the session with {@code keepToken}. */
+    public void invalidateUserExcept(String userId, String keepToken) {
+        var keep = keepToken != null ? hash(keepToken) : null;
+        if (sessions.entrySet().removeIf(e -> e.getValue().userId().equals(userId) && !e.getKey().equals(keep))) save();
+    }
+
     private void load() {
         if (!Files.exists(file)) return;
         try {

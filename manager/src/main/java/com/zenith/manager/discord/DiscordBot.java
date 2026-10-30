@@ -104,33 +104,46 @@ public final class DiscordBot extends ListenerAdapter {
 
     // --- lifecycle ---
 
+    /** Bumped by every start and stop, so a login that finishes after a stop or restart shuts itself down. */
+    private int generation;
+
     public synchronized void start() {
-        if (jda != null || !store.read(s -> s.settings.discordEnabled)) return;
+        // a login still in progress has no jda yet; starting again would log in twice and post everything twice
+        if (jda != null || phase == Phase.CONNECTING || !store.read(s -> s.settings.discordEnabled)) return;
         var token = readToken();
         if (token == null) return;
         phase = Phase.CONNECTING;
         error = null;
+        int gen = ++generation;
         Thread.ofVirtual().name("discord-login").start(() -> {
             try {
                 var bot = JDABuilder.createLight(token, List.of()).addEventListeners(this).build();
                 synchronized (this) {
+                    if (gen != generation) {
+                        bot.shutdownNow();
+                        return;
+                    }
                     jda = bot;
                 }
                 bot.awaitReady();
-                phase = Phase.ONLINE;
+                synchronized (this) {
+                    if (gen != generation) return;
+                    phase = Phase.ONLINE;
+                }
                 LOG.info("Discord bot online as {}", bot.getSelfUser().getName());
                 if (bot.getGuilds().isEmpty()) LOG.info("Invite the bot to your Discord server: {}", inviteUrl(bot));
             } catch (InvalidTokenException e) {
-                fail("Discord rejected the token");
+                fail(gen, "Discord rejected the token");
             } catch (IllegalStateException e) {
-                fail(e.getMessage());
+                fail(gen, e.getMessage());
             } catch (Exception e) {
-                fail("Couldn't connect: " + e.getMessage());
+                fail(gen, "Couldn't connect: " + e.getMessage());
             }
         });
     }
 
-    private synchronized void fail(String message) {
+    private synchronized void fail(int gen, String message) {
+        if (gen != generation) return;
         LOG.warn("Discord bot: {}", message);
         if (jda != null) jda.shutdownNow();
         jda = null;
@@ -139,6 +152,7 @@ public final class DiscordBot extends ListenerAdapter {
     }
 
     public synchronized void stop() {
+        generation++;
         if (jda != null) jda.shutdown();
         jda = null;
         phase = Phase.OFF;
@@ -529,7 +543,14 @@ public final class DiscordBot extends ListenerAdapter {
             var keptChannels = new HashSet<String>();
             var categories = new HashMap<String, Category>();
             for (var account : snapshot.accounts()) {
-                if (snapshot.instances().stream().noneMatch(i -> account.id.equals(i.accountId))) continue;
+                if (snapshot.instances().stream().noneMatch(i -> account.id.equals(i.accountId))) {
+                    // its last instance was deleted: its channels would otherwise stay, readable by old viewers
+                    if (account.discordCategoryId != null) {
+                        deleteCategory(guild, account.discordCategoryId);
+                        store.update(s -> s.accounts.stream().filter(a -> a.id.equals(account.id)).forEach(a -> a.discordCategoryId = null));
+                    }
+                    continue;
+                }
                 // whose account it is, since one Discord server shows everyone's
                 var owner = snapshot.users().stream().filter(u -> u.id.equals(account.ownerId)).findFirst().map(u -> u.username).orElse(null);
                 var categoryName = truncate(owner != null ? account.username + " · " + owner : account.username, 100);
@@ -566,6 +587,22 @@ public final class DiscordBot extends ListenerAdapter {
         } catch (Exception e) {
             LOG.warn("Couldn't update Discord channels: {}", e.getMessage());
         }
+    }
+
+    /** Removes an account's category and its channels, for accounts that are deleted. */
+    public void deleteCategory(String categoryId) {
+        if (categoryId == null) return;
+        worker.execute(() -> {
+            var guild = guild();
+            if (guild != null && online()) deleteCategory(guild, categoryId);
+        });
+    }
+
+    private static void deleteCategory(Guild guild, String categoryId) {
+        var category = guild.getCategoryById(categoryId);
+        if (category == null) return;
+        for (var channel : category.getChannels()) channel.delete().queue();
+        category.delete().queue();
     }
 
     private TextChannel syncChannel(Guild guild, Category category, String channelId, String name, String topic,

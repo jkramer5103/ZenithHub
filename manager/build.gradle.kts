@@ -23,6 +23,7 @@ dependencies {
     implementation("io.javalin:javalin:6.7.0")
     implementation("org.slf4j:slf4j-simple:2.0.17")
     implementation("com.google.code.gson:gson:2.14.0")
+    implementation("org.jsoup:jsoup:1.21.2")
     implementation("net.raphimc:MinecraftAuth:5.0.2")
     // the in-game lobby speaks the same protocol version as the instances
     implementation("com.github.rfresh2:MCProtocolLib:1.21.4.73") {

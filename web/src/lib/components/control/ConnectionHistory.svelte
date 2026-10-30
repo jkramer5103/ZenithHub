@@ -76,7 +76,7 @@
 			<p class="px-1 py-2 text-sm text-zinc-500">Nobody has connected yet.</p>
 		{:else}
 			<ul class="mt-1 space-y-0.5">
-				{#each shown as e (e.ts + e.name + e.event)}
+				{#each shown as e, i (`${i}:${e.ts}:${e.name}:${e.event}`)}
 					<li class="flex items-start gap-2.5 rounded-md px-1 py-1.5 text-sm">
 						<img
 							src="https://mc-heads.net/avatar/{e.uuid ?? e.name}/20"

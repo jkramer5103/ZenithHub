@@ -14,6 +14,7 @@ import com.zenith.mc.dimension.DimensionRegistry;
 import com.zenith.mc.item.ItemRegistry;
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ReferenceSet;
+import org.cloudburstmc.math.vector.Vector3d;
 import org.cloudburstmc.math.vector.Vector3i;
 import org.geysermc.mcprotocollib.protocol.data.game.chunk.ChunkSection;
 import org.geysermc.mcprotocollib.protocol.data.game.chunk.DataPalette;
@@ -95,6 +96,12 @@ public record CoordOffset(
     public Vector3i reverseOffsetVector(final Vector3i vec) {
         return vec.sub(x() * 16, 0, z() * 16);
     }
+    public Vector3d offsetVector(final Vector3d vec) {
+        return vec.add(x() * 16, 0, z() * 16);
+    }
+    public Vector3d reverseOffsetVector(final Vector3d vec) {
+        return vec.sub(x() * 16, 0, z() * 16);
+    }
     public MNBT offsetNbt(final MNBT nbt) {
         try {
             return MNBTIO.write(offsetNbt(MNBTIO.read(nbt)), false);
@@ -170,6 +177,11 @@ public record CoordOffset(
 
     // 2b2t seems to remove most tags already but just to be safe
     public ItemStack sanitizeItemStack(final ItemStack itemStack) {
+        // todo: changing the itemstack has consequences for the stack hash
+        //  fixing that would require a separate inventory cache state for each obf player session
+        //  for now we just return the itemstack as-is and rely on 2b2t to remove dangerous data components
+        if (true) return itemStack;
+
         if (itemStack == null) return null;
         if (itemStack.getId() == ItemRegistry.COMPASS.id()
             || itemStack.getId() == ItemRegistry.RECOVERY_COMPASS.id()
@@ -192,13 +204,15 @@ public record CoordOffset(
                     var containerDataComponent = entry.getValue();
                     var containerDataComponentValue = containerDataComponent.getValue();
                     if (containerDataComponentValue != null) {
-                        var itemStacks = (List<ItemStack>) containerDataComponent.getValue();
-                        var copiedItemStacks = new ArrayList<ItemStack>(itemStacks.size());
+                        var itemStacks = (List<Optional<ItemStack>>) containerDataComponent.getValue();
+                        var copiedItemStacks = new ArrayList<Optional<ItemStack>>(itemStacks.size());
                         for (var itemStackValue : itemStacks) {
-                            // recursively sanitize item stacks in the container
-                            var newStack = sanitizeItemStack(itemStackValue);
-                            if (newStack != null) {
-                                copiedItemStacks.add(newStack);
+                            if (itemStackValue.isEmpty()) {
+                                copiedItemStacks.add(itemStackValue);
+                            } else {
+                                // recursively sanitize item stacks in the container
+                                var newStack = sanitizeItemStack(itemStackValue.get());
+                                copiedItemStacks.add(Optional.ofNullable(newStack));
                             }
                         }
                         var newDataComponent = DataComponentTypes.CONTAINER.getDataComponentFactory()

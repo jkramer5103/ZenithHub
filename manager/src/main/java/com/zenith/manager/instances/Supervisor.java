@@ -51,6 +51,11 @@ public final class Supervisor {
     private final AccountService accounts;
     private final EventHub events;
     private final Map<String, InstanceRuntime> runtimes = new ConcurrentHashMap<>();
+    /**
+     * Settings paths whose global or server change didn't reach an instance's process (it was starting or didn't
+     * answer). Its config still has the old value there, which isn't an in-game change; cleared on the next spawn.
+     */
+    private final Map<String, java.util.Set<String>> stalePaths = new ConcurrentHashMap<>();
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(2, Thread.ofPlatform().name("supervisor-", 0).daemon().factory());
     private final HttpClient http = HttpClient.newBuilder()
         .connectTimeout(Duration.ofSeconds(2))
@@ -263,6 +268,7 @@ public final class Supervisor {
     // --- process lifecycle ---
 
     private void spawn(InstanceRuntime rt) throws IOException {
+        stalePaths.remove(rt.instanceId);
         var ctx = context(rt.instanceId);
         var dir = config.instanceDir(rt.instanceId);
         Files.createDirectories(dir);
@@ -389,7 +395,7 @@ public final class Supervisor {
             if (defaults == null || !Files.exists(configFile)) return;
             var saved = Json.readObject(configFile);
             var ctx = context(instanceId);
-            var overrides = ConfigComposer.extractInstanceOverrides(defaults, ctx, saved);
+            var overrides = ConfigComposer.extractInstanceOverrides(defaults, ctx, saved, stalePaths(instanceId));
             store.update(s -> s.instances.stream().filter(i -> i.id.equals(instanceId)).findFirst()
                 .ifPresent(i -> i.settings = overrides));
             var instanceDefaults = dir.resolve("config.defaults.json");
@@ -404,7 +410,7 @@ public final class Supervisor {
     public JsonObject zenithDefaults(Path instanceDir) {
         for (var candidate : new Path[] { instanceDir.resolve("config.defaults.json"), config.zenithDefaultsFile() }) {
             try {
-                if (Files.exists(candidate)) return Json.readObject(candidate);
+                if (Files.exists(candidate)) return Cheats.offByDefault(Json.readObject(candidate));
             } catch (Exception e) {
                 LOG.warn("Unreadable Zenith defaults {}", candidate, e);
             }
@@ -469,17 +475,35 @@ public final class Supervisor {
         for (var rt : runtimes.values()) {
             var phase = rt.phase;
             if (phase != InstanceRuntime.Phase.STARTING && phase != InstanceRuntime.Phase.RUNNING) continue;
+            long seq = rt.pollsSent.incrementAndGet();
             http.sendAsync(request(rt, "/v1/status").timeout(Duration.ofSeconds(3)).GET().build(), HttpResponse.BodyHandlers.ofString())
-                .thenAccept(response -> {
-                    if (response.statusCode() != 200) return;
-                    var status = JsonParser.parseString(response.body()).getAsJsonObject();
-                    boolean changed = !status.equals(rt.status) || rt.phase == InstanceRuntime.Phase.STARTING;
-                    rt.status = status;
-                    if (rt.phase == InstanceRuntime.Phase.STARTING) rt.phase = InstanceRuntime.Phase.RUNNING;
-                    // a fresh process isn't connected yet; only a real disconnect means it should stay offline
-                    if (status.get("connected").getAsBoolean()) setLastConnected(rt.instanceId, true);
-                    else if (status.has("lastDisconnectReason")) setLastConnected(rt.instanceId, false);
-                    if (changed) publishRuntime(rt);
+                .whenComplete((response, error) -> {
+                    boolean started;
+                    synchronized (rt) {
+                        if (seq <= rt.pollApplied) return;
+                        rt.pollApplied = seq;
+                        // answered just before the process exited: onExit already cleared the status
+                        if (rt.phase != InstanceRuntime.Phase.STARTING && rt.phase != InstanceRuntime.Phase.RUNNING) return;
+                        if (error != null || response.statusCode() != 200) {
+                            // a hung process would otherwise keep showing its last status (say, Online) forever
+                            if (++rt.pollFailures >= 3 && rt.status != null && rt.phase == InstanceRuntime.Phase.RUNNING) {
+                                rt.status = null;
+                                publishRuntime(rt);
+                            }
+                            return;
+                        }
+                        rt.pollFailures = 0;
+                        var status = JsonParser.parseString(response.body()).getAsJsonObject();
+                        started = rt.phase == InstanceRuntime.Phase.STARTING;
+                        boolean changed = !status.equals(rt.status) || started;
+                        rt.status = status;
+                        if (started) rt.phase = InstanceRuntime.Phase.RUNNING;
+                        // a fresh process isn't connected yet; only a real disconnect means it should stay offline
+                        if (status.get("connected").getAsBoolean()) setLastConnected(rt.instanceId, true);
+                        else if (status.has("lastDisconnectReason")) setLastConnected(rt.instanceId, false);
+                        if (changed) publishRuntime(rt);
+                    }
+                    if (started) onRunning.accept(rt.instanceId);
                 });
         }
     }
@@ -521,6 +545,20 @@ public final class Supervisor {
             .header("Authorization", "Bearer " + rt.token);
     }
 
+    public void markStale(String instanceId, java.util.Collection<String> paths) {
+        stalePaths.computeIfAbsent(instanceId, k -> ConcurrentHashMap.newKeySet()).addAll(paths);
+    }
+
+    /** The process took these values, so in-game changes to them count again. */
+    public void clearStale(String instanceId, java.util.Collection<String> paths) {
+        var set = stalePaths.get(instanceId);
+        if (set != null) set.removeAll(paths);
+    }
+
+    public java.util.Set<String> stalePaths(String instanceId) {
+        return stalePaths.getOrDefault(instanceId, java.util.Set.of());
+    }
+
     public ConfigComposer.Context context(String instanceId) {
         var ctx = store.read(s -> {
             var instance = s.instances.stream().filter(i -> i.id.equals(instanceId)).findFirst()
@@ -532,6 +570,13 @@ public final class Supervisor {
             return new ConfigComposer.Context(instance, server, account, s.globalSettings, s.settings, null, config.cheatsDisabled());
         });
         return new ConfigComposer.Context(ctx.instance(), ctx.server(), ctx.account(), ctx.globalSettings(), ctx.managerSettings(), joinLists.apply(instanceId), ctx.cheatsDisabled());
+    }
+
+    /** Called once a new process answers, to push what it couldn't be started with (the join lists). */
+    private volatile java.util.function.Consumer<String> onRunning = id -> {};
+
+    public void setOnRunning(java.util.function.Consumer<String> listener) {
+        this.onRunning = listener;
     }
 
     private volatile java.util.function.Function<String, ConfigComposer.JoinLists> joinLists = id -> ConfigComposer.JoinLists.EMPTY;

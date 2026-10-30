@@ -5,9 +5,276 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 		<meta name="theme-color" content="#09090b" />
 		<title>ZenithHub</title>
+		<!-- inline, so the browser doesn't ask the server for /favicon.ico -->
+		<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' fill='none'%3E%3Crect width='32' height='32' rx='8' fill='%23059669'/%3E%3Cpath d='M9 10h14l-14 12h14' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
+		<script>
+			// Ask for the session and the overview while the scripts download. api.prefetched() uses
+			// the answers; anything that fails here is simply asked for again.
+			(() => {
+				const get = (path) => fetch('/api' + path, { credentials: 'same-origin', priority: 'high' });
+				const session = get('/session');
+				// both at once: a signed-out visitor's overview is a 401, thrown away here
+				const overview = Promise.all([session.then((res) => (res.ok ? res.clone().json() : null)), get('/overview')]).then(
+					([s, res]) => (s && s.user ? res : null)
+				);
+				session.catch(() => {});
+				overview.catch(() => {});
+				window.zenithPrefetch = { '/session': session, '/overview': overview };
+			})();
+		</script>
+		<style>
+			html,
+			body {
+				margin: 0;
+				background: oklch(14.1% 0.005 285.823);
+				color: oklch(96.7% 0.001 286.375);
+				font-family:
+					-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', 'Noto Sans', Arial, sans-serif;
+			}
+			#boot {
+				position: fixed;
+				inset: 0;
+				z-index: 100;
+				overflow: hidden;
+				background: oklch(14.1% 0.005 285.823);
+			}
+			#boot[hidden] {
+				display: none;
+			}
+			.b-bar {
+				border-bottom: 1px solid oklch(27.4% 0.006 286.033 / 0.8);
+			}
+			.b-in {
+				box-sizing: border-box;
+				display: flex;
+				align-items: center;
+				gap: 1.5rem;
+				max-width: 72rem;
+				height: 3.5rem;
+				margin: 0 auto;
+				padding: 0 1rem;
+			}
+			.b-brand {
+				display: flex;
+				align-items: center;
+				gap: 0.5rem;
+				font-weight: 600;
+				font-size: 1rem;
+			}
+			.b-nav {
+				display: none;
+				gap: 0.25rem;
+			}
+			.b {
+				border-radius: 0.5rem;
+				background: oklch(27.4% 0.006 286.033 / 0.7);
+			}
+			.b-main {
+				box-sizing: border-box;
+				max-width: 72rem;
+				margin: 0 auto;
+				padding: 1.5rem 1rem;
+			}
+			.b-head {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				margin-bottom: 1.5rem;
+			}
+			.b-grid {
+				display: grid;
+				gap: 1rem;
+			}
+			.b-card {
+				height: 11rem;
+				border-radius: 0.75rem;
+				border: 1px solid oklch(27.4% 0.006 286.033);
+				background: oklch(21% 0.006 285.885 / 0.6);
+			}
+			.b-tabs {
+				position: fixed;
+				inset: auto 0 0;
+				display: flex;
+				justify-content: space-around;
+				padding: 0.6rem 0 calc(0.6rem + env(safe-area-inset-bottom));
+				border-top: 1px solid oklch(27.4% 0.006 286.033);
+			}
+			.b-msg {
+				max-width: 28rem;
+				margin: 3rem auto 0;
+				padding: 1.5rem;
+				border-radius: 0.75rem;
+				border: 1px solid oklch(27.4% 0.006 286.033);
+				background: oklch(21% 0.006 285.885);
+				text-align: center;
+				font-size: 0.875rem;
+				line-height: 1.4;
+				color: oklch(70.5% 0.015 286.067);
+			}
+			.b-msg strong {
+				display: block;
+				margin-bottom: 0.25rem;
+				font-size: 1rem;
+				color: oklch(96.7% 0.001 286.375);
+			}
+			.b-msg button {
+				margin-top: 1rem;
+				padding: 0.5rem 0.9rem;
+				border: 0;
+				border-radius: 0.5rem;
+				background: oklch(59.6% 0.145 163.225);
+				color: #fff;
+				font: inherit;
+				font-weight: 500;
+				cursor: pointer;
+			}
+			.b-sr {
+				position: absolute;
+				width: 1px;
+				height: 1px;
+				overflow: hidden;
+				clip-path: inset(50%);
+				white-space: nowrap;
+			}
+			@media (min-width: 640px) {
+				.b-grid {
+					grid-template-columns: repeat(2, 1fr);
+				}
+			}
+			@media (min-width: 768px) {
+				.b-nav {
+					display: flex;
+				}
+				.b-tabs {
+					display: none;
+				}
+			}
+			@media (min-width: 1024px) {
+				.b-grid {
+					grid-template-columns: repeat(3, 1fr);
+				}
+			}
+			@media (prefers-reduced-motion: no-preference) {
+				.b {
+					animation: b-pulse 1.6s ease-in-out infinite;
+				}
+				.b-card {
+					animation: b-pulse 1.6s ease-in-out infinite;
+				}
+			}
+			@keyframes b-pulse {
+				50% {
+					opacity: 0.5;
+				}
+			}
+		</style>
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover" class="bg-zinc-950 text-zinc-100 antialiased">
+		<!-- shown until the app has rendered; nothing here depends on who is signed in -->
+		<div id="boot" role="status" aria-busy="true">
+			<span class="b-sr">Loading ZenithHub…</span>
+			<div class="b-bar" aria-hidden="true">
+				<div class="b-in">
+					<span class="b-brand">
+						<svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+							<rect width="32" height="32" rx="8" fill="oklch(59.6% 0.145 163.225)" />
+							<path d="M9 10h14l-14 12h14" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+						</svg>
+						ZenithHub
+					</span>
+					<span class="b-nav">
+						<span class="b" style="width: 6.5rem; height: 2rem"></span>
+						<span class="b" style="width: 6.5rem; height: 2rem"></span>
+						<span class="b" style="width: 5.5rem; height: 2rem"></span>
+					</span>
+					<span class="b" style="width: 1.75rem; height: 1.75rem; margin-left: auto; border-radius: 50%"></span>
+				</div>
+			</div>
+			<div class="b-main">
+				<div id="boot-msg" class="b-msg" hidden>
+					<strong></strong>
+					<span></span>
+					<br />
+					<button type="button" onclick="location.reload()">Try again</button>
+				</div>
+				<div id="boot-skeleton" aria-hidden="true">
+					<div class="b-head">
+						<div>
+							<div class="b" style="width: 8rem; height: 1.75rem"></div>
+							<div class="b" style="width: 10rem; height: 0.9rem; margin-top: 0.5rem"></div>
+						</div>
+						<div class="b" style="width: 8.5rem; height: 2.25rem"></div>
+					</div>
+					<div class="b-grid">
+						<div class="b-card"></div>
+						<div class="b-card"></div>
+						<div class="b-card"></div>
+					</div>
+				</div>
+			</div>
+			<div class="b-tabs" aria-hidden="true">
+				<span class="b" style="width: 3rem; height: 2.25rem"></span>
+				<span class="b" style="width: 3rem; height: 2.25rem"></span>
+				<span class="b" style="width: 3rem; height: 2.25rem"></span>
+			</div>
+			<noscript>
+				<div class="b-msg"><strong>ZenithHub needs JavaScript</strong>Turn it on for this site and reload.</div>
+				<style>
+					#boot-skeleton {
+						display: none;
+					}
+				</style>
+			</noscript>
+		</div>
+		<script>
+			// The layout calls zenithBoot.loading(false) once it has something to show. The stylesheet is loaded without
+			// blocking the first paint (see scripts/finish-build.js), so the skeleton stays up until it has arrived.
+			window.zenithBoot = (() => {
+				const boot = document.getElementById('boot');
+				const msg = document.getElementById('boot-msg');
+				const links = [...document.querySelectorAll('link[rel="stylesheet"][media="print"]')];
+				const styled = Promise.all(
+					links.map((link) =>
+						link.sheet
+							? (link.media = 'all')
+							: new Promise((done) => {
+									link.addEventListener('load', () => done((link.media = 'all')));
+									link.addEventListener('error', done);
+								})
+					)
+				);
+				let started = false;
+				let want = true;
+				const skeleton = document.getElementById('boot-skeleton');
+				const show = (title, text, failed) => {
+					if (started) return;
+					msg.querySelector('strong').textContent = title;
+					msg.querySelector('span').textContent = text;
+					msg.hidden = false;
+					skeleton.hidden = failed;
+					boot.setAttribute('aria-busy', String(!failed));
+				};
+				const failed = () => show("Couldn't load ZenithHub", 'Check your connection and try again.', true);
+				addEventListener(
+					'error',
+					(e) => (e.target.tagName === 'SCRIPT' || /^(modulepreload|stylesheet)$/.test(e.target.rel)) && failed(),
+					true
+				);
+				addEventListener('unhandledrejection', failed);
+				setTimeout(() => show('Still loading…', 'Your connection looks slow. ZenithHub keeps loading in the background.', false), 20000);
+				return {
+					loading(on) {
+						started = true;
+						want = on;
+						msg.hidden = true;
+						skeleton.hidden = false;
+						if (on) boot.hidden = false;
+						else styled.then(() => (boot.hidden = !want));
+					}
+				};
+			})();
+		</script>
 		<div style="display: contents">%sveltekit.body%</div>
 	</body>
 </html>

@@ -40,6 +40,30 @@ class PlayerHistoryTest {
     }
 
     @Test
+    void quickRelogStaysLeftAndJoined() {
+        var history = new PlayerHistory(dir);
+        long now = System.currentTimeMillis();
+        history.record("i", event("joined", "Alex", false, now, null));
+        history.record("i", event("left", "Alex", false, now + 100, "Timed out"));
+        history.record("i", event("joined", "Alex", false, now + 3000, null));
+        var list = history.list("i");
+        assertEquals(3, list.size());
+        assertEquals("joined", list.get(0).getAsJsonObject().get("event").getAsString());
+        assertEquals("Timed out", list.get(1).getAsJsonObject().get("reason").getAsString());
+    }
+
+    @Test
+    void failedKickNamesNobody() {
+        var history = new PlayerHistory(dir);
+        long now = System.currentTimeMillis();
+        history.record("i", event("joined", "Herobrine", true, now, null));
+        history.noteAction("i", "kick", "Herobrine", "admin");
+        history.cancelAction("i", "kick", "Herobrine", "admin");
+        history.record("i", event("left", "Herobrine", true, now + 50, null));
+        assertEquals("left", history.list("i").get(0).getAsJsonObject().get("event").getAsString());
+    }
+
+    @Test
     void kicksNameWhoDidIt() {
         var history = new PlayerHistory(dir);
         long now = System.currentTimeMillis();

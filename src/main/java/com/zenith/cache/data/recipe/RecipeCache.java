@@ -28,11 +28,17 @@ public class RecipeCache implements CachedData {
     protected List<ClientboundUpdateRecipesPacket.SelectableRecipe> stoneCutterRecipes = Collections.synchronizedList(new ArrayList<>());
     protected Map<CraftingBookStateType, ClientboundRecipeBookSettingsPacket.TypeSettings> recipeBookSettings = Collections.synchronizedMap(new EnumMap<>(CraftingBookStateType.class));
     protected Int2ObjectMap<RecipeDisplayEntry> recipeBookEntries = Int2ObjectMaps.synchronize(new Int2ObjectOpenHashMap<>());
+    static final ClientboundRecipeBookSettingsPacket.TypeSettings DEFAULT_TYPESETTINGS = new ClientboundRecipeBookSettingsPacket.TypeSettings(false, false);
 
     @Override
     public synchronized void getPackets(@NonNull final Consumer<Packet> consumer, final @NonNull TcpSession session) {
         consumer.accept(new ClientboundUpdateRecipesPacket(itemSets, new ArrayList<>(stoneCutterRecipes)));
-        consumer.accept(new ClientboundRecipeBookSettingsPacket(recipeBookSettings));
+        consumer.accept(new ClientboundRecipeBookSettingsPacket(
+            recipeBookSettings.getOrDefault(CraftingBookStateType.CRAFTING, DEFAULT_TYPESETTINGS),
+            recipeBookSettings.getOrDefault(CraftingBookStateType.FURNACE, DEFAULT_TYPESETTINGS),
+            recipeBookSettings.getOrDefault(CraftingBookStateType.BLAST_FURNACE, DEFAULT_TYPESETTINGS),
+            recipeBookSettings.getOrDefault(CraftingBookStateType.SMOKER, DEFAULT_TYPESETTINGS)
+        ));
         final List<ClientboundRecipeBookAddPacket.Entry> entries = new ArrayList<>(recipeBookEntries.size());
         for (var entry : recipeBookEntries.int2ObjectEntrySet()) {
             entries.add(new ClientboundRecipeBookAddPacket.Entry(entry.getValue(), false, false));
@@ -68,7 +74,10 @@ public class RecipeCache implements CachedData {
     }
 
     public void setRecipeBookSettings(final ClientboundRecipeBookSettingsPacket packet) {
-        this.recipeBookSettings.putAll(packet.getStates());
+        this.recipeBookSettings.put(CraftingBookStateType.CRAFTING, packet.getCrafting());
+        this.recipeBookSettings.put(CraftingBookStateType.FURNACE, packet.getFurnace());
+        this.recipeBookSettings.put(CraftingBookStateType.BLAST_FURNACE, packet.getBlastFurnace());
+        this.recipeBookSettings.put(CraftingBookStateType.SMOKER, packet.getSmoker());
     }
 
     public void removeRecipeBookEntries(final ClientboundRecipeBookRemovePacket packet) {

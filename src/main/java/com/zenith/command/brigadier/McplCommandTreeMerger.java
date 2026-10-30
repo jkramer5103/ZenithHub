@@ -39,6 +39,7 @@ public class McplCommandTreeMerger {
         return new CommandNode(
             CommandType.ROOT,
             rootNodeA.isExecutable(),
+            rootNodeA.isAllowsRestricted(),
             combinedRootChildIndices,
             rootNodeA.getRedirectIndex(),
             rootNodeA.getName(),
@@ -59,6 +60,7 @@ public class McplCommandTreeMerger {
         return new CommandNode(
             node.getType(),
             node.isExecutable(),
+            node.isAllowsRestricted(),
             childIndices,
             redirectIndex,
             node.getName(),

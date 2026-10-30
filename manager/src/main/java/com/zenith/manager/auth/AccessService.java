@@ -107,11 +107,10 @@ public final class AccessService {
         var names = mcNames == null ? null : normalizeMcNames(mcNames);
         store.update(s -> {
             var user = findUser(s, id);
+            // everything that can fail goes first: a failed update must not half-apply
+            if (names != null) checkMcNamesFree(s, names, id);
             if (password != null) user.passwordHash = Passwords.hash(password);
-            if (names != null) {
-                checkMcNamesFree(s, names, id);
-                user.mcNames = names;
-            }
+            if (names != null) user.mcNames = names;
             if (unlinkDiscord) user.discordId = null;
         });
         fire(null);

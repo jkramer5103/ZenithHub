@@ -4,7 +4,7 @@ package com.zenith.mc.entity;
 import com.zenith.mc.Registry;
 
 public final class EntityRegistry {
-    public static final Registry<EntityData> REGISTRY = new Registry<EntityData>(149);
+    public static final Registry<EntityData> REGISTRY = new Registry<EntityData>(161);
 
     public static final EntityData ACACIA_BOAT;
 
@@ -46,6 +46,8 @@ public final class EntityRegistry {
 
     public static final EntityData CAMEL;
 
+    public static final EntityData CAMEL_HUSK;
+
     public static final EntityData CAT;
 
     public static final EntityData CAVE_SPIDER;
@@ -60,6 +62,8 @@ public final class EntityRegistry {
 
     public static final EntityData COD;
 
+    public static final EntityData COPPER_GOLEM;
+
     public static final EntityData COMMAND_BLOCK_MINECART;
 
     public static final EntityData COW;
@@ -67,6 +71,8 @@ public final class EntityRegistry {
     public static final EntityData CREAKING;
 
     public static final EntityData CREEPER;
+
+    public static final EntityData CUSHION;
 
     public static final EntityData DARK_OAK_BOAT;
 
@@ -118,6 +124,8 @@ public final class EntityRegistry {
 
     public static final EntityData GHAST;
 
+    public static final EntityData HAPPY_GHAST;
+
     public static final EntityData GIANT;
 
     public static final EntityData GLOW_ITEM_FRAME;
@@ -166,6 +174,8 @@ public final class EntityRegistry {
 
     public static final EntityData MANGROVE_CHEST_BOAT;
 
+    public static final EntityData MANNEQUIN;
+
     public static final EntityData MARKER;
 
     public static final EntityData MINECART;
@@ -173,6 +183,8 @@ public final class EntityRegistry {
     public static final EntityData MOOSHROOM;
 
     public static final EntityData MULE;
+
+    public static final EntityData NAUTILUS;
 
     public static final EntityData OAK_BOAT;
 
@@ -190,6 +202,8 @@ public final class EntityRegistry {
 
     public static final EntityData PANDA;
 
+    public static final EntityData PARCHED;
+
     public static final EntityData PARROT;
 
     public static final EntityData PHANTOM;
@@ -204,7 +218,13 @@ public final class EntityRegistry {
 
     public static final EntityData POLAR_BEAR;
 
-    public static final EntityData POTION;
+    public static final EntityData POPLAR_BOAT;
+
+    public static final EntityData POPLAR_CHEST_BOAT;
+
+    public static final EntityData SPLASH_POTION;
+
+    public static final EntityData LINGERING_POTION;
 
     public static final EntityData PUFFERFISH;
 
@@ -252,6 +272,8 @@ public final class EntityRegistry {
 
     public static final EntityData STRIDER;
 
+    public static final EntityData SULFUR_CUBE;
+
     public static final EntityData TADPOLE;
 
     public static final EntityData TEXT_DISPLAY;
@@ -296,6 +318,8 @@ public final class EntityRegistry {
 
     public static final EntityData ZOMBIE_HORSE;
 
+    public static final EntityData ZOMBIE_NAUTILUS;
+
     public static final EntityData ZOMBIE_VILLAGER;
 
     public static final EntityData ZOMBIFIED_PIGLIN;
@@ -327,134 +351,146 @@ public final class EntityRegistry {
         BREEZE = REGISTRY.register(data.get(17));
         BREEZE_WIND_CHARGE = REGISTRY.register(data.get(18));
         CAMEL = REGISTRY.register(data.get(19));
-        CAT = REGISTRY.register(data.get(20));
-        CAVE_SPIDER = REGISTRY.register(data.get(21));
-        CHERRY_BOAT = REGISTRY.register(data.get(22));
-        CHERRY_CHEST_BOAT = REGISTRY.register(data.get(23));
-        CHEST_MINECART = REGISTRY.register(data.get(24));
-        CHICKEN = REGISTRY.register(data.get(25));
-        COD = REGISTRY.register(data.get(26));
-        COMMAND_BLOCK_MINECART = REGISTRY.register(data.get(27));
-        COW = REGISTRY.register(data.get(28));
-        CREAKING = REGISTRY.register(data.get(29));
-        CREEPER = REGISTRY.register(data.get(30));
-        DARK_OAK_BOAT = REGISTRY.register(data.get(31));
-        DARK_OAK_CHEST_BOAT = REGISTRY.register(data.get(32));
-        DOLPHIN = REGISTRY.register(data.get(33));
-        DONKEY = REGISTRY.register(data.get(34));
-        DRAGON_FIREBALL = REGISTRY.register(data.get(35));
-        DROWNED = REGISTRY.register(data.get(36));
-        EGG = REGISTRY.register(data.get(37));
-        ELDER_GUARDIAN = REGISTRY.register(data.get(38));
-        ENDERMAN = REGISTRY.register(data.get(39));
-        ENDERMITE = REGISTRY.register(data.get(40));
-        ENDER_DRAGON = REGISTRY.register(data.get(41));
-        ENDER_PEARL = REGISTRY.register(data.get(42));
-        END_CRYSTAL = REGISTRY.register(data.get(43));
-        EVOKER = REGISTRY.register(data.get(44));
-        EVOKER_FANGS = REGISTRY.register(data.get(45));
-        EXPERIENCE_BOTTLE = REGISTRY.register(data.get(46));
-        EXPERIENCE_ORB = REGISTRY.register(data.get(47));
-        EYE_OF_ENDER = REGISTRY.register(data.get(48));
-        FALLING_BLOCK = REGISTRY.register(data.get(49));
-        FIREBALL = REGISTRY.register(data.get(50));
-        FIREWORK_ROCKET = REGISTRY.register(data.get(51));
-        FOX = REGISTRY.register(data.get(52));
-        FROG = REGISTRY.register(data.get(53));
-        FURNACE_MINECART = REGISTRY.register(data.get(54));
-        GHAST = REGISTRY.register(data.get(55));
-        GIANT = REGISTRY.register(data.get(56));
-        GLOW_ITEM_FRAME = REGISTRY.register(data.get(57));
-        GLOW_SQUID = REGISTRY.register(data.get(58));
-        GOAT = REGISTRY.register(data.get(59));
-        GUARDIAN = REGISTRY.register(data.get(60));
-        HOGLIN = REGISTRY.register(data.get(61));
-        HOPPER_MINECART = REGISTRY.register(data.get(62));
-        HORSE = REGISTRY.register(data.get(63));
-        HUSK = REGISTRY.register(data.get(64));
-        ILLUSIONER = REGISTRY.register(data.get(65));
-        INTERACTION = REGISTRY.register(data.get(66));
-        IRON_GOLEM = REGISTRY.register(data.get(67));
-        ITEM = REGISTRY.register(data.get(68));
-        ITEM_DISPLAY = REGISTRY.register(data.get(69));
-        ITEM_FRAME = REGISTRY.register(data.get(70));
-        JUNGLE_BOAT = REGISTRY.register(data.get(71));
-        JUNGLE_CHEST_BOAT = REGISTRY.register(data.get(72));
-        LEASH_KNOT = REGISTRY.register(data.get(73));
-        LIGHTNING_BOLT = REGISTRY.register(data.get(74));
-        LLAMA = REGISTRY.register(data.get(75));
-        LLAMA_SPIT = REGISTRY.register(data.get(76));
-        MAGMA_CUBE = REGISTRY.register(data.get(77));
-        MANGROVE_BOAT = REGISTRY.register(data.get(78));
-        MANGROVE_CHEST_BOAT = REGISTRY.register(data.get(79));
-        MARKER = REGISTRY.register(data.get(80));
-        MINECART = REGISTRY.register(data.get(81));
-        MOOSHROOM = REGISTRY.register(data.get(82));
-        MULE = REGISTRY.register(data.get(83));
-        OAK_BOAT = REGISTRY.register(data.get(84));
-        OAK_CHEST_BOAT = REGISTRY.register(data.get(85));
-        OCELOT = REGISTRY.register(data.get(86));
-        OMINOUS_ITEM_SPAWNER = REGISTRY.register(data.get(87));
-        PAINTING = REGISTRY.register(data.get(88));
-        PALE_OAK_BOAT = REGISTRY.register(data.get(89));
-        PALE_OAK_CHEST_BOAT = REGISTRY.register(data.get(90));
-        PANDA = REGISTRY.register(data.get(91));
-        PARROT = REGISTRY.register(data.get(92));
-        PHANTOM = REGISTRY.register(data.get(93));
-        PIG = REGISTRY.register(data.get(94));
-        PIGLIN = REGISTRY.register(data.get(95));
-        PIGLIN_BRUTE = REGISTRY.register(data.get(96));
-        PILLAGER = REGISTRY.register(data.get(97));
-        POLAR_BEAR = REGISTRY.register(data.get(98));
-        POTION = REGISTRY.register(data.get(99));
-        PUFFERFISH = REGISTRY.register(data.get(100));
-        RABBIT = REGISTRY.register(data.get(101));
-        RAVAGER = REGISTRY.register(data.get(102));
-        SALMON = REGISTRY.register(data.get(103));
-        SHEEP = REGISTRY.register(data.get(104));
-        SHULKER = REGISTRY.register(data.get(105));
-        SHULKER_BULLET = REGISTRY.register(data.get(106));
-        SILVERFISH = REGISTRY.register(data.get(107));
-        SKELETON = REGISTRY.register(data.get(108));
-        SKELETON_HORSE = REGISTRY.register(data.get(109));
-        SLIME = REGISTRY.register(data.get(110));
-        SMALL_FIREBALL = REGISTRY.register(data.get(111));
-        SNIFFER = REGISTRY.register(data.get(112));
-        SNOWBALL = REGISTRY.register(data.get(113));
-        SNOW_GOLEM = REGISTRY.register(data.get(114));
-        SPAWNER_MINECART = REGISTRY.register(data.get(115));
-        SPECTRAL_ARROW = REGISTRY.register(data.get(116));
-        SPIDER = REGISTRY.register(data.get(117));
-        SPRUCE_BOAT = REGISTRY.register(data.get(118));
-        SPRUCE_CHEST_BOAT = REGISTRY.register(data.get(119));
-        SQUID = REGISTRY.register(data.get(120));
-        STRAY = REGISTRY.register(data.get(121));
-        STRIDER = REGISTRY.register(data.get(122));
-        TADPOLE = REGISTRY.register(data.get(123));
-        TEXT_DISPLAY = REGISTRY.register(data.get(124));
-        TNT = REGISTRY.register(data.get(125));
-        TNT_MINECART = REGISTRY.register(data.get(126));
-        TRADER_LLAMA = REGISTRY.register(data.get(127));
-        TRIDENT = REGISTRY.register(data.get(128));
-        TROPICAL_FISH = REGISTRY.register(data.get(129));
-        TURTLE = REGISTRY.register(data.get(130));
-        VEX = REGISTRY.register(data.get(131));
-        VILLAGER = REGISTRY.register(data.get(132));
-        VINDICATOR = REGISTRY.register(data.get(133));
-        WANDERING_TRADER = REGISTRY.register(data.get(134));
-        WARDEN = REGISTRY.register(data.get(135));
-        WIND_CHARGE = REGISTRY.register(data.get(136));
-        WITCH = REGISTRY.register(data.get(137));
-        WITHER = REGISTRY.register(data.get(138));
-        WITHER_SKELETON = REGISTRY.register(data.get(139));
-        WITHER_SKULL = REGISTRY.register(data.get(140));
-        WOLF = REGISTRY.register(data.get(141));
-        ZOGLIN = REGISTRY.register(data.get(142));
-        ZOMBIE = REGISTRY.register(data.get(143));
-        ZOMBIE_HORSE = REGISTRY.register(data.get(144));
-        ZOMBIE_VILLAGER = REGISTRY.register(data.get(145));
-        ZOMBIFIED_PIGLIN = REGISTRY.register(data.get(146));
-        PLAYER = REGISTRY.register(data.get(147));
-        FISHING_BOBBER = REGISTRY.register(data.get(148));
+        CAMEL_HUSK = REGISTRY.register(data.get(20));
+        CAT = REGISTRY.register(data.get(21));
+        CAVE_SPIDER = REGISTRY.register(data.get(22));
+        CHERRY_BOAT = REGISTRY.register(data.get(23));
+        CHERRY_CHEST_BOAT = REGISTRY.register(data.get(24));
+        CHEST_MINECART = REGISTRY.register(data.get(25));
+        CHICKEN = REGISTRY.register(data.get(26));
+        COD = REGISTRY.register(data.get(27));
+        COPPER_GOLEM = REGISTRY.register(data.get(28));
+        COMMAND_BLOCK_MINECART = REGISTRY.register(data.get(29));
+        COW = REGISTRY.register(data.get(30));
+        CREAKING = REGISTRY.register(data.get(31));
+        CREEPER = REGISTRY.register(data.get(32));
+        CUSHION = REGISTRY.register(data.get(33));
+        DARK_OAK_BOAT = REGISTRY.register(data.get(34));
+        DARK_OAK_CHEST_BOAT = REGISTRY.register(data.get(35));
+        DOLPHIN = REGISTRY.register(data.get(36));
+        DONKEY = REGISTRY.register(data.get(37));
+        DRAGON_FIREBALL = REGISTRY.register(data.get(38));
+        DROWNED = REGISTRY.register(data.get(39));
+        EGG = REGISTRY.register(data.get(40));
+        ELDER_GUARDIAN = REGISTRY.register(data.get(41));
+        ENDERMAN = REGISTRY.register(data.get(42));
+        ENDERMITE = REGISTRY.register(data.get(43));
+        ENDER_DRAGON = REGISTRY.register(data.get(44));
+        ENDER_PEARL = REGISTRY.register(data.get(45));
+        END_CRYSTAL = REGISTRY.register(data.get(46));
+        EVOKER = REGISTRY.register(data.get(47));
+        EVOKER_FANGS = REGISTRY.register(data.get(48));
+        EXPERIENCE_BOTTLE = REGISTRY.register(data.get(49));
+        EXPERIENCE_ORB = REGISTRY.register(data.get(50));
+        EYE_OF_ENDER = REGISTRY.register(data.get(51));
+        FALLING_BLOCK = REGISTRY.register(data.get(52));
+        FIREBALL = REGISTRY.register(data.get(53));
+        FIREWORK_ROCKET = REGISTRY.register(data.get(54));
+        FOX = REGISTRY.register(data.get(55));
+        FROG = REGISTRY.register(data.get(56));
+        FURNACE_MINECART = REGISTRY.register(data.get(57));
+        GHAST = REGISTRY.register(data.get(58));
+        HAPPY_GHAST = REGISTRY.register(data.get(59));
+        GIANT = REGISTRY.register(data.get(60));
+        GLOW_ITEM_FRAME = REGISTRY.register(data.get(61));
+        GLOW_SQUID = REGISTRY.register(data.get(62));
+        GOAT = REGISTRY.register(data.get(63));
+        GUARDIAN = REGISTRY.register(data.get(64));
+        HOGLIN = REGISTRY.register(data.get(65));
+        HOPPER_MINECART = REGISTRY.register(data.get(66));
+        HORSE = REGISTRY.register(data.get(67));
+        HUSK = REGISTRY.register(data.get(68));
+        ILLUSIONER = REGISTRY.register(data.get(69));
+        INTERACTION = REGISTRY.register(data.get(70));
+        IRON_GOLEM = REGISTRY.register(data.get(71));
+        ITEM = REGISTRY.register(data.get(72));
+        ITEM_DISPLAY = REGISTRY.register(data.get(73));
+        ITEM_FRAME = REGISTRY.register(data.get(74));
+        JUNGLE_BOAT = REGISTRY.register(data.get(75));
+        JUNGLE_CHEST_BOAT = REGISTRY.register(data.get(76));
+        LEASH_KNOT = REGISTRY.register(data.get(77));
+        LIGHTNING_BOLT = REGISTRY.register(data.get(78));
+        LLAMA = REGISTRY.register(data.get(79));
+        LLAMA_SPIT = REGISTRY.register(data.get(80));
+        MAGMA_CUBE = REGISTRY.register(data.get(81));
+        MANGROVE_BOAT = REGISTRY.register(data.get(82));
+        MANGROVE_CHEST_BOAT = REGISTRY.register(data.get(83));
+        MANNEQUIN = REGISTRY.register(data.get(84));
+        MARKER = REGISTRY.register(data.get(85));
+        MINECART = REGISTRY.register(data.get(86));
+        MOOSHROOM = REGISTRY.register(data.get(87));
+        MULE = REGISTRY.register(data.get(88));
+        NAUTILUS = REGISTRY.register(data.get(89));
+        OAK_BOAT = REGISTRY.register(data.get(90));
+        OAK_CHEST_BOAT = REGISTRY.register(data.get(91));
+        OCELOT = REGISTRY.register(data.get(92));
+        OMINOUS_ITEM_SPAWNER = REGISTRY.register(data.get(93));
+        PAINTING = REGISTRY.register(data.get(94));
+        PALE_OAK_BOAT = REGISTRY.register(data.get(95));
+        PALE_OAK_CHEST_BOAT = REGISTRY.register(data.get(96));
+        PANDA = REGISTRY.register(data.get(97));
+        PARCHED = REGISTRY.register(data.get(98));
+        PARROT = REGISTRY.register(data.get(99));
+        PHANTOM = REGISTRY.register(data.get(100));
+        PIG = REGISTRY.register(data.get(101));
+        PIGLIN = REGISTRY.register(data.get(102));
+        PIGLIN_BRUTE = REGISTRY.register(data.get(103));
+        PILLAGER = REGISTRY.register(data.get(104));
+        POLAR_BEAR = REGISTRY.register(data.get(105));
+        POPLAR_BOAT = REGISTRY.register(data.get(106));
+        POPLAR_CHEST_BOAT = REGISTRY.register(data.get(107));
+        SPLASH_POTION = REGISTRY.register(data.get(108));
+        LINGERING_POTION = REGISTRY.register(data.get(109));
+        PUFFERFISH = REGISTRY.register(data.get(110));
+        RABBIT = REGISTRY.register(data.get(111));
+        RAVAGER = REGISTRY.register(data.get(112));
+        SALMON = REGISTRY.register(data.get(113));
+        SHEEP = REGISTRY.register(data.get(114));
+        SHULKER = REGISTRY.register(data.get(115));
+        SHULKER_BULLET = REGISTRY.register(data.get(116));
+        SILVERFISH = REGISTRY.register(data.get(117));
+        SKELETON = REGISTRY.register(data.get(118));
+        SKELETON_HORSE = REGISTRY.register(data.get(119));
+        SLIME = REGISTRY.register(data.get(120));
+        SMALL_FIREBALL = REGISTRY.register(data.get(121));
+        SNIFFER = REGISTRY.register(data.get(122));
+        SNOWBALL = REGISTRY.register(data.get(123));
+        SNOW_GOLEM = REGISTRY.register(data.get(124));
+        SPAWNER_MINECART = REGISTRY.register(data.get(125));
+        SPECTRAL_ARROW = REGISTRY.register(data.get(126));
+        SPIDER = REGISTRY.register(data.get(127));
+        SPRUCE_BOAT = REGISTRY.register(data.get(128));
+        SPRUCE_CHEST_BOAT = REGISTRY.register(data.get(129));
+        SQUID = REGISTRY.register(data.get(130));
+        STRAY = REGISTRY.register(data.get(131));
+        STRIDER = REGISTRY.register(data.get(132));
+        SULFUR_CUBE = REGISTRY.register(data.get(133));
+        TADPOLE = REGISTRY.register(data.get(134));
+        TEXT_DISPLAY = REGISTRY.register(data.get(135));
+        TNT = REGISTRY.register(data.get(136));
+        TNT_MINECART = REGISTRY.register(data.get(137));
+        TRADER_LLAMA = REGISTRY.register(data.get(138));
+        TRIDENT = REGISTRY.register(data.get(139));
+        TROPICAL_FISH = REGISTRY.register(data.get(140));
+        TURTLE = REGISTRY.register(data.get(141));
+        VEX = REGISTRY.register(data.get(142));
+        VILLAGER = REGISTRY.register(data.get(143));
+        VINDICATOR = REGISTRY.register(data.get(144));
+        WANDERING_TRADER = REGISTRY.register(data.get(145));
+        WARDEN = REGISTRY.register(data.get(146));
+        WIND_CHARGE = REGISTRY.register(data.get(147));
+        WITCH = REGISTRY.register(data.get(148));
+        WITHER = REGISTRY.register(data.get(149));
+        WITHER_SKELETON = REGISTRY.register(data.get(150));
+        WITHER_SKULL = REGISTRY.register(data.get(151));
+        WOLF = REGISTRY.register(data.get(152));
+        ZOGLIN = REGISTRY.register(data.get(153));
+        ZOMBIE = REGISTRY.register(data.get(154));
+        ZOMBIE_HORSE = REGISTRY.register(data.get(155));
+        ZOMBIE_NAUTILUS = REGISTRY.register(data.get(156));
+        ZOMBIE_VILLAGER = REGISTRY.register(data.get(157));
+        ZOMBIFIED_PIGLIN = REGISTRY.register(data.get(158));
+        PLAYER = REGISTRY.register(data.get(159));
+        FISHING_BOBBER = REGISTRY.register(data.get(160));
     }
 }

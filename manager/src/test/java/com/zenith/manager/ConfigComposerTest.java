@@ -7,6 +7,8 @@ import com.zenith.manager.state.State;
 import com.zenith.manager.util.Json;
 import org.junit.jupiter.api.Test;
 
+import java.util.Set;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -44,7 +46,7 @@ class ConfigComposerTest {
         account.username = "Steve";
         var settings = new State.ManagerSettings();
         settings.publicAddress = "proxy.example.com";
-        settings.outboundProxiesEnabled = proxies;
+        settings.userProxiesAllowed = proxies;
         return new ConfigComposer.Context(instance, server, account, global, settings, ConfigComposer.JoinLists.EMPTY, cheatsDisabled);
     }
 
@@ -75,17 +77,70 @@ class ConfigComposerTest {
         // user changed hunger in-game; Zenith also rewrote a forced value
         saved.getAsJsonObject("client").getAsJsonObject("extra").getAsJsonObject("autoEat").addProperty("hunger", 18);
         saved.getAsJsonObject("authentication").addProperty("username", "Renamed");
-        var overrides = ConfigComposer.extractInstanceOverrides(DEFAULTS, c, saved);
+        var overrides = ConfigComposer.extractInstanceOverrides(DEFAULTS, c, saved, Set.of());
         assertEquals(json("{\"client\": {\"extra\": {\"autoEat\": {\"hunger\": 18}}}}"), overrides);
     }
 
     @Test
+    void globalChangeThatNeverReachedTheInstanceIsNotAnOverride() {
+        // the instance started with hunger 10; the admin set 14 globally while it was starting
+        var saved = ConfigComposer.compose(DEFAULTS, ctx(new JsonObject(), new JsonObject(), new JsonObject(), false));
+        var c = ctx(json("{\"client\": {\"extra\": {\"autoEat\": {\"hunger\": 14}}}}"), new JsonObject(), new JsonObject(), false);
+        assertEquals(new JsonObject(), ConfigComposer.extractInstanceOverrides(DEFAULTS, c, saved, Set.of("client.extra.autoEat.hunger")));
+        // without knowing, the old value would stick as an instance override
+        assertEquals(json("{\"client\": {\"extra\": {\"autoEat\": {\"hunger\": 10}}}}"), ConfigComposer.extractInstanceOverrides(DEFAULTS, c, saved, Set.of()));
+    }
+
+    private static final JsonObject GLOBAL_PROXY = json("""
+        {"client": {"connectionProxy": {"enabled": true, "type": "SOCKS5", "host": "gw.example.com", "port": 1080, "user": "admin", "password": "secret"}}}
+        """);
+
+    private static JsonObject proxy(JsonObject config) {
+        return config.getAsJsonObject("client").getAsJsonObject("connectionProxy");
+    }
+
+    @Test
+    void withoutOwnProxiesEveryInstanceUsesTheGlobalProxy() {
+        var c = ctx(GLOBAL_PROXY, json("{\"client\": {\"connectionProxy\": {\"port\": 9000}}}"),
+            json("{\"client\": {\"connectionProxy\": {\"enabled\": false, \"host\": \"10.0.0.5\"}}}"), false);
+        assertEquals(proxy(GLOBAL_PROXY), proxy(ConfigComposer.compose(DEFAULTS, c)));
+    }
+
+    @Test
+    void ownProxyCanChangeButNotTurnOffTheGlobalOne() {
+        var c = ctx(GLOBAL_PROXY, new JsonObject(), json("{\"client\": {\"connectionProxy\": {\"enabled\": false, \"host\": \"10.0.0.5\"}}}"), true);
+        var saved = ConfigComposer.compose(DEFAULTS, c);
+        var p = proxy(saved);
+        assertTrue(p.get("enabled").getAsBoolean());
+        assertEquals("10.0.0.5", p.get("host").getAsString());
+        // the admin's login never goes to someone else's proxy
+        assertEquals("", p.get("user").getAsString());
+        assertEquals("", p.get("password").getAsString());
+        // and the blanked login isn't mistaken for the user's own
+        assertEquals(c.instance().settings, ConfigComposer.extractInstanceOverrides(DEFAULTS, c, saved, Set.of()));
+    }
+
+    @Test
+    void ownProxySettingsKeepTheGlobalLoginForTheSameProxy() {
+        var c = ctx(GLOBAL_PROXY, new JsonObject(), json("{\"client\": {\"connectionProxy\": {\"user\": \"admin-session-2\"}}}"), true);
+        var p = proxy(ConfigComposer.compose(DEFAULTS, c));
+        assertEquals("admin-session-2", p.get("user").getAsString());
+        assertEquals("secret", p.get("password").getAsString());
+    }
+
+    @Test
+    void oldProxySwitchStillLoads() {
+        var state = Json.GSON.fromJson("{\"settings\": {\"outboundProxiesEnabled\": true}}", State.class);
+        assertTrue(state.settings.userProxiesAllowed);
+    }
+
+    @Test
     void forcedPathsKeepPreviousInstanceOverride() {
-        // proxy enabled per-instance, but the admin switch is off: the override must survive a run
+        // proxy enabled per-instance, but own proxies aren't allowed: the override must survive a run
         var c = ctx(new JsonObject(), new JsonObject(), json("{\"client\": {\"connectionProxy\": {\"enabled\": true, \"host\": \"10.0.0.5\"}}}"), false);
         var saved = ConfigComposer.compose(DEFAULTS, c);
         assertFalse(saved.getAsJsonObject("client").getAsJsonObject("connectionProxy").get("enabled").getAsBoolean());
-        var overrides = ConfigComposer.extractInstanceOverrides(DEFAULTS, c, saved);
+        var overrides = ConfigComposer.extractInstanceOverrides(DEFAULTS, c, saved, Set.of());
         assertEquals(c.instance().settings, overrides);
     }
 
@@ -98,7 +153,7 @@ class ConfigComposerTest {
         assertFalse(extra.getAsJsonObject("antiafk").get("enabled").getAsBoolean());
         assertEquals(1.0, saved.getAsJsonObject("client").get("tickRate").getAsDouble());
         // turning the switch off again brings back what the instance had
-        assertEquals(c.instance().settings, ConfigComposer.extractInstanceOverrides(DEFAULTS, c, saved));
+        assertEquals(c.instance().settings, ConfigComposer.extractInstanceOverrides(DEFAULTS, c, saved, Set.of()));
         var normal = ConfigComposer.compose(DEFAULTS, ctx(new JsonObject(), new JsonObject(), c.instance().settings, false));
         assertTrue(normal.getAsJsonObject("client").getAsJsonObject("extra").getAsJsonObject("autoEat").get("enabled").getAsBoolean());
     }

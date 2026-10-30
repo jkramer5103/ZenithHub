@@ -3,7 +3,8 @@
 	import { CircleAlert, CircleCheck } from '@lucide/svelte';
 </script>
 
-<div class="pointer-events-none fixed inset-x-0 bottom-0 z-50 flex flex-col items-center gap-2 p-4 sm:items-end">
+<!-- above the phone's bottom nav, not over it -->
+<div class="pointer-events-none fixed inset-x-0 bottom-[calc(4rem+env(safe-area-inset-bottom))] z-50 flex md:bottom-0 flex-col items-center gap-2 p-4 sm:items-end">
 	{#each toasts.items as toast (toast.id)}
 		<button
 			class="pointer-events-auto flex max-w-md items-start gap-2 rounded-lg border px-4 py-3 text-left text-sm shadow-lg {toast.kind ===

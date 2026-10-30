@@ -4,7 +4,6 @@ import com.zenith.mc.block.Direction;
 import com.zenith.mc.block.properties.*;
 
 public class BlockStateProperties {
-    public static final BooleanProperty ACTIVE = BooleanProperty.create("active");
     public static final BooleanProperty ATTACHED = BooleanProperty.create("attached");
     public static final BooleanProperty BERRIES = BooleanProperty.create("berries");
     public static final BooleanProperty BLOOM = BooleanProperty.create("bloom");
@@ -54,6 +53,7 @@ public class BlockStateProperties {
     public static final EnumProperty<Direction> FACING_HOPPER = EnumProperty.create("facing", Direction.class, direction -> direction != Direction.UP);
     public static final EnumProperty<Direction> HORIZONTAL_FACING = EnumProperty.create("facing", Direction.class, Direction.Plane.HORIZONTAL);
     public static final IntegerProperty FLOWER_AMOUNT = IntegerProperty.create("flower_amount", 1, 4);
+    public static final IntegerProperty SEGMENT_AMOUNT = IntegerProperty.create("segment_amount", 1, 4);
     public static final EnumProperty<FrontAndTop> ORIENTATION = EnumProperty.create("orientation", FrontAndTop.class);
     public static final EnumProperty<AttachFace> ATTACH_FACE = EnumProperty.create("face", AttachFace.class);
     public static final EnumProperty<BellAttachType> BELL_ATTACHMENT = EnumProperty.create("attachment", BellAttachType.class);
@@ -67,6 +67,7 @@ public class BlockStateProperties {
     public static final EnumProperty<RedstoneSide> WEST_REDSTONE = EnumProperty.create("west", RedstoneSide.class);
     public static final EnumProperty<DoubleBlockHalf> DOUBLE_BLOCK_HALF = EnumProperty.create("half", DoubleBlockHalf.class);
     public static final EnumProperty<Half> HALF = EnumProperty.create("half", Half.class);
+    public static final EnumProperty<SideChainPart> SIDE_CHAIN_PART = EnumProperty.create("side_chain", SideChainPart.class);
     public static final EnumProperty<RailShape> RAIL_SHAPE = EnumProperty.create("shape", RailShape.class);
     public static final EnumProperty<RailShape> RAIL_SHAPE_STRAIGHT = EnumProperty.create(
         "shape",
@@ -103,6 +104,7 @@ public class BlockStateProperties {
     public static final IntegerProperty STAGE = IntegerProperty.create("stage", 0, 1);
     public static final IntegerProperty STABILITY_DISTANCE = IntegerProperty.create("distance", 0, 7);
     public static final IntegerProperty RESPAWN_ANCHOR_CHARGES = IntegerProperty.create("charges", 0, 4);
+    public static final IntegerProperty DRIED_GHAST_HYDRATION_LEVELS = IntegerProperty.create("hydration", 0, 3);
     public static final IntegerProperty ROTATION_16 = IntegerProperty.create("rotation", 0, 15);
     public static final EnumProperty<BedPart> BED_PART = EnumProperty.create("part", BedPart.class);
     public static final EnumProperty<ChestType> CHEST_TYPE = EnumProperty.create("type", ChestType.class);
@@ -116,18 +118,23 @@ public class BlockStateProperties {
     public static final EnumProperty<BambooLeaves> BAMBOO_LEAVES = EnumProperty.create("leaves", BambooLeaves.class);
     public static final EnumProperty<Tilt> TILT = EnumProperty.create("tilt", Tilt.class);
     public static final EnumProperty<Direction> VERTICAL_DIRECTION = EnumProperty.create("vertical_direction", Direction.class, Direction.UP, Direction.DOWN);
-    public static final EnumProperty<DripstoneThickness> DRIPSTONE_THICKNESS = EnumProperty.create("thickness", DripstoneThickness.class);
+    public static final EnumProperty<SpeleothemThickness> SPELEOTHEM_THICKNESS = EnumProperty.create("thickness", SpeleothemThickness.class);
     public static final EnumProperty<SculkSensorPhase> SCULK_SENSOR_PHASE = EnumProperty.create("sculk_sensor_phase", SculkSensorPhase.class);
-    public static final BooleanProperty CHISELED_BOOKSHELF_SLOT_0_OCCUPIED = BooleanProperty.create("slot_0_occupied");
-    public static final BooleanProperty CHISELED_BOOKSHELF_SLOT_1_OCCUPIED = BooleanProperty.create("slot_1_occupied");
-    public static final BooleanProperty CHISELED_BOOKSHELF_SLOT_2_OCCUPIED = BooleanProperty.create("slot_2_occupied");
-    public static final BooleanProperty CHISELED_BOOKSHELF_SLOT_3_OCCUPIED = BooleanProperty.create("slot_3_occupied");
-    public static final BooleanProperty CHISELED_BOOKSHELF_SLOT_4_OCCUPIED = BooleanProperty.create("slot_4_occupied");
-    public static final BooleanProperty CHISELED_BOOKSHELF_SLOT_5_OCCUPIED = BooleanProperty.create("slot_5_occupied");
+    public static final BooleanProperty SLOT_0_OCCUPIED = BooleanProperty.create("slot_0_occupied");
+    public static final BooleanProperty SLOT_1_OCCUPIED = BooleanProperty.create("slot_1_occupied");
+    public static final BooleanProperty SLOT_2_OCCUPIED = BooleanProperty.create("slot_2_occupied");
+    public static final BooleanProperty SLOT_3_OCCUPIED = BooleanProperty.create("slot_3_occupied");
+    public static final BooleanProperty SLOT_4_OCCUPIED = BooleanProperty.create("slot_4_occupied");
+    public static final BooleanProperty SLOT_5_OCCUPIED = BooleanProperty.create("slot_5_occupied");
     public static final IntegerProperty DUSTED = IntegerProperty.create("dusted", 0, 3);
     public static final BooleanProperty CRACKED = BooleanProperty.create("cracked");
     public static final BooleanProperty CRAFTING = BooleanProperty.create("crafting");
     public static final EnumProperty<TrialSpawnerState> TRIAL_SPAWNER_STATE = EnumProperty.create("trial_spawner_state", TrialSpawnerState.class);
     public static final EnumProperty<VaultState> VAULT_STATE = EnumProperty.create("vault_state", VaultState.class);
+    public static final EnumProperty<CreakingHeartState> CREAKING_HEART_STATE = EnumProperty.create("creaking_heart_state", CreakingHeartState.class);
     public static final BooleanProperty OMINOUS = BooleanProperty.create("ominous");
+    public static final EnumProperty<TestBlockMode> TEST_BLOCK_MODE = EnumProperty.create("mode", TestBlockMode.class);
+    public static final BooleanProperty MAP = BooleanProperty.create("map");
+    public static final EnumProperty<CopperGolemStatueBlockPose> COPPER_GOLEM_POSE = EnumProperty.create("copper_golem_pose", CopperGolemStatueBlockPose.class);
+    public static final EnumProperty<PotentSulfurState> POTENT_SULFUR_STATE = EnumProperty.create("potent_sulfur_state", PotentSulfurState.class);
 }

@@ -16,7 +16,7 @@ public class GameEventHandler implements ClientEventLoopPacketHandler<Clientboun
     @Override
     public boolean applyAsync(@NonNull ClientboundGameEventPacket packet, @NonNull ClientSession session) {
         switch (packet.getNotification()) {
-            case CHANGE_GAMEMODE -> {
+            case CHANGE_GAME_MODE -> {
                 var gameMode = (GameMode) packet.getValue();
                 CACHE.getPlayerCache().setGameMode(gameMode);
                 switch (gameMode) {
@@ -34,25 +34,25 @@ public class GameEventHandler implements ClientEventLoopPacketHandler<Clientboun
                 }
                 BOT.syncFromCache(false);
             }
-            case START_RAIN -> {
+            case START_RAINING -> {
                 CACHE.getChunkCache().setRaining(true);
                 EVENT_BUS.postAsync(WeatherChangeEvent.INSTANCE);
             }
-            case STOP_RAIN -> {
+            case STOP_RAINING -> {
                 CACHE.getChunkCache().setRaining(false);
                 CACHE.getChunkCache().setThunderStrength(0.0f);
                 CACHE.getChunkCache().setRainStrength(0.0f);
                 EVENT_BUS.postAsync(WeatherChangeEvent.INSTANCE);
             }
-            case RAIN_STRENGTH -> {
+            case RAIN_LEVEL_CHANGE -> {
                 CACHE.getChunkCache().setRainStrength(((RainStrengthValue) packet.getValue()).getStrength());
                 EVENT_BUS.postAsync(WeatherChangeEvent.INSTANCE);
             }
-            case THUNDER_STRENGTH -> {
+            case THUNDER_LEVEL_CHANGE -> {
                 CACHE.getChunkCache().setThunderStrength(((ThunderStrengthValue) packet.getValue()).getStrength());
                 EVENT_BUS.postAsync(WeatherChangeEvent.INSTANCE);
             }
-            case ENABLE_RESPAWN_SCREEN -> CACHE.getPlayerCache()
+            case IMMEDIATE_RESPAWN -> CACHE.getPlayerCache()
                 .setEnableRespawnScreen(packet.getValue() == RespawnScreenValue.ENABLE_RESPAWN_SCREEN);
         }
         return true;

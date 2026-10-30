@@ -143,7 +143,7 @@ public class ChunkCache implements CachedData {
             var chunkSection = chunk.getChunkSection(y);
             if (chunkSection == null) {
                 var palettedWorldState = Proxy.getInstance().getClient().getPalettedWorldState();
-                chunkSection = new ChunkSection(0,
+                chunkSection = new ChunkSection(0, 0,
                     DataPalette.createForChunk(palettedWorldState),
                     DataPalette.createForBiome(palettedWorldState)
                 );
@@ -327,8 +327,8 @@ public class ChunkCache implements CachedData {
         for (int i = 0; i < sectionPlusAboveBelowCount; i++) {
             skyUpdates.add(fullBrightSkyLightData);
         }
-        long[] lightMask = skylightMaskSet.toLongArray();
-        long[] emptyLightMask = emptySkyLightMask.toLongArray();
+        byte[] lightMask = skylightMaskSet.toByteArray();
+        byte[] emptyLightMask = emptySkyLightMask.toByteArray();
         return new LightUpdateData(
             lightMask,
             CONFIG.debug.server.cache.fullbrightChunkBlocklight
@@ -389,9 +389,9 @@ public class ChunkCache implements CachedData {
             CLIENT_LOG.error("Error getting ChunkData packets from cache", e);
         }
         if (isRaining) {
-            consumer.accept(new ClientboundGameEventPacket(GameEvent.START_RAIN, null));
-            consumer.accept(new ClientboundGameEventPacket(GameEvent.RAIN_STRENGTH, new RainStrengthValue(this.rainStrength)));
-            consumer.accept(new ClientboundGameEventPacket(GameEvent.THUNDER_STRENGTH, new ThunderStrengthValue(this.thunderStrength)));
+            consumer.accept(new ClientboundGameEventPacket(GameEvent.START_RAINING, null));
+            consumer.accept(new ClientboundGameEventPacket(GameEvent.RAIN_LEVEL_CHANGE, new RainStrengthValue(this.rainStrength)));
+            consumer.accept(new ClientboundGameEventPacket(GameEvent.THUNDER_LEVEL_CHANGE, new ThunderStrengthValue(this.thunderStrength)));
         }
     }
 
@@ -417,6 +417,9 @@ public class ChunkCache implements CachedData {
             this.worldBorderData = WorldBorderData.DEFAULT;
             this.worldTimeData = null;
             this.serverBrand = null;
+        }
+        if (type == CacheResetType.PROTOCOL_SWITCH) {
+            this.worldTimeData = null;
         }
     }
 

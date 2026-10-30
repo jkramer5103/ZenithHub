@@ -1,8 +1,11 @@
 package com.zenith.via;
 
 import com.viaversion.viabackwards.ViaBackwardsPlatformImpl;
+import com.viaversion.viabackwards.protocol.v1_21_6to1_21_5.Protocol1_21_6To1_21_5;
+import com.viaversion.viabackwards.protocol.v1_21_6to1_21_5.provider.DialogViewProvider;
 import com.viaversion.viarewind.ViaRewindPlatformImpl;
 import com.viaversion.viaversion.ViaManagerImpl;
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.commands.ViaCommandHandler;
 import com.viaversion.viaversion.connection.UserConnectionImpl;
@@ -31,6 +34,8 @@ public class ZenithViaInitializer {
                 ViaBackwardsPlatformImpl::new,
                 ViaRewindPlatformImpl::new
             );
+            var dialogs = Via.getManager().getProtocolManager().getProtocol(Protocol1_21_6To1_21_5.class);
+            if (dialogs != null) Via.getManager().getProviders().use(DialogViewProvider.class, new ZenithDialogViewProvider(dialogs));
         }
     }
 

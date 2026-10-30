@@ -33,8 +33,8 @@
 		{#if status?.online}
 			<div class="grid grid-cols-2 gap-x-4 gap-y-1.5 text-xs text-zinc-400">
 				<span class="flex items-center gap-1.5"><Clock size={13} /> {duration(status.onlineSeconds)} online</span>
-				<span class="flex items-center gap-1.5"><Heart size={13} /> {Math.round(status.health)} hp · {status.food} food</span>
-				{#if status.position}
+				<span class="flex items-center gap-1.5"><Heart size={13} /> {Math.round(status.health ?? 0)} hp · {status.food ?? 0} food</span>
+				{#if status.position?.dimension}
 					<span class="flex items-center gap-1.5 truncate"><MapPin size={13} /> {status.position.dimension.replace('minecraft:', '')}</span>
 				{/if}
 				<span class="flex items-center gap-1.5"><Gauge size={13} /> {status.ping}ms · {status.tps?.toFixed(1)} tps</span>
@@ -47,7 +47,7 @@
 			</div>
 		{:else if status?.inQueue}
 			<div class="text-xs text-zinc-400">
-				Position {status.queuePosition}{status.queueEtaSeconds > 0 ? ` · about ${duration(status.queueEtaSeconds)} left` : ''}
+				Position {status.queuePosition}{status.queueEtaSeconds ? ` · about ${duration(status.queueEtaSeconds)} left` : ''}
 			</div>
 		{:else if instance.runtime.phase === 'BACKOFF' && instance.runtime.lastError}
 			<div class="line-clamp-2 text-xs text-red-400">{instance.runtime.lastError}</div>

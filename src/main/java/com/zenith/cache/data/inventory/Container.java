@@ -1,8 +1,10 @@
 package com.zenith.cache.data.inventory;
 
+import com.zenith.mc.item.hashing.ItemStackHasher;
 import lombok.Data;
 import net.kyori.adventure.text.Component;
 import org.geysermc.mcprotocollib.protocol.data.game.inventory.ContainerType;
+import org.geysermc.mcprotocollib.protocol.data.game.item.HashedStack;
 import org.geysermc.mcprotocollib.protocol.data.game.item.ItemStack;
 
 import java.util.ArrayList;
@@ -52,6 +54,27 @@ public class Container {
         for (int i = 0; i < inventory.length; i++) {
             contents.set(i, inventory[i]);
         }
+    }
+
+    // returns a cloned itemstack
+    // so we can still retain itemstack field mutability
+    public ItemStack hashToMatchingStack(HashedStack hashedStack) {
+        for (int i = 0; i < contents.size(); i++) {
+            ItemStack itemStack = contents.get(i);
+            if (ItemStackHasher.matches(hashedStack, itemStack)) {
+                if (itemStack != null) {
+                    // defensively clone the itemStack
+                    return new ItemStack(
+                        itemStack.getId(),
+                        itemStack.getAmount(),
+                        itemStack.getDataComponents() != null
+                            ? itemStack.getDataComponents().clone()
+                            : null);
+                }
+                return null;
+            }
+        }
+        return null;
     }
 
     public void setItemStack(final int slot, final ItemStack newItemStack) {

@@ -114,7 +114,6 @@ public class InventoryCache {
     }
 
     public void handleContainerClick(ServerboundContainerClickPacket packet) {
-        mouseStack = packet.getCarriedItem();
         var container = containers.get(packet.getContainerId());
         if (container == containers.defaultReturnValue()) {
             CACHE_LOG.debug("Attempted to click in unknown container {}", packet.getContainerId());
@@ -129,7 +128,12 @@ public class InventoryCache {
                 getPlayerInventory().setItemStack(45, container.getItemStack(packet.getSlot()));
             }
         }
-        packet.getChangedSlots().forEach(container::setItemStack);
+        Int2ObjectMap<@Nullable ItemStack> unhashedStacks = new Int2ObjectOpenHashMap<>();
+        packet.getChangedSlots().forEach((slot, hashedStack) -> {
+            var stack = container.hashToMatchingStack(hashedStack);
+            unhashedStacks.put((int) slot, stack);
+        });
+        unhashedStacks.forEach(container::setItemStack);
         lastContainerClick = System.currentTimeMillis();
         activeContainerId = packet.getContainerId();
     }

@@ -46,6 +46,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 import static com.zenith.Globals.BOT;
+import static com.zenith.Globals.CACHE;
 import static org.geysermc.mcprotocollib.protocol.data.game.entity.EquipmentSlot.*;
 
 
@@ -81,7 +82,7 @@ public class PlayerCache implements CachedData {
     protected boolean onGround = true;
     protected double lastMoveX, lastMoveY, lastMoveZ;
     protected long lastMoveTime;
-    protected EntityEvent opLevel = EntityEvent.PLAYER_OP_PERMISSION_LEVEL_0;
+    protected EntityEvent opLevel = EntityEvent.PLAYER_SET_NO_PERMISSIONS;
 //    protected AtomicInteger actionId = new AtomicInteger(0);
     private static final MutableVec3i DEFAULT_SPAWN_POSITION = new MutableVec3i(0, 0, 0);
     protected MutableVec3i spawnPosition = DEFAULT_SPAWN_POSITION;
@@ -99,7 +100,7 @@ public class PlayerCache implements CachedData {
     public void getPackets(@NonNull Consumer<Packet> consumer, final @NonNull TcpSession session) {
         // todo: may need to move this out so spectators don't get sent wrong abilities
         consumer.accept(new ClientboundChangeDifficultyPacket(this.difficulty, this.isDifficultyLocked));
-        consumer.accept(new ClientboundGameEventPacket(GameEvent.CHANGE_GAMEMODE, this.gameMode)); // resets abilities to default, must send abilities after
+        consumer.accept(new ClientboundGameEventPacket(GameEvent.CHANGE_GAME_MODE, this.gameMode));
         consumer.accept(new ClientboundPlayerAbilitiesPacket(this.invincible, this.canFly, this.flying, this.creative, this.flySpeed, this.walkSpeed));
         consumer.accept(new ClientboundEntityEventPacket(this.thePlayer.getEntityId(), this.opLevel));
         var container = this.inventoryCache.getContainers().get(this.inventoryCache.getOpenContainerId());
@@ -119,7 +120,10 @@ public class PlayerCache implements CachedData {
         } else {
             consumer.accept(new ClientboundPlayerPositionPacket(ThreadLocalRandom.current().nextInt(16, 1024), this.getX(), this.getY(), this.getZ(), this.getVelX(), this.getVelY(), this.getVelZ(), this.getYaw(), this.getPitch()));
         }
-        consumer.accept(new ClientboundSetDefaultSpawnPositionPacket(spawnPosition.getX(), spawnPosition.getY(), spawnPosition.getZ(), 0.0f));
+        consumer.accept(new ClientboundSetDefaultSpawnPositionPacket(
+            // todo: cache spawn world key
+            new GlobalPos(CACHE.getChunkCache().getWorldName(), spawnPosition.getX(), spawnPosition.getY(), spawnPosition.getZ()),
+            0.0f, 0.0f));
         consumer.accept(new ClientboundSetHeldSlotPacket(heldItemSlot));
     }
 
@@ -173,7 +177,7 @@ public class PlayerCache implements CachedData {
             0,
             ContainerActionType.CREATIVE_GRAB_MAX_STACK,
             CreativeGrabAction.GRAB,
-            new ItemStack(1, 1),
+            null,
             Int2ObjectMaps.emptyMap())
         );
     }

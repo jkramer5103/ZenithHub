@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.zenith.manager.ManagerConfig;
 import com.zenith.manager.state.State;
 import com.zenith.manager.state.StateStore;
@@ -143,7 +144,7 @@ public final class SettingsService {
 
     private JsonObject defaults() {
         try {
-            return Json.readObject(config.zenithDefaultsFile());
+            return Cheats.offByDefault(Json.readObject(config.zenithDefaultsFile()));
         } catch (IOException e) {
             throw new IllegalStateException("Settings aren't available yet. Try again in a moment.");
         }
@@ -183,7 +184,9 @@ public final class SettingsService {
                 });
                 layers.put("global", layer[0]);
                 own = layer[1];
+                forced = store.read(s -> ConfigComposer.proxyForcedValues(s.settings, s.globalSettings));
                 effective = Json.merge(Json.merge(defaults, layer[0]), own);
+                for (var e : forced.entrySet()) Json.set(effective, e.getKey(), e.getValue());
             }
             case INSTANCE -> {
                 var ctx = supervisor.context(id);
@@ -192,7 +195,7 @@ public final class SettingsService {
                 forced = ConfigComposer.forcedValues(ctx);
                 var liveConfig = supervisor.isRunning(id) ? tryLiveConfig(id) : null;
                 if (liveConfig != null) {
-                    own = ConfigComposer.extractInstanceOverrides(defaults, ctx, liveConfig);
+                    own = ConfigComposer.extractInstanceOverrides(defaults, ctx, liveConfig, supervisor.stalePaths(id));
                     effective = liveConfig;
                     live = true;
                 } else {
@@ -222,6 +225,16 @@ public final class SettingsService {
                 sources.addProperty(path, ownLayerName);
             } else {
                 sources.addProperty(path, sourceOf(layers, path));
+            }
+        }
+        // the global proxy's login is the admin's: other layers see it's set, not what it is
+        if (scope != Scope.GLOBAL) {
+            var path = ConfigComposer.PROXY + "password";
+            var globalPassword = store.read(s -> Json.get(s.globalSettings, path));
+            if (globalPassword != null && !globalPassword.equals(new JsonPrimitive(""))) {
+                for (var shown : List.of(values, inheritedValues)) {
+                    if (globalPassword.equals(shown.get(path))) shown.addProperty(path, "");
+                }
             }
         }
         var forcedPaths = new JsonArray();
@@ -288,7 +301,17 @@ public final class SettingsService {
             if (live != null) liveConfigs.put(instanceId, live);
         }
         var running = List.copyOf(liveConfigs.keySet());
+        // a process that's starting or didn't answer keeps the old values; don't take them for in-game changes later
+        if (scope != Scope.INSTANCE) {
+            for (var instanceId : affected) if (!liveConfigs.containsKey(instanceId)) supervisor.markStale(instanceId, changed);
+        }
 
+        if (scope == Scope.SERVER) {
+            var forced = store.read(s -> ConfigComposer.proxyForcedValues(s.settings, s.globalSettings));
+            for (var path : changed) {
+                if (forced.containsKey(path)) throw new IllegalArgumentException(path + " is managed automatically");
+            }
+        }
         if (scope == Scope.INSTANCE) {
             var forced = ConfigComposer.forcedValues(supervisor.context(id));
             for (var path : changed) {
@@ -300,7 +323,7 @@ public final class SettingsService {
         // so they aren't mistaken for overrides once the layers below change
         for (var instanceId : running) {
             var ctx = supervisor.context(instanceId);
-            var overrides = ConfigComposer.extractInstanceOverrides(defaults, ctx, liveConfigs.get(instanceId));
+            var overrides = ConfigComposer.extractInstanceOverrides(defaults, ctx, liveConfigs.get(instanceId), supervisor.stalePaths(instanceId));
             store.update(s -> s.instances.stream().filter(i -> i.id.equals(instanceId)).forEach(i -> i.settings = overrides));
         }
 
@@ -314,19 +337,63 @@ public final class SettingsService {
             reset.forEach(path -> Json.remove(layer, path));
         });
 
+        // the proxy's login depends on its other fields (ConfigComposer never sends the global login elsewhere)
+        var pushed = new ArrayList<>(changed);
+        if (changed.stream().anyMatch(path -> path.startsWith(ConfigComposer.PROXY))) {
+            ConfigComposer.PROXY_PATHS.stream().filter(path -> !pushed.contains(path)).forEach(pushed::add);
+        }
         for (var instanceId : running) {
             var composed = ConfigComposer.compose(defaults, supervisor.context(instanceId));
             var patch = new JsonObject();
-            for (var path : changed) {
+            for (var path : pushed) {
                 var value = Json.get(composed, path);
                 if (value != null) Json.set(patch, path, value);
             }
             try {
                 supervisor.pushConfig(instanceId, patch);
+                supervisor.clearStale(instanceId, changed);
             } catch (Exception e) {
                 // the change is saved and applies on the next start
                 LOG.warn("Couldn't apply settings to running instance {}: {}", instanceId, e.getMessage());
+                supervisor.markStale(instanceId, changed);
                 if (scope == Scope.INSTANCE) throw new IllegalStateException("Saved, but the running instance rejected it: " + e.getMessage());
+            }
+        }
+    }
+
+    /**
+     * Changes who may set their own proxy. That changes forced values, so running instances get the proxy
+     * right away; in-game changes are captured first, against the old rules.
+     */
+    public synchronized void setUserProxiesAllowed(boolean allowed) throws Exception {
+        if (store.read(s -> s.settings.userProxiesAllowed == allowed)) return;
+        var defaults = defaults();
+        var liveConfigs = new LinkedHashMap<String, JsonObject>();
+        for (var instanceId : store.read(s -> s.instances.stream().map(i -> i.id).toList())) {
+            if (!supervisor.isRunning(instanceId)) continue;
+            var live = tryLiveConfig(instanceId);
+            if (live != null) liveConfigs.put(instanceId, live);
+            else supervisor.markStale(instanceId, ConfigComposer.PROXY_PATHS);
+        }
+        for (var e : liveConfigs.entrySet()) {
+            var instanceId = e.getKey();
+            var overrides = ConfigComposer.extractInstanceOverrides(defaults, supervisor.context(instanceId), e.getValue(), supervisor.stalePaths(instanceId));
+            store.update(s -> s.instances.stream().filter(i -> i.id.equals(instanceId)).forEach(i -> i.settings = overrides));
+        }
+        store.update(s -> s.settings.userProxiesAllowed = allowed);
+        for (var instanceId : liveConfigs.keySet()) {
+            var composed = ConfigComposer.compose(defaults, supervisor.context(instanceId));
+            var patch = new JsonObject();
+            for (var path : ConfigComposer.PROXY_PATHS) {
+                var value = Json.get(composed, path);
+                if (value != null) Json.set(patch, path, value);
+            }
+            try {
+                supervisor.pushConfig(instanceId, patch);
+                supervisor.clearStale(instanceId, ConfigComposer.PROXY_PATHS);
+            } catch (Exception ex) {
+                LOG.warn("Couldn't apply the proxy to running instance {}: {}", instanceId, ex.getMessage());
+                supervisor.markStale(instanceId, ConfigComposer.PROXY_PATHS);
             }
         }
     }

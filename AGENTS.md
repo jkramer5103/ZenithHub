@@ -9,7 +9,7 @@ records what is done. Keep it up to date when you change behaviour.
 - `src/`: ZenithProxy (the bot). Upstream code, minus the parts listed under "Removed in the fork"
   in PLAN.md (its own Discord bot, chat relay, terminal input, self-updater, launcher). Don't bring
   those back. Otherwise keep fork changes small so upstream merges stay easy. Fork-specific code
-  lives in `com.zenith.control` (managed mode and control API), `command/impl/LobbyCommand.java` and
+  lives in `com.zenith.control` (managed mode, control API, outbound proxy), `command/impl/LobbyCommand.java` and
   `command/impl/ControllerCommand.java`.
   `discord/DiscordBot.java` no longer logs in to Discord: it posts events that the control API
   forwards to the manager's central bot.
@@ -51,6 +51,7 @@ Run prettier only on `.ts` files. No Svelte plugin is installed, so it fails on 
 - `ZENITH_DISABLE_CHEATS` lists cheat modules twice: `com.zenith.control.Cheats` (bot) and
   `manager/.../instances/Cheats.java` (settings). Change both together.
 - Copy buttons must work over plain `http://<ip>`, where `navigator.clipboard` is missing.
+- While an outbound proxy is on, everything an instance or the manager sends for it goes through it (see PLAN.md). New outbound requests must use `OutboundProxy` (bot) or `OutboundProxies` (manager), never a bare `HttpClient` or `Socket`.
 
 ## Gotchas
 
@@ -69,9 +70,10 @@ Run prettier only on `.ts` files. No Svelte plugin is installed, so it fails on 
 
 ## Git
 
-- One branch: `main`. Zenith's native version is 1.21.4 and ViaVersion covers every other version in
-  both directions, so there are no per-version branches like upstream's.
+- One branch: `main`. Zenith's native version is 26.3 (upstream's `26.3.0` branch) and ViaVersion
+  covers every other version in both directions, so there are no per-version branches like upstream's.
 - `origin` is this repo (jkramer5103/ZenithHub) and `upstream` is rfresh2/ZenithProxy. Merge
-  `upstream/1.21.4` into `main` to pick up bot fixes. If the native version ever has to move
-  (e.g. 2b2t switches versions), merge upstream's newer version branch into `main` instead.
+  `upstream/26.3.0` into `main` to pick up bot fixes. When a newer Minecraft release comes out, merge
+  upstream's branch for it and recapture `src/main/resources/mcdata/core-registries.bin.gz` and
+  `en_us.json.gz` from that vanilla version (see PLAN.md).
 - Commit only when asked.

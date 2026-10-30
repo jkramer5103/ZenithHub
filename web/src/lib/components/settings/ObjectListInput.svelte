@@ -165,7 +165,7 @@
 	<div>
 		{#if sortedTimes.length}
 			<ul class="mb-2 flex flex-wrap gap-1.5">
-				{#each sortedTimes as row (`${row.hour}:${row.minute}`)}
+				{#each sortedTimes as row, i (`${i}:${row.hour}:${row.minute}`)}
 					<li class="flex items-center gap-1.5 rounded-md border border-zinc-700 bg-zinc-800/70 py-0.5 pr-0.5 pl-2 text-sm tabular-nums">
 						{pad(row.hour)}:{pad(row.minute)}
 						<button

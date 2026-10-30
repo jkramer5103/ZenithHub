@@ -1,6 +1,7 @@
 package com.zenith.feature.inventory.actions;
 
 import com.zenith.cache.data.inventory.Container;
+import com.zenith.mc.item.hashing.ItemStackHasher;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import lombok.Data;
@@ -9,8 +10,10 @@ import org.geysermc.mcprotocollib.protocol.codec.MinecraftPacket;
 import org.geysermc.mcprotocollib.protocol.data.game.entity.EquipmentSlot;
 import org.geysermc.mcprotocollib.protocol.data.game.inventory.ContainerActionType;
 import org.geysermc.mcprotocollib.protocol.data.game.inventory.MoveToHotbarAction;
+import org.geysermc.mcprotocollib.protocol.data.game.item.HashedStack;
 import org.geysermc.mcprotocollib.protocol.data.game.item.ItemStack;
 import org.geysermc.mcprotocollib.protocol.packet.ingame.serverbound.inventory.ServerboundContainerClickPacket;
+import org.jspecify.annotations.Nullable;
 
 import static com.zenith.Globals.*;
 
@@ -34,7 +37,7 @@ public class MoveToHotbarSlot implements InventoryAction {
             CLIENT_LOG.debug("Can't move to hotbar, mouse stack is not empty: {}", this);
             return null; // can't swap if mouse stack is not empty
         }
-        Int2ObjectMap<ItemStack> changedSlots = new Int2ObjectArrayMap<>();
+        Int2ObjectMap<@Nullable HashedStack> changedSlots = new Int2ObjectArrayMap<>();
         int hotBarSlot = -1;
         boolean playerInv = containerId == 0;
         int hotbarOffset = playerInv ? 36 : container.getSize() - 9;
@@ -59,10 +62,10 @@ public class MoveToHotbarSlot implements InventoryAction {
             return null; // can't swap if clickStack and swapStack is empty
         }
         if (hotBarSlot != -1) { // -1 == Swapping with offhand while in a container
-            changedSlots.put(hotBarSlot, clickStack);
+            changedSlots.put(hotBarSlot, ItemStackHasher.hash(clickStack));
         }
         // there is no offhand slot id in the container, so only one slot is set as changed in the packet
-        changedSlots.put(slotId, swapStack);
+        changedSlots.put(slotId, ItemStackHasher.hash(swapStack));
 
         return new ServerboundContainerClickPacket(
             containerId,
@@ -72,7 +75,7 @@ public class MoveToHotbarSlot implements InventoryAction {
             slotId,
             containerActionType,
             moveToHotbarAction,
-            Container.EMPTY_STACK,
+            ItemStackHasher.hash(Container.EMPTY_STACK),
             changedSlots
         );
     }

@@ -2,7 +2,9 @@
 	import type { ItemStack } from '#lib/types.js';
 
 	let { item }: { item: ItemStack } = $props();
-	let failed = $state(false);
+	// per item: the slot can hold a different item later, whose icon may well load
+	let failedId = $state<string | null>(null);
+	const failed = $derived(failedId === item.id);
 
 	// two letters when the icon can't load (offline, or an item the icon site doesn't have)
 	const initials = $derived(
@@ -21,7 +23,7 @@
 		loading="lazy"
 		draggable="false"
 		class="size-full object-contain [image-rendering:pixelated]"
-		onerror={() => (failed = true)}
+		onerror={() => (failedId = item.id)}
 	/>
 {:else}
 	<span class="text-[11px] font-semibold text-zinc-300">{initials}</span>

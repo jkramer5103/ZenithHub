@@ -909,7 +909,7 @@ public final class ElytraBehavior implements ProcessUtil {
         return CACHE.getEntityCache().getEntities().values().stream()
             .filter(e -> !e.isRemoved() && e.getEntityType() == EntityType.FIREWORK_ROCKET)
             .filter(e -> {
-                var attached = e.getMetadataValue(9, MetadataTypes.OPTIONAL_VARINT, OptionalInt.class);
+                var attached = e.getMetadataValue(9, MetadataTypes.OPTIONAL_UNSIGNED_INT, OptionalInt.class);
                 return attached != null && attached.isPresent() && attached.getAsInt() == CACHE.getPlayerCache().getEntityId();
             })
             .findFirst();

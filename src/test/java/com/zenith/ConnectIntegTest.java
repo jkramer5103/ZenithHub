@@ -3,6 +3,7 @@ package com.zenith;
 import com.zenith.util.Wait;
 import com.zenith.util.config.Config;
 import com.zenith.util.config.LaunchConfig;
+import org.geysermc.mcprotocollib.protocol.codec.MinecraftCodec;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledInNativeImage;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,11 +23,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class ConnectIntegTest {
 
     @Container
-    public GenericContainer minecraftServer = new GenericContainer(DockerImageName.parse("itzg/minecraft-server:java21"))
+    public GenericContainer minecraftServer = new GenericContainer(DockerImageName.parse("itzg/minecraft-server:java25"))
         .withExposedPorts(25565)
         .withEnv("EULA", "TRUE")
         .withEnv("TYPE", "PAPER")
-        .withEnv("VERSION", "1.21.4")
+        .withEnv("VERSION", MinecraftCodec.CODEC.getMinecraftVersion())
         .withEnv("ONLINE_MODE", "FALSE")
         .waitingFor(org.testcontainers.containers.wait.strategy.Wait.forLogMessage(".*Done \\(.*\\)!.*", 1))
         .withStartupTimeout(Duration.ofMinutes(3));

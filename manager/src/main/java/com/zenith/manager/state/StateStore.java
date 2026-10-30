@@ -58,7 +58,8 @@ public final class StateStore {
         for (var s : state.servers) if (s.settings == null) s.settings = new com.google.gson.JsonObject();
         for (var i : state.instances) {
             if (i.settings == null) i.settings = new com.google.gson.JsonObject();
-            if (i.grants == null) i.grants = new java.util.ArrayList<>();
+            // Gson loads lists as ArrayList; grants are read without the lock, see State.Instance#grants
+            i.grants = new java.util.concurrent.CopyOnWriteArrayList<>(i.grants == null ? java.util.List.of() : i.grants);
             if (i.autostart == null) i.autostart = State.Autostart.RESTORE;
         }
         for (var u : state.users) if (u.mcNames == null) u.mcNames = new java.util.ArrayList<>();

@@ -2,13 +2,16 @@ package com.zenith.feature.inventory.actions;
 
 import com.zenith.cache.data.inventory.Container;
 import com.zenith.feature.inventory.menu.QuickMoveMenu;
+import com.zenith.mc.item.hashing.ItemStackHasher;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.geysermc.mcprotocollib.protocol.codec.MinecraftPacket;
 import org.geysermc.mcprotocollib.protocol.data.game.inventory.ContainerActionType;
 import org.geysermc.mcprotocollib.protocol.data.game.inventory.ShiftClickItemAction;
+import org.geysermc.mcprotocollib.protocol.data.game.item.HashedStack;
 import org.geysermc.mcprotocollib.protocol.packet.ingame.serverbound.inventory.ServerboundContainerClickPacket;
+import org.jspecify.annotations.Nullable;
 
 import static com.zenith.Globals.*;
 
@@ -47,8 +50,8 @@ public class ShiftClick implements InventoryAction {
                 slotId,
                 containerActionType,
                 action,
-                Container.EMPTY_STACK,
-                new Int2ObjectArrayMap<>()
+                ItemStackHasher.hash(Container.EMPTY_STACK),
+                new Int2ObjectArrayMap<@Nullable HashedStack>()
             );
         }
 
@@ -62,6 +65,10 @@ public class ShiftClick implements InventoryAction {
             CLIENT_LOG.debug("Can't shift click, no destination slot available: {}", this);
             return null;
         }
+        var hashedChangedSlots = new Int2ObjectArrayMap<@Nullable HashedStack>();
+        for (var e : changedSlots.int2ObjectEntrySet()) {
+            hashedChangedSlots.put(e.getIntKey(), ItemStackHasher.hash(e.getValue()));
+        }
 
         return new ServerboundContainerClickPacket(
             containerId,
@@ -71,8 +78,8 @@ public class ShiftClick implements InventoryAction {
             slotId,
             containerActionType,
             action,
-            Container.EMPTY_STACK,
-            changedSlots
+            ItemStackHasher.hash(Container.EMPTY_STACK),
+            hashedChangedSlots
         );
     }
 

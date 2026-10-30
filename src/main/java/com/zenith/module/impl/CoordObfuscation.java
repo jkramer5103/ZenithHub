@@ -48,20 +48,17 @@ import org.geysermc.mcprotocollib.protocol.data.game.item.ItemStack;
 import org.geysermc.mcprotocollib.protocol.packet.ingame.clientbound.ClientboundLoginPacket;
 import org.geysermc.mcprotocollib.protocol.packet.ingame.clientbound.ClientboundRespawnPacket;
 import org.geysermc.mcprotocollib.protocol.packet.ingame.clientbound.ClientboundStartConfigurationPacket;
+import org.geysermc.mcprotocollib.protocol.packet.ingame.clientbound.ClientboundTestInstanceBlockStatus;
 import org.geysermc.mcprotocollib.protocol.packet.ingame.clientbound.entity.*;
 import org.geysermc.mcprotocollib.protocol.packet.ingame.clientbound.entity.player.ClientboundPlayerLookAtPacket;
 import org.geysermc.mcprotocollib.protocol.packet.ingame.clientbound.entity.player.ClientboundPlayerPositionPacket;
-import org.geysermc.mcprotocollib.protocol.packet.ingame.clientbound.entity.spawn.ClientboundAddEntityPacket;
-import org.geysermc.mcprotocollib.protocol.packet.ingame.clientbound.entity.spawn.ClientboundAddExperienceOrbPacket;
 import org.geysermc.mcprotocollib.protocol.packet.ingame.clientbound.inventory.ClientboundContainerSetContentPacket;
 import org.geysermc.mcprotocollib.protocol.packet.ingame.clientbound.inventory.ClientboundContainerSetSlotPacket;
 import org.geysermc.mcprotocollib.protocol.packet.ingame.clientbound.inventory.ClientboundSetCursorItemPacket;
 import org.geysermc.mcprotocollib.protocol.packet.ingame.clientbound.inventory.ClientboundSetPlayerInventoryPacket;
 import org.geysermc.mcprotocollib.protocol.packet.ingame.clientbound.level.*;
 import org.geysermc.mcprotocollib.protocol.packet.ingame.serverbound.inventory.ServerboundPickItemFromBlockPacket;
-import org.geysermc.mcprotocollib.protocol.packet.ingame.serverbound.level.ServerboundAcceptTeleportationPacket;
-import org.geysermc.mcprotocollib.protocol.packet.ingame.serverbound.level.ServerboundMoveVehiclePacket;
-import org.geysermc.mcprotocollib.protocol.packet.ingame.serverbound.level.ServerboundSignUpdatePacket;
+import org.geysermc.mcprotocollib.protocol.packet.ingame.serverbound.level.*;
 import org.geysermc.mcprotocollib.protocol.packet.ingame.serverbound.player.*;
 
 import java.security.SecureRandom;
@@ -161,9 +158,10 @@ public class CoordObfuscation extends Module {
                 .inbound(ServerboundUseItemPacket.class, new COUseItemHandler())
                 .inbound(ServerboundUseItemOnPacket.class, new COUseItemOnHandler())
                 .inbound(ServerboundPickItemFromBlockPacket.class, new COPickItemFromBlockHandler())
+                .inbound(ServerboundSetTestBlockPacket.class, (p, s) -> null)
+                .inbound(ServerboundTestInstanceBlockActionPacket.class, (p, s) -> null)
                 .outbound(ClientboundStartConfigurationPacket.class, new COCStartConfigurationHandler())
                 .outbound(ClientboundAddEntityPacket.class, new COAddEntityHandler())
-                .outbound(ClientboundAddExperienceOrbPacket.class, new COAddExperienceOrbHandler())
                 .outbound(ClientboundBlockDestructionPacket.class, new COBlockDestructionHandler())
                 .outbound(ClientboundBlockEntityDataPacket.class, new COBlockEntityDataHandler())
                 .outbound(ClientboundBlockEventPacket.class, new COBlockEventHandler())
@@ -200,6 +198,8 @@ public class CoordObfuscation extends Module {
                 .outbound(ClientboundMoveMinecartPacket.class, new COMoveMinecartHandler())
                 .outbound(ClientboundSetCursorItemPacket.class, new COSetCursorItemHandler())
                 .outbound(ClientboundSetPlayerInventoryPacket.class, new COSetPlayerInventoryHandler())
+                .outbound(ClientboundTestInstanceBlockStatus.class, (p, s) -> null)
+                .outbound(ClientboundTrackedWaypointPacket.class, new COTrackedWaypointsHandler())
                 .build())
             .build();
     }
@@ -556,7 +556,7 @@ public class CoordObfuscation extends Module {
         for (var entity : CACHE.getEntityCache().getEntities().values()) {
             if (entity.getEntityType() == EntityType.EYE_OF_ENDER) return true;
             if (entity.getEntityType() == EntityType.ITEM) {
-                var itemStack = entity.getMetadataValue(8, MetadataTypes.ITEM, ItemStack.class);
+                var itemStack = entity.getMetadataValue(8, MetadataTypes.ITEM_STACK, ItemStack.class);
                 if (itemStack == null) continue;
                 if (itemStack.getId() == ItemRegistry.ENDER_EYE.id()) return true;
             }
@@ -610,6 +610,10 @@ public class CoordObfuscation extends Module {
             invalidReasons.add("Action Limiter server commands should be disabled to prevent `/kill` or whispers: `actionLimiter allowServerCommands off`");
             valid = false;
         }
+
+        // todo: remove after implementing
+        invalidReasons.add("1.21.5+ item component obfuscation is not implemented yet. Items like beehives and recovery compasses may leak coords. Downgrade release channel to 1.21.4: `channel set <linux/java> 1.21.4`");
+        valid = false;
 
         return new ValidationResult(valid, invalidReasons);
     }

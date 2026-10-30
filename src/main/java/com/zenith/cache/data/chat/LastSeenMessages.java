@@ -17,7 +17,15 @@ public class LastSeenMessages {
     private int offset;
     private byte[] lastTracked;
 
-    public record Update(List<byte[]> signatures, int offset, BitSet acknowledged) {}
+    public record Update(List<byte[]> signatures, int offset, BitSet acknowledged) {
+        /** As vanilla's LastSeenMessages.computeChecksum: 0 means "not checked", so it's never sent. */
+        public byte checksum() {
+            int hash = 1;
+            for (var signature : signatures) hash = 31 * hash + java.util.Arrays.hashCode(signature);
+            byte checksum = (byte) hash;
+            return checksum == 0 ? 1 : checksum;
+        }
+    }
 
     /** Returns the offset to send in a chat ack packet, or -1 if it's not due yet. */
     public synchronized int addPending(final byte[] signature) {

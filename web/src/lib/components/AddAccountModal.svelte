@@ -17,12 +17,39 @@
 		relogin?: { id: string; username: string } | null;
 	} = $props();
 
-	type Tab = 'microsoft' | 'import' | 'offline';
+	type Tab = 'microsoft' | 'import' | 'offline' | 'more';
+	type CredentialMethod = 'cookie' | 'token' | 'refresh-token';
+	let method = $state<CredentialMethod>('cookie');
+	let credential = $state('');
+	let clientId = $state('');
+	let switchedTo = $state<CredentialMethod | null>(null);
+
+	/** What a pasted credential looks like: tokens are easy to paste under the wrong method. */
+	function guessMethod(text: string): CredentialMethod | null {
+		const value = text.trim().replace(/^Bearer\s+/i, '');
+		if (/^eyJ[\w-]+\.[\w-]+\.[\w-]*$/.test(value)) return 'token';
+		if (/^M\.[\w.!*$-]+$/.test(value)) return 'refresh-token';
+		if (/\t/.test(value) || /^[^=\s;]+=[^;]*(;\s*[^=\s;]+=[^;]*)*;?$/.test(value)) return 'cookie';
+		return null;
+	}
+
+	function onCredentialInput() {
+		const guess = guessMethod(credential);
+		if (guess && guess !== method) {
+			method = guess;
+			switchedTo = guess;
+			login = null;
+		}
+	}
+
+	const methodNames: Record<CredentialMethod, string> = { cookie: 'Cookie', token: 'Token', 'refresh-token': 'Refresh token' };
 	let tab = $state<Tab>('microsoft');
 
 	// --- microsoft device code ---
 	let login = $state<PendingLogin | null>(null);
 	let starting = $state(false);
+	const busy = $derived(starting || login?.state === 'WAITING_FOR_CODE' || login?.state === 'WAITING_FOR_USER');
+
 	let now = $state(Date.now());
 	const ticker = setInterval(() => (now = Date.now()), 1000);
 	let poller: ReturnType<typeof setInterval> | undefined;
@@ -31,22 +58,33 @@
 		if (l.id === login?.id) update(l);
 	});
 
+	let finished = false;
+
 	function update(l: PendingLogin) {
 		login = l;
 		if (l.state === 'DONE') {
+			// the WebSocket and the fallback poll can both report it
+			if (finished) return;
+			finished = true;
 			clearInterval(poller);
 			toasts.success(relogin ? `Logged in to ${relogin.username} again` : 'Account added');
-			app.refresh();
-			onclose();
+			// wait for the new account, so the New instance dialog can pick it
+			app.refresh().catch(() => {}).finally(onclose);
 		} else if (l.state === 'FAILED' || l.state === 'CANCELLED') {
 			clearInterval(poller);
 		}
 	}
 
-	async function startLogin() {
+	async function startLogin(useCredential = false) {
 		starting = true;
 		try {
-			login = await api.post<PendingLogin>('/accounts/login', relogin ? { accountId: relogin.id } : {});
+			login = await api.post<PendingLogin>('/accounts/login', {
+				...(relogin ? { accountId: relogin.id } : {}),
+				...(useCredential ? { method, credential, ...(method === 'refresh-token' && clientId.trim() ? { clientId: clientId.trim() } : {}) } : {})
+			});
+			credential = '';
+			update(login);
+			if (login.state === 'DONE' || login.state === 'FAILED' || login.state === 'CANCELLED') return;
 			// the WebSocket delivers updates; polling covers a dropped connection
 			clearInterval(poller);
 			poller = setInterval(async () => {
@@ -128,24 +166,23 @@
 	const tabs: { id: Tab; label: string }[] = [
 		{ id: 'microsoft', label: 'Microsoft' },
 		{ id: 'import', label: 'Import' },
-		{ id: 'offline', label: 'Offline' }
+		{ id: 'offline', label: 'Offline' },
+		{ id: 'more', label: 'More' }
 	];
 </script>
 
 <Modal title={relogin ? `Log in again: ${relogin.username}` : 'Add account'} onclose={close}>
-	{#if !relogin}
-		<div class="mb-5 grid grid-cols-3 gap-1 rounded-lg bg-zinc-950 p-1">
-			{#each tabs as t}
-				<button
-					class="rounded-md py-1.5 text-sm font-medium transition-colors {tab === t.id
-						? 'bg-zinc-800 text-zinc-100'
-						: 'text-zinc-400 hover:text-zinc-200'}"
-					onclick={() => (tab = t.id)}
-					disabled={!!login && tab !== t.id && login.state === 'WAITING_FOR_USER'}>{t.label}</button
-				>
-			{/each}
-		</div>
-	{/if}
+	<div class="mb-5 grid {relogin ? 'grid-cols-2' : 'grid-cols-4'} gap-1 rounded-lg bg-zinc-950 p-1">
+		{#each tabs.filter((t) => !relogin || t.id === 'microsoft' || t.id === 'more') as t}
+			<button
+				class="rounded-md py-1.5 text-sm font-medium transition-colors {tab === t.id
+					? 'bg-zinc-800 text-zinc-100'
+					: 'text-zinc-400 hover:text-zinc-200'}"
+				onclick={() => { tab = t.id; credential = ''; if (login?.state === 'FAILED') login = null; }}
+				disabled={busy && tab !== t.id}>{t.label}</button
+			>
+		{/each}
+	</div>
 
 	{#if tab === 'microsoft'}
 		{#if !login || login.state === 'CANCELLED'}
@@ -153,7 +190,7 @@
 				Sign in with the Microsoft account that owns Minecraft. You'll get a code to enter on Microsoft's website; this works from
 				any device, your phone included.
 			</p>
-			<button class="btn-primary w-full" onclick={startLogin} disabled={starting}>
+			<button class="btn-primary w-full" onclick={() => startLogin()} disabled={starting}>
 				{#if starting}<LoaderCircle size={16} class="animate-spin" />{/if}
 				Get login code
 			</button>
@@ -182,7 +219,7 @@
 			</div>
 		{:else if login.state === 'FAILED'}
 			<div class="mb-4 rounded-lg border border-red-900 bg-red-950/50 p-3 text-sm text-red-200">{login.error}</div>
-			<button class="btn-primary w-full" onclick={startLogin} disabled={starting}>Try again</button>
+			<button class="btn-primary w-full" onclick={() => startLogin()} disabled={starting}>Try again</button>
 		{/if}
 	{:else if tab === 'import'}
 		<p class="mb-4 text-sm text-zinc-400">
@@ -204,6 +241,52 @@
 			{#if importing}<LoaderCircle size={16} class="animate-spin" />{/if}
 			Import account
 		</button>
+	{:else if tab === 'more'}
+		<form onsubmit={(e) => { e.preventDefault(); startLogin(true); }}>
+			<label class="label" for="auth-method">Sign-in method</label>
+			<select id="auth-method" class="input mb-4" bind:value={method} disabled={busy}
+				onchange={() => { credential = ''; login = null; switchedTo = null; }}>
+				<option value="cookie">Cookie</option>
+				<option value="token">Token</option>
+				<option value="refresh-token">Refresh token</option>
+			</select>
+			<p class="mb-4 text-sm text-zinc-400" id="credential-help">
+				{#if method === 'cookie'}
+					Paste your login.live.com Cookie header or upload a Netscape cookies.txt export. Continuing approves Minecraft Launcher's Xbox profile and automatic renewal permissions. Microsoft may still require a regular sign-in.
+				{:else if method === 'token'}
+					Use a Minecraft: Java Edition access token. This login lasts until the token expires; you'll need to sign in again to replace it.
+				{:else}
+					Use a Microsoft refresh token to keep your account signed in automatically. The application client ID must match the app that issued it.
+				{/if}
+			</p>
+			{#if method === 'cookie'}
+				<label class="btn-secondary mb-3 w-full cursor-pointer">
+					<FileUp size={16} /> Choose cookie file
+					<input type="file" accept=".txt,text/plain" class="hidden" disabled={busy}
+						onchange={async (e) => {
+							const file = e.currentTarget.files?.[0];
+							if (file) credential = await file.text();
+						}} />
+				</label>
+			{/if}
+			<label class="label" for="auth-credential">{method === 'cookie' ? 'Microsoft cookies' : method === 'token' ? 'Minecraft access token' : 'Microsoft refresh token'}</label>
+			<textarea id="auth-credential" class="input h-28 font-mono text-xs" bind:value={credential}
+				aria-describedby="credential-help" placeholder={method === 'cookie' ? 'Paste cookies here' : 'Paste token here'}
+				oninput={onCredentialInput}
+				autocomplete="off" autocapitalize="off" spellcheck="false" disabled={busy}></textarea>
+			{#if switchedTo === method}
+				<p class="mt-2 text-xs text-emerald-400">That looks like a {method === 'token' ? 'Minecraft access token' : method === 'cookie' ? 'set of cookies' : 'Microsoft refresh token'}, so the method is now {methodNames[method]}.</p>
+			{/if}
+			{#if method === 'refresh-token'}
+				<label class="label mt-3" for="auth-client-id">Application client ID (optional)</label>
+				<input id="auth-client-id" class="input font-mono text-xs" bind:value={clientId} disabled={busy}
+					placeholder="Default: Minecraft for Windows" autocomplete="off" spellcheck="false" />
+			{/if}
+			{#if login?.state === 'FAILED'}<p class="mt-3 text-sm text-red-400" role="alert">{login.error}</p>{/if}
+			<button class="btn-primary mt-4 w-full" disabled={busy || !credential.trim()}>
+				{#if busy}<LoaderCircle size={16} class="animate-spin" /> Signing in…{:else}{relogin ? 'Log in again' : 'Add account'}{/if}
+			</button>
+		</form>
 	{:else}
 		<form onsubmit={addOffline}>
 			<p class="mb-4 text-sm text-zinc-400">For servers in offline (cracked) mode. No login needed, just a name.</p>

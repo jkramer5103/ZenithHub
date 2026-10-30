@@ -1,6 +1,7 @@
 package com.zenith.feature.inventory.actions;
 
 import com.zenith.cache.data.inventory.Container;
+import com.zenith.mc.item.hashing.ItemStackHasher;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import lombok.Data;
@@ -8,8 +9,10 @@ import lombok.RequiredArgsConstructor;
 import org.geysermc.mcprotocollib.protocol.codec.MinecraftPacket;
 import org.geysermc.mcprotocollib.protocol.data.game.inventory.ContainerActionType;
 import org.geysermc.mcprotocollib.protocol.data.game.inventory.DropItemAction;
+import org.geysermc.mcprotocollib.protocol.data.game.item.HashedStack;
 import org.geysermc.mcprotocollib.protocol.data.game.item.ItemStack;
 import org.geysermc.mcprotocollib.protocol.packet.ingame.serverbound.inventory.ServerboundContainerClickPacket;
+import org.jspecify.annotations.Nullable;
 
 import static com.zenith.Globals.*;
 
@@ -38,17 +41,18 @@ public class DropItem implements InventoryAction {
             CLIENT_LOG.debug("Can't drop empty click stack: {}", this);
             return null; // can't drop if clickStack is empty
         }
-        final Int2ObjectMap<ItemStack> changedSlots = new Int2ObjectArrayMap<>();
+        final Int2ObjectMap<@Nullable HashedStack> changedSlots = new Int2ObjectArrayMap<>();
 
         switch (dropItemAction) {
             case DROP_FROM_SELECTED -> // drop 1 item from the selected slot
                 changedSlots.put(
                     slotId,
-                    clickStack.getAmount() == 1
-                        ? Container.EMPTY_STACK
-                        : new ItemStack(clickStack.getId(), clickStack.getAmount() - 1, clickStack.getDataComponents()));
+                    ItemStackHasher.hash(
+                        clickStack.getAmount() == 1
+                            ? Container.EMPTY_STACK
+                            : new ItemStack(clickStack.getId(), clickStack.getAmount() - 1, clickStack.getDataComponents())));
             case DROP_SELECTED_STACK -> // drop the entire stack from the selected slot
-                changedSlots.put(slotId, Container.EMPTY_STACK);
+                changedSlots.put(slotId, ItemStackHasher.hash(Container.EMPTY_STACK));
             default -> {
                 CLIENT_LOG.debug("Unhandled drop item action: {}", this);
                 return null;
@@ -62,7 +66,7 @@ public class DropItem implements InventoryAction {
             slotId,
             containerActionType,
             dropItemAction,
-            Container.EMPTY_STACK,
+            ItemStackHasher.hash(Container.EMPTY_STACK),
             changedSlots
         );
     }

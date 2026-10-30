@@ -5,7 +5,7 @@ import org.jspecify.annotations.Nullable;
 
 @NullMarked
 public class LaunchConfig {
-    public String release_channel = "java.1.21.4";
+    public String release_channel = "java.26.3.0";
     public @Nullable String getMcVersion() {
         try {
             return release_channel.substring(release_channel.indexOf('.') + 1);

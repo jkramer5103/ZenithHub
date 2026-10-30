@@ -4,6 +4,7 @@ import ar.com.hjg.pngj.PngReader;
 import ch.qos.logback.classic.LoggerContext;
 import com.zenith.cache.CacheResetType;
 import com.zenith.control.ManagedMode;
+import com.zenith.control.OutboundProxy;
 import com.zenith.discord.Embed;
 import com.zenith.discord.NotificationEventListener;
 import com.zenith.event.client.*;
@@ -21,6 +22,7 @@ import com.zenith.feature.skin.SkinRetriever;
 import com.zenith.module.impl.AutoReconnect;
 import com.zenith.network.client.Authenticator;
 import com.zenith.network.client.ClientSession;
+import com.zenith.network.codec.McplPacketFixes;
 import com.zenith.network.server.LanBroadcaster;
 import com.zenith.network.server.ProxyServerListener;
 import com.zenith.network.server.ServerSession;
@@ -39,6 +41,7 @@ import lombok.SneakyThrows;
 import net.kyori.adventure.key.Key;
 import net.raphimc.minecraftauth.bedrock.exception.MinecraftRequestException;
 import org.geysermc.mcprotocollib.auth.GameProfile;
+import org.geysermc.mcprotocollib.auth.SessionService;
 import org.geysermc.mcprotocollib.network.ProxyInfo;
 import org.geysermc.mcprotocollib.network.tcp.TcpConnectionManager;
 import org.geysermc.mcprotocollib.network.tcp.TcpServer;
@@ -152,6 +155,7 @@ public class Proxy {
             DEFAULT_LOG.warn("Updated version to match embedded ZenithProxy version: {}", exeReleaseVersion);
         }
         ManagedMode.applyOverrides();
+        McplPacketFixes.apply();
         initEventHandlers();
         try {
             var configVerifyResult = ConfigVerifier.verifyConfigs();
@@ -287,8 +291,10 @@ public class Proxy {
 
                     Most likely you have two or more ZenithProxy instance running on the same configured port: %s.
 
-                    Shut down duplicate instances, or change the configured port: `serverConnection port <port>`
-                    """.formatted(CONFIG.server.bind.port);
+                    %s
+                    """.formatted(CONFIG.server.bind.port, ManagedMode.isManaged()
+                        ? "Restart the instance from ZenithHub. If it happens again, another program is using that port."
+                        : "Shut down duplicate instances, or change the configured port: `serverConnection port <port>`");
                 DISCORD.sendEmbedMessage(
                     Embed.builder()
                         .title("ZenithProxy Server Error")
@@ -465,6 +471,10 @@ public class Proxy {
         this.client = new ClientSession(address, port, CONFIG.client.bindAddress, minecraftProtocol, getClientProxyInfo(), tcpManager);
         this.client.setReadTimeout(CONFIG.client.timeout.enable ? CONFIG.client.timeout.seconds : 0);
         this.client.setFlag(MinecraftConstants.CLIENT_CHANNEL_INITIALIZER, ZenithClientChannelInitializer.FACTORY);
+        // ZenithHub: the session server join goes through the proxy too
+        var sessionService = new SessionService();
+        sessionService.setProxy(OutboundProxy.sessionServiceProxy());
+        this.client.setFlag(MinecraftConstants.SESSION_SERVICE_KEY, sessionService);
         this.client.connect(true);
         // wait for connection state to stabilize
         Wait.waitUntil(() -> this.client.isConnected() || this.client.isTerminalState(), 30);
@@ -806,7 +816,8 @@ public class Proxy {
         this.connectTime = Instant.now();
         if (isOn2b2t()) EXECUTOR.execute(Queue::updateQueueStatusNow);
         else {
-            if (!ChatSchemaParser.hasCustomSchema()) {
+            // ZenithHub has no chat schema settings yet: nothing a user could act on
+            if (!ChatSchemaParser.hasCustomSchema() && !ManagedMode.isManaged()) {
                 CLIENT_LOG.warn("No custom chat schema found for server: {}, setting one may be required for chats and whispers to parse correctly: `help chatSchema`", ChatSchemaParser.getServerAddress());
             }
         }

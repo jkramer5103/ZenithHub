@@ -30,7 +30,7 @@ settings all happen in the browser.
   account and a channel per instance, posts Zenith's notification embeds and pings the owner. It
   has `/status`, `/connect` and `/command`, and every notification can be switched off. There is no
   chat relay.
-- **Per-instance outbound proxy** (SOCKS/HTTP).
+- **Outbound proxy** (SOCKS/HTTP) for all traffic: the server connection, Microsoft and Xbox sign-in, skins and every other request. One global proxy, optionally with per-user proxies.
 - Instances return to their previous state after a restart and are restarted with backoff if they crash.
 
 Deleted compared to upstream: Zenith's own per-instance Discord bot and its Discord commands, the

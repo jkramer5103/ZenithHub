@@ -46,14 +46,14 @@
 		const rows: [string, string][] = [];
 		if (status.inQueue) {
 			rows.push(['Queue position', String(status.queuePosition)]);
-			if (status.queueEtaSeconds > 0) rows.push(['Queue ETA', duration(status.queueEtaSeconds)]);
+			if (status.queueEtaSeconds) rows.push(['Queue ETA', duration(status.queueEtaSeconds)]);
 		}
 		if (status.online) {
 			rows.push(['Online for', duration(status.onlineSeconds)]);
-			rows.push(['Health', `${Math.round(status.health)} / 20`]);
-			rows.push(['Food', `${status.food} / 20`]);
+			rows.push(['Health', `${Math.round(status.health ?? 0)} / 20`]);
+			rows.push(['Food', `${status.food ?? 0} / 20`]);
 			if (status.position) {
-				rows.push(['Dimension', status.position.dimension.replace('minecraft:', '')]);
+				if (status.position.dimension) rows.push(['Dimension', status.position.dimension.replace('minecraft:', '')]);
 				rows.push(['Position', `${Math.round(status.position.x)}, ${Math.round(status.position.y)}, ${Math.round(status.position.z)}`]);
 			}
 			rows.push(['Ping', `${status.ping} ms`]);
@@ -83,7 +83,7 @@
 		/>
 		<div class="min-w-0 flex-1">
 			<div class="flex flex-wrap items-center gap-2">
-				<h1 class="truncate text-xl font-semibold">{instance.name}</h1>
+				<h1 class="min-w-0 text-xl font-semibold [overflow-wrap:anywhere]">{instance.name}</h1>
 				<PhaseBadge {runtime} />
 				<OwnerBadge mine={instance.mine} ownerName={instance.ownerName} />
 			</div>

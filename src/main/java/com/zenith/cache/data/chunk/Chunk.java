@@ -1,15 +1,15 @@
 package com.zenith.cache.data.chunk;
 
-import com.viaversion.nbt.io.MNBTIO;
-import com.viaversion.nbt.mini.MNBT;
-import com.viaversion.nbt.tag.CompoundTag;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.geysermc.mcprotocollib.protocol.data.game.chunk.ChunkSection;
+import org.geysermc.mcprotocollib.protocol.data.game.level.HeightmapTypes;
 import org.geysermc.mcprotocollib.protocol.data.game.level.LightUpdateData;
 import org.geysermc.mcprotocollib.protocol.data.game.level.block.BlockEntityInfo;
 
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 
 @Data
 @AllArgsConstructor
@@ -22,11 +22,10 @@ public class Chunk {
     final List<BlockEntityInfo> blockEntities;
     LightUpdateData lightUpdateData;
 
-    public static final MNBT EMPTY_HEIGHT_MAP = generateEmptyHeightMap();
+    public static final Map<HeightmapTypes, long[]> EMPTY_HEIGHT_MAP = generateEmptyHeightMap();
 
-    public static MNBT generateEmptyHeightMap() {
-        var tag = new CompoundTag();
-        return MNBTIO.write(tag, false);
+    public static Map<HeightmapTypes, long[]> generateEmptyHeightMap() {
+        return new EnumMap<>(HeightmapTypes.class);
     }
 
     /**
@@ -35,7 +34,7 @@ public class Chunk {
      * Also even if we do cache real heightmaps they are not guaranteed to be correct
      * as we do not have logic to rebuild or mutate heightmaps as block updates occur
      */
-    public final MNBT getHeightMap() {
+    public final Map<HeightmapTypes, long[]> getHeightMap() {
         return EMPTY_HEIGHT_MAP;
     }
 

@@ -29,7 +29,7 @@
 	}
 
 	async function save() {
-		if (!status?.position) return;
+		if (!status?.position?.dimension) return;
 		const ok = await run({
 			action: 'addWaypoint',
 			id: name.trim(),
@@ -46,7 +46,7 @@
 	<h2 class="mb-3 flex items-center gap-2 text-sm font-semibold text-zinc-300"><MapPin size={15} /> Waypoints</h2>
 	{#if waypoints.length}
 		<ul class="mb-2 divide-y divide-zinc-800/70">
-			{#each waypoints as w (w.id)}
+			{#each waypoints as w, i (`${i}:${w.id}`)}
 				<li class="flex items-center gap-2 py-1.5 text-sm">
 					<span class="min-w-0 flex-1 truncate">
 						<span class="font-medium text-zinc-200">{w.id}</span>
@@ -64,7 +64,7 @@
 	{:else}
 		<p class="mb-2 text-xs text-zinc-500">No waypoints yet. Save a spot to send the bot back there with one tap.</p>
 	{/if}
-	{#if canSave && status?.position}
+	{#if canSave && status?.position?.dimension}
 		<form
 			class="flex gap-2"
 			onsubmit={(e) => {

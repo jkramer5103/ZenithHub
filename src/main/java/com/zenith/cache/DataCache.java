@@ -15,6 +15,7 @@ import com.zenith.cache.data.scoreboard.ScoreboardCache;
 import com.zenith.cache.data.stats.StatisticsCache;
 import com.zenith.cache.data.tab.TabListCache;
 import com.zenith.cache.data.team.TeamCache;
+import com.zenith.cache.data.waypoint.WaypointCache;
 import com.zenith.network.server.ServerSession;
 import lombok.Getter;
 
@@ -42,6 +43,7 @@ public class DataCache {
     protected final ConfigurationCache configurationCache = new ConfigurationCache();
     protected final ClientInfoCache clientInfoCache = new ClientInfoCache();
     protected final RegistriesCache registriesCache = new RegistriesCache();
+    protected final WaypointCache waypointCache = new WaypointCache();
     {
         entityCache.subscribeEvents();
         chunkCache.subscribeEvents();
@@ -51,7 +53,7 @@ public class DataCache {
         // order is important, matches vanilla
         return List.of(
             profileCache, playerCache, chunkCache, statsCache, tabListCache, bossBarCache, entityCache,
-            chatCache, mapDataCache, recipeCache, teamCache, scoreboardCache,
+            chatCache, mapDataCache, recipeCache, teamCache, scoreboardCache, waypointCache,
             // special case caches that don't provide packets on world join
             // only here so they are still reset
             // todo: cleaner interface for caches that send at different times

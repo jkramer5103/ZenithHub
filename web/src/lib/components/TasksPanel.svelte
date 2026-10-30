@@ -290,7 +290,9 @@
 			{/if}
 
 			{#if !details}
-				<p class="px-4 py-6 text-sm text-zinc-500">Loading…</p>
+				<p class="px-4 py-6 text-sm {poller.error ? 'text-red-300' : 'text-zinc-500'}">
+					{poller.error ? `Couldn't load the tasks: ${poller.error}` : 'Loading…'}
+				</p>
 			{:else if !tasks.length && !adding}
 				<div class="flex flex-col items-center gap-2 px-4 py-10 text-center text-sm text-zinc-400">
 					<CalendarClock size={28} class="text-zinc-600" />

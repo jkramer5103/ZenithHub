@@ -24,6 +24,10 @@ public final class InstanceRuntime {
     /** Set when the manager initiated the stop, so the exit isn't treated as a crash. */
     volatile boolean stopRequested;
     int crashCount;
+    /** Status polls overlap when the instance is slow; only the newest answer counts. */
+    final java.util.concurrent.atomic.AtomicLong pollsSent = new java.util.concurrent.atomic.AtomicLong();
+    long pollApplied;
+    int pollFailures;
 
     InstanceRuntime(String instanceId) {
         this.instanceId = instanceId;

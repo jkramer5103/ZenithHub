@@ -4,7 +4,7 @@ package com.zenith.mc.item;
 import com.zenith.mc.Registry;
 
 public final class ItemRegistry {
-    public static final Registry<ItemData> REGISTRY = new Registry<ItemData>(1385);
+    public static final Registry<ItemData> REGISTRY = new Registry<ItemData>(1658);
 
     public static final ItemData AIR;
 
@@ -58,6 +58,60 @@ public final class ItemRegistry {
 
     public static final ItemData CHISELED_TUFF_BRICKS;
 
+    public static final ItemData SULFUR;
+
+    public static final ItemData POTENT_SULFUR;
+
+    public static final ItemData SULFUR_SLAB;
+
+    public static final ItemData SULFUR_STAIRS;
+
+    public static final ItemData SULFUR_WALL;
+
+    public static final ItemData POLISHED_SULFUR;
+
+    public static final ItemData POLISHED_SULFUR_SLAB;
+
+    public static final ItemData POLISHED_SULFUR_STAIRS;
+
+    public static final ItemData POLISHED_SULFUR_WALL;
+
+    public static final ItemData SULFUR_BRICKS;
+
+    public static final ItemData SULFUR_BRICK_SLAB;
+
+    public static final ItemData SULFUR_BRICK_STAIRS;
+
+    public static final ItemData SULFUR_BRICK_WALL;
+
+    public static final ItemData CHISELED_SULFUR;
+
+    public static final ItemData CINNABAR;
+
+    public static final ItemData CINNABAR_SLAB;
+
+    public static final ItemData CINNABAR_STAIRS;
+
+    public static final ItemData CINNABAR_WALL;
+
+    public static final ItemData POLISHED_CINNABAR;
+
+    public static final ItemData POLISHED_CINNABAR_SLAB;
+
+    public static final ItemData POLISHED_CINNABAR_STAIRS;
+
+    public static final ItemData POLISHED_CINNABAR_WALL;
+
+    public static final ItemData CINNABAR_BRICKS;
+
+    public static final ItemData CINNABAR_BRICK_SLAB;
+
+    public static final ItemData CINNABAR_BRICK_STAIRS;
+
+    public static final ItemData CINNABAR_BRICK_WALL;
+
+    public static final ItemData CHISELED_CINNABAR;
+
     public static final ItemData DRIPSTONE_BLOCK;
 
     public static final ItemData GRASS_BLOCK;
@@ -96,6 +150,8 @@ public final class ItemRegistry {
 
     public static final ItemData MANGROVE_PLANKS;
 
+    public static final ItemData POPLAR_PLANKS;
+
     public static final ItemData BAMBOO_PLANKS;
 
     public static final ItemData CRIMSON_PLANKS;
@@ -121,6 +177,8 @@ public final class ItemRegistry {
     public static final ItemData PALE_OAK_SAPLING;
 
     public static final ItemData MANGROVE_PROPAGULE;
+
+    public static final ItemData POPLAR_SAPLING;
 
     public static final ItemData BEDROCK;
 
@@ -190,49 +248,11 @@ public final class ItemRegistry {
 
     public static final ItemData COPPER_BLOCK;
 
-    public static final ItemData GOLD_BLOCK;
-
-    public static final ItemData DIAMOND_BLOCK;
-
-    public static final ItemData NETHERITE_BLOCK;
-
     public static final ItemData EXPOSED_COPPER;
 
     public static final ItemData WEATHERED_COPPER;
 
     public static final ItemData OXIDIZED_COPPER;
-
-    public static final ItemData CHISELED_COPPER;
-
-    public static final ItemData EXPOSED_CHISELED_COPPER;
-
-    public static final ItemData WEATHERED_CHISELED_COPPER;
-
-    public static final ItemData OXIDIZED_CHISELED_COPPER;
-
-    public static final ItemData CUT_COPPER;
-
-    public static final ItemData EXPOSED_CUT_COPPER;
-
-    public static final ItemData WEATHERED_CUT_COPPER;
-
-    public static final ItemData OXIDIZED_CUT_COPPER;
-
-    public static final ItemData CUT_COPPER_STAIRS;
-
-    public static final ItemData EXPOSED_CUT_COPPER_STAIRS;
-
-    public static final ItemData WEATHERED_CUT_COPPER_STAIRS;
-
-    public static final ItemData OXIDIZED_CUT_COPPER_STAIRS;
-
-    public static final ItemData CUT_COPPER_SLAB;
-
-    public static final ItemData EXPOSED_CUT_COPPER_SLAB;
-
-    public static final ItemData WEATHERED_CUT_COPPER_SLAB;
-
-    public static final ItemData OXIDIZED_CUT_COPPER_SLAB;
 
     public static final ItemData WAXED_COPPER_BLOCK;
 
@@ -242,6 +262,20 @@ public final class ItemRegistry {
 
     public static final ItemData WAXED_OXIDIZED_COPPER;
 
+    public static final ItemData GOLD_BLOCK;
+
+    public static final ItemData DIAMOND_BLOCK;
+
+    public static final ItemData NETHERITE_BLOCK;
+
+    public static final ItemData CHISELED_COPPER;
+
+    public static final ItemData EXPOSED_CHISELED_COPPER;
+
+    public static final ItemData WEATHERED_CHISELED_COPPER;
+
+    public static final ItemData OXIDIZED_CHISELED_COPPER;
+
     public static final ItemData WAXED_CHISELED_COPPER;
 
     public static final ItemData WAXED_EXPOSED_CHISELED_COPPER;
@@ -249,6 +283,14 @@ public final class ItemRegistry {
     public static final ItemData WAXED_WEATHERED_CHISELED_COPPER;
 
     public static final ItemData WAXED_OXIDIZED_CHISELED_COPPER;
+
+    public static final ItemData CUT_COPPER;
+
+    public static final ItemData EXPOSED_CUT_COPPER;
+
+    public static final ItemData WEATHERED_CUT_COPPER;
+
+    public static final ItemData OXIDIZED_CUT_COPPER;
 
     public static final ItemData WAXED_CUT_COPPER;
 
@@ -258,6 +300,14 @@ public final class ItemRegistry {
 
     public static final ItemData WAXED_OXIDIZED_CUT_COPPER;
 
+    public static final ItemData CUT_COPPER_STAIRS;
+
+    public static final ItemData EXPOSED_CUT_COPPER_STAIRS;
+
+    public static final ItemData WEATHERED_CUT_COPPER_STAIRS;
+
+    public static final ItemData OXIDIZED_CUT_COPPER_STAIRS;
+
     public static final ItemData WAXED_CUT_COPPER_STAIRS;
 
     public static final ItemData WAXED_EXPOSED_CUT_COPPER_STAIRS;
@@ -265,6 +315,14 @@ public final class ItemRegistry {
     public static final ItemData WAXED_WEATHERED_CUT_COPPER_STAIRS;
 
     public static final ItemData WAXED_OXIDIZED_CUT_COPPER_STAIRS;
+
+    public static final ItemData CUT_COPPER_SLAB;
+
+    public static final ItemData EXPOSED_CUT_COPPER_SLAB;
+
+    public static final ItemData WEATHERED_CUT_COPPER_SLAB;
+
+    public static final ItemData OXIDIZED_CUT_COPPER_SLAB;
 
     public static final ItemData WAXED_CUT_COPPER_SLAB;
 
@@ -291,6 +349,8 @@ public final class ItemRegistry {
     public static final ItemData DARK_OAK_LOG;
 
     public static final ItemData MANGROVE_LOG;
+
+    public static final ItemData POPLAR_LOG;
 
     public static final ItemData MANGROVE_ROOTS;
 
@@ -320,6 +380,8 @@ public final class ItemRegistry {
 
     public static final ItemData STRIPPED_MANGROVE_LOG;
 
+    public static final ItemData STRIPPED_POPLAR_LOG;
+
     public static final ItemData STRIPPED_CRIMSON_STEM;
 
     public static final ItemData STRIPPED_WARPED_STEM;
@@ -341,6 +403,8 @@ public final class ItemRegistry {
     public static final ItemData STRIPPED_PALE_OAK_WOOD;
 
     public static final ItemData STRIPPED_MANGROVE_WOOD;
+
+    public static final ItemData STRIPPED_POPLAR_WOOD;
 
     public static final ItemData STRIPPED_CRIMSON_HYPHAE;
 
@@ -366,6 +430,8 @@ public final class ItemRegistry {
 
     public static final ItemData MANGROVE_WOOD;
 
+    public static final ItemData POPLAR_WOOD;
+
     public static final ItemData CRIMSON_HYPHAE;
 
     public static final ItemData WARPED_HYPHAE;
@@ -387,6 +453,12 @@ public final class ItemRegistry {
     public static final ItemData PALE_OAK_LEAVES;
 
     public static final ItemData MANGROVE_LEAVES;
+
+    public static final ItemData RED_POPLAR_LEAVES;
+
+    public static final ItemData ORANGE_POPLAR_LEAVES;
+
+    public static final ItemData YELLOW_POPLAR_LEAVES;
 
     public static final ItemData AZALEA_LEAVES;
 
@@ -414,11 +486,21 @@ public final class ItemRegistry {
 
     public static final ItemData FERN;
 
+    public static final ItemData BUSH;
+
+    public static final ItemData RED_SHRUB;
+
     public static final ItemData AZALEA;
 
     public static final ItemData FLOWERING_AZALEA;
 
     public static final ItemData DEAD_BUSH;
+
+    public static final ItemData FIREFLY_BUSH;
+
+    public static final ItemData SHORT_DRY_GRASS;
+
+    public static final ItemData TALL_DRY_GRASS;
 
     public static final ItemData SEAGRASS;
 
@@ -456,7 +538,73 @@ public final class ItemRegistry {
 
     public static final ItemData BLACK_WOOL;
 
+    public static final ItemData WHITE_WOOL_STAIRS;
+
+    public static final ItemData ORANGE_WOOL_STAIRS;
+
+    public static final ItemData MAGENTA_WOOL_STAIRS;
+
+    public static final ItemData LIGHT_BLUE_WOOL_STAIRS;
+
+    public static final ItemData YELLOW_WOOL_STAIRS;
+
+    public static final ItemData LIME_WOOL_STAIRS;
+
+    public static final ItemData PINK_WOOL_STAIRS;
+
+    public static final ItemData GRAY_WOOL_STAIRS;
+
+    public static final ItemData LIGHT_GRAY_WOOL_STAIRS;
+
+    public static final ItemData CYAN_WOOL_STAIRS;
+
+    public static final ItemData PURPLE_WOOL_STAIRS;
+
+    public static final ItemData BLUE_WOOL_STAIRS;
+
+    public static final ItemData BROWN_WOOL_STAIRS;
+
+    public static final ItemData GREEN_WOOL_STAIRS;
+
+    public static final ItemData RED_WOOL_STAIRS;
+
+    public static final ItemData BLACK_WOOL_STAIRS;
+
+    public static final ItemData WHITE_WOOL_SLAB;
+
+    public static final ItemData ORANGE_WOOL_SLAB;
+
+    public static final ItemData MAGENTA_WOOL_SLAB;
+
+    public static final ItemData LIGHT_BLUE_WOOL_SLAB;
+
+    public static final ItemData YELLOW_WOOL_SLAB;
+
+    public static final ItemData LIME_WOOL_SLAB;
+
+    public static final ItemData PINK_WOOL_SLAB;
+
+    public static final ItemData GRAY_WOOL_SLAB;
+
+    public static final ItemData LIGHT_GRAY_WOOL_SLAB;
+
+    public static final ItemData CYAN_WOOL_SLAB;
+
+    public static final ItemData PURPLE_WOOL_SLAB;
+
+    public static final ItemData BLUE_WOOL_SLAB;
+
+    public static final ItemData BROWN_WOOL_SLAB;
+
+    public static final ItemData GREEN_WOOL_SLAB;
+
+    public static final ItemData RED_WOOL_SLAB;
+
+    public static final ItemData BLACK_WOOL_SLAB;
+
     public static final ItemData DANDELION;
+
+    public static final ItemData GOLDEN_DANDELION;
 
     public static final ItemData OPEN_EYEBLOSSOM;
 
@@ -496,6 +644,8 @@ public final class ItemRegistry {
 
     public static final ItemData RED_MUSHROOM;
 
+    public static final ItemData SHELF_MUSHROOM;
+
     public static final ItemData CRIMSON_FUNGUS;
 
     public static final ItemData WARPED_FUNGUS;
@@ -515,6 +665,10 @@ public final class ItemRegistry {
     public static final ItemData KELP;
 
     public static final ItemData PINK_PETALS;
+
+    public static final ItemData WILDFLOWERS;
+
+    public static final ItemData LEAF_LITTER;
 
     public static final ItemData MOSS_CARPET;
 
@@ -551,6 +705,8 @@ public final class ItemRegistry {
     public static final ItemData PALE_OAK_SLAB;
 
     public static final ItemData MANGROVE_SLAB;
+
+    public static final ItemData POPLAR_SLAB;
 
     public static final ItemData BAMBOO_SLAB;
 
@@ -604,6 +760,32 @@ public final class ItemRegistry {
 
     public static final ItemData BRICKS;
 
+    public static final ItemData ACACIA_SHELF;
+
+    public static final ItemData BAMBOO_SHELF;
+
+    public static final ItemData BIRCH_SHELF;
+
+    public static final ItemData CHERRY_SHELF;
+
+    public static final ItemData CRIMSON_SHELF;
+
+    public static final ItemData DARK_OAK_SHELF;
+
+    public static final ItemData JUNGLE_SHELF;
+
+    public static final ItemData MANGROVE_SHELF;
+
+    public static final ItemData POPLAR_SHELF;
+
+    public static final ItemData OAK_SHELF;
+
+    public static final ItemData PALE_OAK_SHELF;
+
+    public static final ItemData SPRUCE_SHELF;
+
+    public static final ItemData WARPED_SHELF;
+
     public static final ItemData BOOKSHELF;
 
     public static final ItemData CHISELED_BOOKSHELF;
@@ -652,6 +834,8 @@ public final class ItemRegistry {
 
     public static final ItemData CACTUS;
 
+    public static final ItemData CACTUS_FLOWER;
+
     public static final ItemData CLAY;
 
     public static final ItemData JUKEBOX;
@@ -673,6 +857,8 @@ public final class ItemRegistry {
     public static final ItemData PALE_OAK_FENCE;
 
     public static final ItemData MANGROVE_FENCE;
+
+    public static final ItemData POPLAR_FENCE;
 
     public static final ItemData BAMBOO_FENCE;
 
@@ -699,6 +885,8 @@ public final class ItemRegistry {
     public static final ItemData SMOOTH_BASALT;
 
     public static final ItemData SOUL_TORCH;
+
+    public static final ItemData COPPER_TORCH;
 
     public static final ItemData GLOWSTONE;
 
@@ -748,7 +936,39 @@ public final class ItemRegistry {
 
     public static final ItemData IRON_BARS;
 
-    public static final ItemData CHAIN;
+    public static final ItemData COPPER_BARS;
+
+    public static final ItemData EXPOSED_COPPER_BARS;
+
+    public static final ItemData WEATHERED_COPPER_BARS;
+
+    public static final ItemData OXIDIZED_COPPER_BARS;
+
+    public static final ItemData WAXED_COPPER_BARS;
+
+    public static final ItemData WAXED_EXPOSED_COPPER_BARS;
+
+    public static final ItemData WAXED_WEATHERED_COPPER_BARS;
+
+    public static final ItemData WAXED_OXIDIZED_COPPER_BARS;
+
+    public static final ItemData IRON_CHAIN;
+
+    public static final ItemData COPPER_CHAIN;
+
+    public static final ItemData EXPOSED_COPPER_CHAIN;
+
+    public static final ItemData WEATHERED_COPPER_CHAIN;
+
+    public static final ItemData OXIDIZED_COPPER_CHAIN;
+
+    public static final ItemData WAXED_COPPER_CHAIN;
+
+    public static final ItemData WAXED_EXPOSED_COPPER_CHAIN;
+
+    public static final ItemData WAXED_WEATHERED_COPPER_CHAIN;
+
+    public static final ItemData WAXED_OXIDIZED_COPPER_CHAIN;
 
     public static final ItemData GLASS_PANE;
 
@@ -833,6 +1053,8 @@ public final class ItemRegistry {
     public static final ItemData PALE_OAK_STAIRS;
 
     public static final ItemData MANGROVE_STAIRS;
+
+    public static final ItemData POPLAR_STAIRS;
 
     public static final ItemData BAMBOO_STAIRS;
 
@@ -1194,6 +1416,70 @@ public final class ItemRegistry {
 
     public static final ItemData BLACK_CONCRETE;
 
+    public static final ItemData WHITE_CONCRETE_STAIRS;
+
+    public static final ItemData ORANGE_CONCRETE_STAIRS;
+
+    public static final ItemData MAGENTA_CONCRETE_STAIRS;
+
+    public static final ItemData LIGHT_BLUE_CONCRETE_STAIRS;
+
+    public static final ItemData YELLOW_CONCRETE_STAIRS;
+
+    public static final ItemData LIME_CONCRETE_STAIRS;
+
+    public static final ItemData PINK_CONCRETE_STAIRS;
+
+    public static final ItemData GRAY_CONCRETE_STAIRS;
+
+    public static final ItemData LIGHT_GRAY_CONCRETE_STAIRS;
+
+    public static final ItemData CYAN_CONCRETE_STAIRS;
+
+    public static final ItemData PURPLE_CONCRETE_STAIRS;
+
+    public static final ItemData BLUE_CONCRETE_STAIRS;
+
+    public static final ItemData BROWN_CONCRETE_STAIRS;
+
+    public static final ItemData GREEN_CONCRETE_STAIRS;
+
+    public static final ItemData RED_CONCRETE_STAIRS;
+
+    public static final ItemData BLACK_CONCRETE_STAIRS;
+
+    public static final ItemData WHITE_CONCRETE_SLAB;
+
+    public static final ItemData ORANGE_CONCRETE_SLAB;
+
+    public static final ItemData MAGENTA_CONCRETE_SLAB;
+
+    public static final ItemData LIGHT_BLUE_CONCRETE_SLAB;
+
+    public static final ItemData YELLOW_CONCRETE_SLAB;
+
+    public static final ItemData LIME_CONCRETE_SLAB;
+
+    public static final ItemData PINK_CONCRETE_SLAB;
+
+    public static final ItemData GRAY_CONCRETE_SLAB;
+
+    public static final ItemData LIGHT_GRAY_CONCRETE_SLAB;
+
+    public static final ItemData CYAN_CONCRETE_SLAB;
+
+    public static final ItemData PURPLE_CONCRETE_SLAB;
+
+    public static final ItemData BLUE_CONCRETE_SLAB;
+
+    public static final ItemData BROWN_CONCRETE_SLAB;
+
+    public static final ItemData GREEN_CONCRETE_SLAB;
+
+    public static final ItemData RED_CONCRETE_SLAB;
+
+    public static final ItemData BLACK_CONCRETE_SLAB;
+
     public static final ItemData WHITE_CONCRETE_POWDER;
 
     public static final ItemData ORANGE_CONCRETE_POWDER;
@@ -1229,6 +1515,8 @@ public final class ItemRegistry {
     public static final ItemData TURTLE_EGG;
 
     public static final ItemData SNIFFER_EGG;
+
+    public static final ItemData DRIED_GHAST;
 
     public static final ItemData DEAD_TUBE_CORAL_BLOCK;
 
@@ -1400,6 +1688,20 @@ public final class ItemRegistry {
 
     public static final ItemData LIGHTNING_ROD;
 
+    public static final ItemData EXPOSED_LIGHTNING_ROD;
+
+    public static final ItemData WEATHERED_LIGHTNING_ROD;
+
+    public static final ItemData OXIDIZED_LIGHTNING_ROD;
+
+    public static final ItemData WAXED_LIGHTNING_ROD;
+
+    public static final ItemData WAXED_EXPOSED_LIGHTNING_ROD;
+
+    public static final ItemData WAXED_WEATHERED_LIGHTNING_ROD;
+
+    public static final ItemData WAXED_OXIDIZED_LIGHTNING_ROD;
+
     public static final ItemData DAYLIGHT_DETECTOR;
 
     public static final ItemData SCULK_SENSOR;
@@ -1438,6 +1740,8 @@ public final class ItemRegistry {
 
     public static final ItemData MANGROVE_BUTTON;
 
+    public static final ItemData POPLAR_BUTTON;
+
     public static final ItemData BAMBOO_BUTTON;
 
     public static final ItemData CRIMSON_BUTTON;
@@ -1470,6 +1774,8 @@ public final class ItemRegistry {
 
     public static final ItemData MANGROVE_PRESSURE_PLATE;
 
+    public static final ItemData POPLAR_PRESSURE_PLATE;
+
     public static final ItemData BAMBOO_PRESSURE_PLATE;
 
     public static final ItemData CRIMSON_PRESSURE_PLATE;
@@ -1495,6 +1801,8 @@ public final class ItemRegistry {
     public static final ItemData PALE_OAK_DOOR;
 
     public static final ItemData MANGROVE_DOOR;
+
+    public static final ItemData POPLAR_DOOR;
 
     public static final ItemData BAMBOO_DOOR;
 
@@ -1538,6 +1846,8 @@ public final class ItemRegistry {
 
     public static final ItemData MANGROVE_TRAPDOOR;
 
+    public static final ItemData POPLAR_TRAPDOOR;
+
     public static final ItemData BAMBOO_TRAPDOOR;
 
     public static final ItemData CRIMSON_TRAPDOOR;
@@ -1578,6 +1888,8 @@ public final class ItemRegistry {
 
     public static final ItemData MANGROVE_FENCE_GATE;
 
+    public static final ItemData POPLAR_FENCE_GATE;
+
     public static final ItemData BAMBOO_FENCE_GATE;
 
     public static final ItemData CRIMSON_FENCE_GATE;
@@ -1593,6 +1905,38 @@ public final class ItemRegistry {
     public static final ItemData ACTIVATOR_RAIL;
 
     public static final ItemData SADDLE;
+
+    public static final ItemData WHITE_HARNESS;
+
+    public static final ItemData ORANGE_HARNESS;
+
+    public static final ItemData MAGENTA_HARNESS;
+
+    public static final ItemData LIGHT_BLUE_HARNESS;
+
+    public static final ItemData YELLOW_HARNESS;
+
+    public static final ItemData LIME_HARNESS;
+
+    public static final ItemData PINK_HARNESS;
+
+    public static final ItemData GRAY_HARNESS;
+
+    public static final ItemData LIGHT_GRAY_HARNESS;
+
+    public static final ItemData CYAN_HARNESS;
+
+    public static final ItemData PURPLE_HARNESS;
+
+    public static final ItemData BLUE_HARNESS;
+
+    public static final ItemData BROWN_HARNESS;
+
+    public static final ItemData GREEN_HARNESS;
+
+    public static final ItemData RED_HARNESS;
+
+    public static final ItemData BLACK_HARNESS;
 
     public static final ItemData MINECART;
 
@@ -1648,6 +1992,10 @@ public final class ItemRegistry {
 
     public static final ItemData MANGROVE_CHEST_BOAT;
 
+    public static final ItemData POPLAR_BOAT;
+
+    public static final ItemData POPLAR_CHEST_BOAT;
+
     public static final ItemData BAMBOO_RAFT;
 
     public static final ItemData BAMBOO_CHEST_RAFT;
@@ -1655,6 +2003,10 @@ public final class ItemRegistry {
     public static final ItemData STRUCTURE_BLOCK;
 
     public static final ItemData JIGSAW;
+
+    public static final ItemData TEST_BLOCK;
+
+    public static final ItemData TEST_INSTANCE_BLOCK;
 
     public static final ItemData TURTLE_HELMET;
 
@@ -1713,6 +2065,16 @@ public final class ItemRegistry {
     public static final ItemData WOODEN_AXE;
 
     public static final ItemData WOODEN_HOE;
+
+    public static final ItemData COPPER_SWORD;
+
+    public static final ItemData COPPER_SHOVEL;
+
+    public static final ItemData COPPER_PICKAXE;
+
+    public static final ItemData COPPER_AXE;
+
+    public static final ItemData COPPER_HOE;
 
     public static final ItemData STONE_SWORD;
 
@@ -1788,6 +2150,14 @@ public final class ItemRegistry {
 
     public static final ItemData LEATHER_BOOTS;
 
+    public static final ItemData COPPER_HELMET;
+
+    public static final ItemData COPPER_CHESTPLATE;
+
+    public static final ItemData COPPER_LEGGINGS;
+
+    public static final ItemData COPPER_BOOTS;
+
     public static final ItemData CHAINMAIL_HELMET;
 
     public static final ItemData CHAINMAIL_CHESTPLATE;
@@ -1858,6 +2228,8 @@ public final class ItemRegistry {
 
     public static final ItemData MANGROVE_SIGN;
 
+    public static final ItemData POPLAR_SIGN;
+
     public static final ItemData BAMBOO_SIGN;
 
     public static final ItemData CRIMSON_SIGN;
@@ -1881,6 +2253,8 @@ public final class ItemRegistry {
     public static final ItemData PALE_OAK_HANGING_SIGN;
 
     public static final ItemData MANGROVE_HANGING_SIGN;
+
+    public static final ItemData POPLAR_HANGING_SIGN;
 
     public static final ItemData BAMBOO_HANGING_SIGN;
 
@@ -1912,6 +2286,8 @@ public final class ItemRegistry {
 
     public static final ItemData AXOLOTL_BUCKET;
 
+    public static final ItemData SULFUR_CUBE_BUCKET;
+
     public static final ItemData TADPOLE_BUCKET;
 
     public static final ItemData BRICK;
@@ -1927,6 +2303,10 @@ public final class ItemRegistry {
     public static final ItemData SLIME_BALL;
 
     public static final ItemData EGG;
+
+    public static final ItemData BLUE_EGG;
+
+    public static final ItemData BROWN_EGG;
 
     public static final ItemData COMPASS;
 
@@ -1965,6 +2345,38 @@ public final class ItemRegistry {
     public static final ItemData RED_BUNDLE;
 
     public static final ItemData BLACK_BUNDLE;
+
+    public static final ItemData WHITE_CUSHION;
+
+    public static final ItemData ORANGE_CUSHION;
+
+    public static final ItemData MAGENTA_CUSHION;
+
+    public static final ItemData LIGHT_BLUE_CUSHION;
+
+    public static final ItemData YELLOW_CUSHION;
+
+    public static final ItemData LIME_CUSHION;
+
+    public static final ItemData PINK_CUSHION;
+
+    public static final ItemData GRAY_CUSHION;
+
+    public static final ItemData LIGHT_GRAY_CUSHION;
+
+    public static final ItemData CYAN_CUSHION;
+
+    public static final ItemData PURPLE_CUSHION;
+
+    public static final ItemData BLUE_CUSHION;
+
+    public static final ItemData BROWN_CUSHION;
+
+    public static final ItemData GREEN_CUSHION;
+
+    public static final ItemData RED_CUSHION;
+
+    public static final ItemData BLACK_CUSHION;
 
     public static final ItemData FISHING_ROD;
 
@@ -2064,11 +2476,45 @@ public final class ItemRegistry {
 
     public static final ItemData BLACK_BED;
 
+    public static final ItemData STRAW_BED;
+
     public static final ItemData COOKIE;
 
     public static final ItemData CRAFTER;
 
     public static final ItemData FILLED_MAP;
+
+    public static final ItemData OCEAN_MONUMENT_MAP;
+
+    public static final ItemData WOODLAND_MANSION_MAP;
+
+    public static final ItemData BURIED_TRIAL_CHAMBERS_MAP;
+
+    public static final ItemData JUNGLE_PYRAMID_MAP;
+
+    public static final ItemData SWAMP_HUT_MAP;
+
+    public static final ItemData DESERT_VILLAGE_MAP;
+
+    public static final ItemData PLAINS_VILLAGE_MAP;
+
+    public static final ItemData SAVANNA_VILLAGE_MAP;
+
+    public static final ItemData SNOWY_VILLAGE_MAP;
+
+    public static final ItemData TAIGA_VILLAGE_MAP;
+
+    public static final ItemData BURIED_TREASURE_MAP;
+
+    public static final ItemData BURIED_ANCIENT_CITY_MAP;
+
+    public static final ItemData BURIED_MINESHAFT_MAP;
+
+    public static final ItemData DESERT_PYRAMID_MAP;
+
+    public static final ItemData ABANDONED_CAMP_MAP;
+
+    public static final ItemData WARM_OCEAN_RUINS_MAP;
 
     public static final ItemData SHEARS;
 
@@ -2120,43 +2566,173 @@ public final class ItemRegistry {
 
     public static final ItemData GLISTERING_MELON_SLICE;
 
+    public static final ItemData CHICKEN_SPAWN_EGG;
+
+    public static final ItemData COW_SPAWN_EGG;
+
+    public static final ItemData PIG_SPAWN_EGG;
+
+    public static final ItemData SHEEP_SPAWN_EGG;
+
+    public static final ItemData CAMEL_SPAWN_EGG;
+
+    public static final ItemData DONKEY_SPAWN_EGG;
+
+    public static final ItemData HORSE_SPAWN_EGG;
+
+    public static final ItemData MULE_SPAWN_EGG;
+
+    public static final ItemData CAT_SPAWN_EGG;
+
+    public static final ItemData PARROT_SPAWN_EGG;
+
+    public static final ItemData WOLF_SPAWN_EGG;
+
     public static final ItemData ARMADILLO_SPAWN_EGG;
-
-    public static final ItemData ALLAY_SPAWN_EGG;
-
-    public static final ItemData AXOLOTL_SPAWN_EGG;
 
     public static final ItemData BAT_SPAWN_EGG;
 
     public static final ItemData BEE_SPAWN_EGG;
 
-    public static final ItemData BLAZE_SPAWN_EGG;
+    public static final ItemData FOX_SPAWN_EGG;
 
-    public static final ItemData BOGGED_SPAWN_EGG;
+    public static final ItemData GOAT_SPAWN_EGG;
 
-    public static final ItemData BREEZE_SPAWN_EGG;
+    public static final ItemData LLAMA_SPAWN_EGG;
 
-    public static final ItemData CAT_SPAWN_EGG;
+    public static final ItemData OCELOT_SPAWN_EGG;
 
-    public static final ItemData CAMEL_SPAWN_EGG;
+    public static final ItemData PANDA_SPAWN_EGG;
 
-    public static final ItemData CAVE_SPIDER_SPAWN_EGG;
+    public static final ItemData POLAR_BEAR_SPAWN_EGG;
 
-    public static final ItemData CHICKEN_SPAWN_EGG;
+    public static final ItemData RABBIT_SPAWN_EGG;
+
+    public static final ItemData AXOLOTL_SPAWN_EGG;
 
     public static final ItemData COD_SPAWN_EGG;
 
-    public static final ItemData COW_SPAWN_EGG;
-
-    public static final ItemData CREEPER_SPAWN_EGG;
-
     public static final ItemData DOLPHIN_SPAWN_EGG;
 
-    public static final ItemData DONKEY_SPAWN_EGG;
+    public static final ItemData FROG_SPAWN_EGG;
+
+    public static final ItemData GLOW_SQUID_SPAWN_EGG;
+
+    public static final ItemData NAUTILUS_SPAWN_EGG;
+
+    public static final ItemData PUFFERFISH_SPAWN_EGG;
+
+    public static final ItemData SALMON_SPAWN_EGG;
+
+    public static final ItemData SQUID_SPAWN_EGG;
+
+    public static final ItemData TADPOLE_SPAWN_EGG;
+
+    public static final ItemData TROPICAL_FISH_SPAWN_EGG;
+
+    public static final ItemData TURTLE_SPAWN_EGG;
+
+    public static final ItemData ALLAY_SPAWN_EGG;
+
+    public static final ItemData MOOSHROOM_SPAWN_EGG;
+
+    public static final ItemData SNIFFER_SPAWN_EGG;
+
+    public static final ItemData SULFUR_CUBE_SPAWN_EGG;
+
+    public static final ItemData COPPER_GOLEM_SPAWN_EGG;
+
+    public static final ItemData IRON_GOLEM_SPAWN_EGG;
+
+    public static final ItemData SNOW_GOLEM_SPAWN_EGG;
+
+    public static final ItemData TRADER_LLAMA_SPAWN_EGG;
+
+    public static final ItemData VILLAGER_SPAWN_EGG;
+
+    public static final ItemData WANDERING_TRADER_SPAWN_EGG;
+
+    public static final ItemData BOGGED_SPAWN_EGG;
+
+    public static final ItemData CAMEL_HUSK_SPAWN_EGG;
 
     public static final ItemData DROWNED_SPAWN_EGG;
 
+    public static final ItemData HUSK_SPAWN_EGG;
+
+    public static final ItemData PARCHED_SPAWN_EGG;
+
+    public static final ItemData SKELETON_SPAWN_EGG;
+
+    public static final ItemData SKELETON_HORSE_SPAWN_EGG;
+
+    public static final ItemData STRAY_SPAWN_EGG;
+
+    public static final ItemData WITHER_SPAWN_EGG;
+
+    public static final ItemData WITHER_SKELETON_SPAWN_EGG;
+
+    public static final ItemData ZOMBIE_SPAWN_EGG;
+
+    public static final ItemData ZOMBIE_HORSE_SPAWN_EGG;
+
+    public static final ItemData ZOMBIE_NAUTILUS_SPAWN_EGG;
+
+    public static final ItemData ZOMBIE_VILLAGER_SPAWN_EGG;
+
+    public static final ItemData CAVE_SPIDER_SPAWN_EGG;
+
+    public static final ItemData SPIDER_SPAWN_EGG;
+
+    public static final ItemData BREEZE_SPAWN_EGG;
+
+    public static final ItemData CREAKING_SPAWN_EGG;
+
+    public static final ItemData CREEPER_SPAWN_EGG;
+
     public static final ItemData ELDER_GUARDIAN_SPAWN_EGG;
+
+    public static final ItemData GUARDIAN_SPAWN_EGG;
+
+    public static final ItemData PHANTOM_SPAWN_EGG;
+
+    public static final ItemData SILVERFISH_SPAWN_EGG;
+
+    public static final ItemData SLIME_SPAWN_EGG;
+
+    public static final ItemData WARDEN_SPAWN_EGG;
+
+    public static final ItemData WITCH_SPAWN_EGG;
+
+    public static final ItemData EVOKER_SPAWN_EGG;
+
+    public static final ItemData PILLAGER_SPAWN_EGG;
+
+    public static final ItemData RAVAGER_SPAWN_EGG;
+
+    public static final ItemData VINDICATOR_SPAWN_EGG;
+
+    public static final ItemData VEX_SPAWN_EGG;
+
+    public static final ItemData BLAZE_SPAWN_EGG;
+
+    public static final ItemData GHAST_SPAWN_EGG;
+
+    public static final ItemData HAPPY_GHAST_SPAWN_EGG;
+
+    public static final ItemData HOGLIN_SPAWN_EGG;
+
+    public static final ItemData MAGMA_CUBE_SPAWN_EGG;
+
+    public static final ItemData PIGLIN_SPAWN_EGG;
+
+    public static final ItemData PIGLIN_BRUTE_SPAWN_EGG;
+
+    public static final ItemData STRIDER_SPAWN_EGG;
+
+    public static final ItemData ZOGLIN_SPAWN_EGG;
+
+    public static final ItemData ZOMBIFIED_PIGLIN_SPAWN_EGG;
 
     public static final ItemData ENDER_DRAGON_SPAWN_EGG;
 
@@ -2164,123 +2740,7 @@ public final class ItemRegistry {
 
     public static final ItemData ENDERMITE_SPAWN_EGG;
 
-    public static final ItemData EVOKER_SPAWN_EGG;
-
-    public static final ItemData FOX_SPAWN_EGG;
-
-    public static final ItemData FROG_SPAWN_EGG;
-
-    public static final ItemData GHAST_SPAWN_EGG;
-
-    public static final ItemData GLOW_SQUID_SPAWN_EGG;
-
-    public static final ItemData GOAT_SPAWN_EGG;
-
-    public static final ItemData GUARDIAN_SPAWN_EGG;
-
-    public static final ItemData HOGLIN_SPAWN_EGG;
-
-    public static final ItemData HORSE_SPAWN_EGG;
-
-    public static final ItemData HUSK_SPAWN_EGG;
-
-    public static final ItemData IRON_GOLEM_SPAWN_EGG;
-
-    public static final ItemData LLAMA_SPAWN_EGG;
-
-    public static final ItemData MAGMA_CUBE_SPAWN_EGG;
-
-    public static final ItemData MOOSHROOM_SPAWN_EGG;
-
-    public static final ItemData MULE_SPAWN_EGG;
-
-    public static final ItemData OCELOT_SPAWN_EGG;
-
-    public static final ItemData PANDA_SPAWN_EGG;
-
-    public static final ItemData PARROT_SPAWN_EGG;
-
-    public static final ItemData PHANTOM_SPAWN_EGG;
-
-    public static final ItemData PIG_SPAWN_EGG;
-
-    public static final ItemData PIGLIN_SPAWN_EGG;
-
-    public static final ItemData PIGLIN_BRUTE_SPAWN_EGG;
-
-    public static final ItemData PILLAGER_SPAWN_EGG;
-
-    public static final ItemData POLAR_BEAR_SPAWN_EGG;
-
-    public static final ItemData PUFFERFISH_SPAWN_EGG;
-
-    public static final ItemData RABBIT_SPAWN_EGG;
-
-    public static final ItemData RAVAGER_SPAWN_EGG;
-
-    public static final ItemData SALMON_SPAWN_EGG;
-
-    public static final ItemData SHEEP_SPAWN_EGG;
-
     public static final ItemData SHULKER_SPAWN_EGG;
-
-    public static final ItemData SILVERFISH_SPAWN_EGG;
-
-    public static final ItemData SKELETON_SPAWN_EGG;
-
-    public static final ItemData SKELETON_HORSE_SPAWN_EGG;
-
-    public static final ItemData SLIME_SPAWN_EGG;
-
-    public static final ItemData SNIFFER_SPAWN_EGG;
-
-    public static final ItemData SNOW_GOLEM_SPAWN_EGG;
-
-    public static final ItemData SPIDER_SPAWN_EGG;
-
-    public static final ItemData SQUID_SPAWN_EGG;
-
-    public static final ItemData STRAY_SPAWN_EGG;
-
-    public static final ItemData STRIDER_SPAWN_EGG;
-
-    public static final ItemData TADPOLE_SPAWN_EGG;
-
-    public static final ItemData TRADER_LLAMA_SPAWN_EGG;
-
-    public static final ItemData TROPICAL_FISH_SPAWN_EGG;
-
-    public static final ItemData TURTLE_SPAWN_EGG;
-
-    public static final ItemData VEX_SPAWN_EGG;
-
-    public static final ItemData VILLAGER_SPAWN_EGG;
-
-    public static final ItemData VINDICATOR_SPAWN_EGG;
-
-    public static final ItemData WANDERING_TRADER_SPAWN_EGG;
-
-    public static final ItemData WARDEN_SPAWN_EGG;
-
-    public static final ItemData WITCH_SPAWN_EGG;
-
-    public static final ItemData WITHER_SPAWN_EGG;
-
-    public static final ItemData WITHER_SKELETON_SPAWN_EGG;
-
-    public static final ItemData WOLF_SPAWN_EGG;
-
-    public static final ItemData ZOGLIN_SPAWN_EGG;
-
-    public static final ItemData CREAKING_SPAWN_EGG;
-
-    public static final ItemData ZOMBIE_SPAWN_EGG;
-
-    public static final ItemData ZOMBIE_HORSE_SPAWN_EGG;
-
-    public static final ItemData ZOMBIE_VILLAGER_SPAWN_EGG;
-
-    public static final ItemData ZOMBIFIED_PIGLIN_SPAWN_EGG;
 
     public static final ItemData EXPERIENCE_BOTTLE;
 
@@ -2358,11 +2818,15 @@ public final class ItemRegistry {
 
     public static final ItemData ARMOR_STAND;
 
+    public static final ItemData COPPER_HORSE_ARMOR;
+
     public static final ItemData IRON_HORSE_ARMOR;
 
     public static final ItemData GOLDEN_HORSE_ARMOR;
 
     public static final ItemData DIAMOND_HORSE_ARMOR;
+
+    public static final ItemData NETHERITE_HORSE_ARMOR;
 
     public static final ItemData LEATHER_HORSE_ARMOR;
 
@@ -2436,11 +2900,27 @@ public final class ItemRegistry {
 
     public static final ItemData SHIELD;
 
+    public static final ItemData WOODEN_SPEAR;
+
+    public static final ItemData STONE_SPEAR;
+
+    public static final ItemData COPPER_SPEAR;
+
+    public static final ItemData IRON_SPEAR;
+
+    public static final ItemData GOLDEN_SPEAR;
+
+    public static final ItemData DIAMOND_SPEAR;
+
+    public static final ItemData NETHERITE_SPEAR;
+
     public static final ItemData TOTEM_OF_UNDYING;
 
     public static final ItemData SHULKER_SHELL;
 
     public static final ItemData IRON_NUGGET;
+
+    public static final ItemData COPPER_NUGGET;
 
     public static final ItemData KNOWLEDGE_BOOK;
 
@@ -2452,6 +2932,8 @@ public final class ItemRegistry {
 
     public static final ItemData MUSIC_DISC_BLOCKS;
 
+    public static final ItemData MUSIC_DISC_BOUNCE;
+
     public static final ItemData MUSIC_DISC_CHIRP;
 
     public static final ItemData MUSIC_DISC_CREATOR;
@@ -2459,6 +2941,8 @@ public final class ItemRegistry {
     public static final ItemData MUSIC_DISC_CREATOR_MUSIC_BOX;
 
     public static final ItemData MUSIC_DISC_FAR;
+
+    public static final ItemData MUSIC_DISC_LAVA_CHICKEN;
 
     public static final ItemData MUSIC_DISC_MALL;
 
@@ -2484,11 +2968,23 @@ public final class ItemRegistry {
 
     public static final ItemData MUSIC_DISC_PRECIPICE;
 
+    public static final ItemData MUSIC_DISC_TEARS;
+
     public static final ItemData DISC_FRAGMENT_5;
 
     public static final ItemData TRIDENT;
 
     public static final ItemData NAUTILUS_SHELL;
+
+    public static final ItemData IRON_NAUTILUS_ARMOR;
+
+    public static final ItemData GOLDEN_NAUTILUS_ARMOR;
+
+    public static final ItemData DIAMOND_NAUTILUS_ARMOR;
+
+    public static final ItemData NETHERITE_NAUTILUS_ARMOR;
+
+    public static final ItemData COPPER_NAUTILUS_ARMOR;
 
     public static final ItemData HEART_OF_THE_SEA;
 
@@ -2543,6 +3039,22 @@ public final class ItemRegistry {
     public static final ItemData LANTERN;
 
     public static final ItemData SOUL_LANTERN;
+
+    public static final ItemData COPPER_LANTERN;
+
+    public static final ItemData EXPOSED_COPPER_LANTERN;
+
+    public static final ItemData WEATHERED_COPPER_LANTERN;
+
+    public static final ItemData OXIDIZED_COPPER_LANTERN;
+
+    public static final ItemData WAXED_COPPER_LANTERN;
+
+    public static final ItemData WAXED_EXPOSED_COPPER_LANTERN;
+
+    public static final ItemData WAXED_WEATHERED_COPPER_LANTERN;
+
+    public static final ItemData WAXED_OXIDIZED_COPPER_LANTERN;
 
     public static final ItemData SWEET_BERRIES;
 
@@ -2637,6 +3149,8 @@ public final class ItemRegistry {
     public static final ItemData AMETHYST_CLUSTER;
 
     public static final ItemData POINTED_DRIPSTONE;
+
+    public static final ItemData SULFUR_SPIKE;
 
     public static final ItemData OCHRE_FROGLIGHT;
 
@@ -2766,6 +3280,38 @@ public final class ItemRegistry {
 
     public static final ItemData WAXED_OXIDIZED_COPPER_BULB;
 
+    public static final ItemData COPPER_CHEST;
+
+    public static final ItemData EXPOSED_COPPER_CHEST;
+
+    public static final ItemData WEATHERED_COPPER_CHEST;
+
+    public static final ItemData OXIDIZED_COPPER_CHEST;
+
+    public static final ItemData WAXED_COPPER_CHEST;
+
+    public static final ItemData WAXED_EXPOSED_COPPER_CHEST;
+
+    public static final ItemData WAXED_WEATHERED_COPPER_CHEST;
+
+    public static final ItemData WAXED_OXIDIZED_COPPER_CHEST;
+
+    public static final ItemData COPPER_GOLEM_STATUE;
+
+    public static final ItemData EXPOSED_COPPER_GOLEM_STATUE;
+
+    public static final ItemData WEATHERED_COPPER_GOLEM_STATUE;
+
+    public static final ItemData OXIDIZED_COPPER_GOLEM_STATUE;
+
+    public static final ItemData WAXED_COPPER_GOLEM_STATUE;
+
+    public static final ItemData WAXED_EXPOSED_COPPER_GOLEM_STATUE;
+
+    public static final ItemData WAXED_WEATHERED_COPPER_GOLEM_STATUE;
+
+    public static final ItemData WAXED_OXIDIZED_COPPER_GOLEM_STATUE;
+
     public static final ItemData TRIAL_SPAWNER;
 
     public static final ItemData TRIAL_KEY;
@@ -2805,1364 +3351,1637 @@ public final class ItemRegistry {
         TUFF_BRICK_STAIRS = REGISTRY.register(data.get(23));
         TUFF_BRICK_WALL = REGISTRY.register(data.get(24));
         CHISELED_TUFF_BRICKS = REGISTRY.register(data.get(25));
-        DRIPSTONE_BLOCK = REGISTRY.register(data.get(26));
-        GRASS_BLOCK = REGISTRY.register(data.get(27));
-        DIRT = REGISTRY.register(data.get(28));
-        COARSE_DIRT = REGISTRY.register(data.get(29));
-        PODZOL = REGISTRY.register(data.get(30));
-        ROOTED_DIRT = REGISTRY.register(data.get(31));
-        MUD = REGISTRY.register(data.get(32));
-        CRIMSON_NYLIUM = REGISTRY.register(data.get(33));
-        WARPED_NYLIUM = REGISTRY.register(data.get(34));
-        COBBLESTONE = REGISTRY.register(data.get(35));
-        OAK_PLANKS = REGISTRY.register(data.get(36));
-        SPRUCE_PLANKS = REGISTRY.register(data.get(37));
-        BIRCH_PLANKS = REGISTRY.register(data.get(38));
-        JUNGLE_PLANKS = REGISTRY.register(data.get(39));
-        ACACIA_PLANKS = REGISTRY.register(data.get(40));
-        CHERRY_PLANKS = REGISTRY.register(data.get(41));
-        DARK_OAK_PLANKS = REGISTRY.register(data.get(42));
-        PALE_OAK_PLANKS = REGISTRY.register(data.get(43));
-        MANGROVE_PLANKS = REGISTRY.register(data.get(44));
-        BAMBOO_PLANKS = REGISTRY.register(data.get(45));
-        CRIMSON_PLANKS = REGISTRY.register(data.get(46));
-        WARPED_PLANKS = REGISTRY.register(data.get(47));
-        BAMBOO_MOSAIC = REGISTRY.register(data.get(48));
-        OAK_SAPLING = REGISTRY.register(data.get(49));
-        SPRUCE_SAPLING = REGISTRY.register(data.get(50));
-        BIRCH_SAPLING = REGISTRY.register(data.get(51));
-        JUNGLE_SAPLING = REGISTRY.register(data.get(52));
-        ACACIA_SAPLING = REGISTRY.register(data.get(53));
-        CHERRY_SAPLING = REGISTRY.register(data.get(54));
-        DARK_OAK_SAPLING = REGISTRY.register(data.get(55));
-        PALE_OAK_SAPLING = REGISTRY.register(data.get(56));
-        MANGROVE_PROPAGULE = REGISTRY.register(data.get(57));
-        BEDROCK = REGISTRY.register(data.get(58));
-        SAND = REGISTRY.register(data.get(59));
-        SUSPICIOUS_SAND = REGISTRY.register(data.get(60));
-        SUSPICIOUS_GRAVEL = REGISTRY.register(data.get(61));
-        RED_SAND = REGISTRY.register(data.get(62));
-        GRAVEL = REGISTRY.register(data.get(63));
-        COAL_ORE = REGISTRY.register(data.get(64));
-        DEEPSLATE_COAL_ORE = REGISTRY.register(data.get(65));
-        IRON_ORE = REGISTRY.register(data.get(66));
-        DEEPSLATE_IRON_ORE = REGISTRY.register(data.get(67));
-        COPPER_ORE = REGISTRY.register(data.get(68));
-        DEEPSLATE_COPPER_ORE = REGISTRY.register(data.get(69));
-        GOLD_ORE = REGISTRY.register(data.get(70));
-        DEEPSLATE_GOLD_ORE = REGISTRY.register(data.get(71));
-        REDSTONE_ORE = REGISTRY.register(data.get(72));
-        DEEPSLATE_REDSTONE_ORE = REGISTRY.register(data.get(73));
-        EMERALD_ORE = REGISTRY.register(data.get(74));
-        DEEPSLATE_EMERALD_ORE = REGISTRY.register(data.get(75));
-        LAPIS_ORE = REGISTRY.register(data.get(76));
-        DEEPSLATE_LAPIS_ORE = REGISTRY.register(data.get(77));
-        DIAMOND_ORE = REGISTRY.register(data.get(78));
-        DEEPSLATE_DIAMOND_ORE = REGISTRY.register(data.get(79));
-        NETHER_GOLD_ORE = REGISTRY.register(data.get(80));
-        NETHER_QUARTZ_ORE = REGISTRY.register(data.get(81));
-        ANCIENT_DEBRIS = REGISTRY.register(data.get(82));
-        COAL_BLOCK = REGISTRY.register(data.get(83));
-        RAW_IRON_BLOCK = REGISTRY.register(data.get(84));
-        RAW_COPPER_BLOCK = REGISTRY.register(data.get(85));
-        RAW_GOLD_BLOCK = REGISTRY.register(data.get(86));
-        HEAVY_CORE = REGISTRY.register(data.get(87));
-        AMETHYST_BLOCK = REGISTRY.register(data.get(88));
-        BUDDING_AMETHYST = REGISTRY.register(data.get(89));
-        IRON_BLOCK = REGISTRY.register(data.get(90));
-        COPPER_BLOCK = REGISTRY.register(data.get(91));
-        GOLD_BLOCK = REGISTRY.register(data.get(92));
-        DIAMOND_BLOCK = REGISTRY.register(data.get(93));
-        NETHERITE_BLOCK = REGISTRY.register(data.get(94));
-        EXPOSED_COPPER = REGISTRY.register(data.get(95));
-        WEATHERED_COPPER = REGISTRY.register(data.get(96));
-        OXIDIZED_COPPER = REGISTRY.register(data.get(97));
-        CHISELED_COPPER = REGISTRY.register(data.get(98));
-        EXPOSED_CHISELED_COPPER = REGISTRY.register(data.get(99));
-        WEATHERED_CHISELED_COPPER = REGISTRY.register(data.get(100));
-        OXIDIZED_CHISELED_COPPER = REGISTRY.register(data.get(101));
-        CUT_COPPER = REGISTRY.register(data.get(102));
-        EXPOSED_CUT_COPPER = REGISTRY.register(data.get(103));
-        WEATHERED_CUT_COPPER = REGISTRY.register(data.get(104));
-        OXIDIZED_CUT_COPPER = REGISTRY.register(data.get(105));
-        CUT_COPPER_STAIRS = REGISTRY.register(data.get(106));
-        EXPOSED_CUT_COPPER_STAIRS = REGISTRY.register(data.get(107));
-        WEATHERED_CUT_COPPER_STAIRS = REGISTRY.register(data.get(108));
-        OXIDIZED_CUT_COPPER_STAIRS = REGISTRY.register(data.get(109));
-        CUT_COPPER_SLAB = REGISTRY.register(data.get(110));
-        EXPOSED_CUT_COPPER_SLAB = REGISTRY.register(data.get(111));
-        WEATHERED_CUT_COPPER_SLAB = REGISTRY.register(data.get(112));
-        OXIDIZED_CUT_COPPER_SLAB = REGISTRY.register(data.get(113));
-        WAXED_COPPER_BLOCK = REGISTRY.register(data.get(114));
-        WAXED_EXPOSED_COPPER = REGISTRY.register(data.get(115));
-        WAXED_WEATHERED_COPPER = REGISTRY.register(data.get(116));
-        WAXED_OXIDIZED_COPPER = REGISTRY.register(data.get(117));
-        WAXED_CHISELED_COPPER = REGISTRY.register(data.get(118));
-        WAXED_EXPOSED_CHISELED_COPPER = REGISTRY.register(data.get(119));
-        WAXED_WEATHERED_CHISELED_COPPER = REGISTRY.register(data.get(120));
-        WAXED_OXIDIZED_CHISELED_COPPER = REGISTRY.register(data.get(121));
-        WAXED_CUT_COPPER = REGISTRY.register(data.get(122));
-        WAXED_EXPOSED_CUT_COPPER = REGISTRY.register(data.get(123));
-        WAXED_WEATHERED_CUT_COPPER = REGISTRY.register(data.get(124));
-        WAXED_OXIDIZED_CUT_COPPER = REGISTRY.register(data.get(125));
-        WAXED_CUT_COPPER_STAIRS = REGISTRY.register(data.get(126));
-        WAXED_EXPOSED_CUT_COPPER_STAIRS = REGISTRY.register(data.get(127));
-        WAXED_WEATHERED_CUT_COPPER_STAIRS = REGISTRY.register(data.get(128));
-        WAXED_OXIDIZED_CUT_COPPER_STAIRS = REGISTRY.register(data.get(129));
-        WAXED_CUT_COPPER_SLAB = REGISTRY.register(data.get(130));
-        WAXED_EXPOSED_CUT_COPPER_SLAB = REGISTRY.register(data.get(131));
-        WAXED_WEATHERED_CUT_COPPER_SLAB = REGISTRY.register(data.get(132));
-        WAXED_OXIDIZED_CUT_COPPER_SLAB = REGISTRY.register(data.get(133));
-        OAK_LOG = REGISTRY.register(data.get(134));
-        SPRUCE_LOG = REGISTRY.register(data.get(135));
-        BIRCH_LOG = REGISTRY.register(data.get(136));
-        JUNGLE_LOG = REGISTRY.register(data.get(137));
-        ACACIA_LOG = REGISTRY.register(data.get(138));
-        CHERRY_LOG = REGISTRY.register(data.get(139));
-        PALE_OAK_LOG = REGISTRY.register(data.get(140));
-        DARK_OAK_LOG = REGISTRY.register(data.get(141));
-        MANGROVE_LOG = REGISTRY.register(data.get(142));
-        MANGROVE_ROOTS = REGISTRY.register(data.get(143));
-        MUDDY_MANGROVE_ROOTS = REGISTRY.register(data.get(144));
-        CRIMSON_STEM = REGISTRY.register(data.get(145));
-        WARPED_STEM = REGISTRY.register(data.get(146));
-        BAMBOO_BLOCK = REGISTRY.register(data.get(147));
-        STRIPPED_OAK_LOG = REGISTRY.register(data.get(148));
-        STRIPPED_SPRUCE_LOG = REGISTRY.register(data.get(149));
-        STRIPPED_BIRCH_LOG = REGISTRY.register(data.get(150));
-        STRIPPED_JUNGLE_LOG = REGISTRY.register(data.get(151));
-        STRIPPED_ACACIA_LOG = REGISTRY.register(data.get(152));
-        STRIPPED_CHERRY_LOG = REGISTRY.register(data.get(153));
-        STRIPPED_DARK_OAK_LOG = REGISTRY.register(data.get(154));
-        STRIPPED_PALE_OAK_LOG = REGISTRY.register(data.get(155));
-        STRIPPED_MANGROVE_LOG = REGISTRY.register(data.get(156));
-        STRIPPED_CRIMSON_STEM = REGISTRY.register(data.get(157));
-        STRIPPED_WARPED_STEM = REGISTRY.register(data.get(158));
-        STRIPPED_OAK_WOOD = REGISTRY.register(data.get(159));
-        STRIPPED_SPRUCE_WOOD = REGISTRY.register(data.get(160));
-        STRIPPED_BIRCH_WOOD = REGISTRY.register(data.get(161));
-        STRIPPED_JUNGLE_WOOD = REGISTRY.register(data.get(162));
-        STRIPPED_ACACIA_WOOD = REGISTRY.register(data.get(163));
-        STRIPPED_CHERRY_WOOD = REGISTRY.register(data.get(164));
-        STRIPPED_DARK_OAK_WOOD = REGISTRY.register(data.get(165));
-        STRIPPED_PALE_OAK_WOOD = REGISTRY.register(data.get(166));
-        STRIPPED_MANGROVE_WOOD = REGISTRY.register(data.get(167));
-        STRIPPED_CRIMSON_HYPHAE = REGISTRY.register(data.get(168));
-        STRIPPED_WARPED_HYPHAE = REGISTRY.register(data.get(169));
-        STRIPPED_BAMBOO_BLOCK = REGISTRY.register(data.get(170));
-        OAK_WOOD = REGISTRY.register(data.get(171));
-        SPRUCE_WOOD = REGISTRY.register(data.get(172));
-        BIRCH_WOOD = REGISTRY.register(data.get(173));
-        JUNGLE_WOOD = REGISTRY.register(data.get(174));
-        ACACIA_WOOD = REGISTRY.register(data.get(175));
-        CHERRY_WOOD = REGISTRY.register(data.get(176));
-        PALE_OAK_WOOD = REGISTRY.register(data.get(177));
-        DARK_OAK_WOOD = REGISTRY.register(data.get(178));
-        MANGROVE_WOOD = REGISTRY.register(data.get(179));
-        CRIMSON_HYPHAE = REGISTRY.register(data.get(180));
-        WARPED_HYPHAE = REGISTRY.register(data.get(181));
-        OAK_LEAVES = REGISTRY.register(data.get(182));
-        SPRUCE_LEAVES = REGISTRY.register(data.get(183));
-        BIRCH_LEAVES = REGISTRY.register(data.get(184));
-        JUNGLE_LEAVES = REGISTRY.register(data.get(185));
-        ACACIA_LEAVES = REGISTRY.register(data.get(186));
-        CHERRY_LEAVES = REGISTRY.register(data.get(187));
-        DARK_OAK_LEAVES = REGISTRY.register(data.get(188));
-        PALE_OAK_LEAVES = REGISTRY.register(data.get(189));
-        MANGROVE_LEAVES = REGISTRY.register(data.get(190));
-        AZALEA_LEAVES = REGISTRY.register(data.get(191));
-        FLOWERING_AZALEA_LEAVES = REGISTRY.register(data.get(192));
-        SPONGE = REGISTRY.register(data.get(193));
-        WET_SPONGE = REGISTRY.register(data.get(194));
-        GLASS = REGISTRY.register(data.get(195));
-        TINTED_GLASS = REGISTRY.register(data.get(196));
-        LAPIS_BLOCK = REGISTRY.register(data.get(197));
-        SANDSTONE = REGISTRY.register(data.get(198));
-        CHISELED_SANDSTONE = REGISTRY.register(data.get(199));
-        CUT_SANDSTONE = REGISTRY.register(data.get(200));
-        COBWEB = REGISTRY.register(data.get(201));
-        SHORT_GRASS = REGISTRY.register(data.get(202));
-        FERN = REGISTRY.register(data.get(203));
-        AZALEA = REGISTRY.register(data.get(204));
-        FLOWERING_AZALEA = REGISTRY.register(data.get(205));
-        DEAD_BUSH = REGISTRY.register(data.get(206));
-        SEAGRASS = REGISTRY.register(data.get(207));
-        SEA_PICKLE = REGISTRY.register(data.get(208));
-        WHITE_WOOL = REGISTRY.register(data.get(209));
-        ORANGE_WOOL = REGISTRY.register(data.get(210));
-        MAGENTA_WOOL = REGISTRY.register(data.get(211));
-        LIGHT_BLUE_WOOL = REGISTRY.register(data.get(212));
-        YELLOW_WOOL = REGISTRY.register(data.get(213));
-        LIME_WOOL = REGISTRY.register(data.get(214));
-        PINK_WOOL = REGISTRY.register(data.get(215));
-        GRAY_WOOL = REGISTRY.register(data.get(216));
-        LIGHT_GRAY_WOOL = REGISTRY.register(data.get(217));
-        CYAN_WOOL = REGISTRY.register(data.get(218));
-        PURPLE_WOOL = REGISTRY.register(data.get(219));
-        BLUE_WOOL = REGISTRY.register(data.get(220));
-        BROWN_WOOL = REGISTRY.register(data.get(221));
-        GREEN_WOOL = REGISTRY.register(data.get(222));
-        RED_WOOL = REGISTRY.register(data.get(223));
-        BLACK_WOOL = REGISTRY.register(data.get(224));
-        DANDELION = REGISTRY.register(data.get(225));
-        OPEN_EYEBLOSSOM = REGISTRY.register(data.get(226));
-        CLOSED_EYEBLOSSOM = REGISTRY.register(data.get(227));
-        POPPY = REGISTRY.register(data.get(228));
-        BLUE_ORCHID = REGISTRY.register(data.get(229));
-        ALLIUM = REGISTRY.register(data.get(230));
-        AZURE_BLUET = REGISTRY.register(data.get(231));
-        RED_TULIP = REGISTRY.register(data.get(232));
-        ORANGE_TULIP = REGISTRY.register(data.get(233));
-        WHITE_TULIP = REGISTRY.register(data.get(234));
-        PINK_TULIP = REGISTRY.register(data.get(235));
-        OXEYE_DAISY = REGISTRY.register(data.get(236));
-        CORNFLOWER = REGISTRY.register(data.get(237));
-        LILY_OF_THE_VALLEY = REGISTRY.register(data.get(238));
-        WITHER_ROSE = REGISTRY.register(data.get(239));
-        TORCHFLOWER = REGISTRY.register(data.get(240));
-        PITCHER_PLANT = REGISTRY.register(data.get(241));
-        SPORE_BLOSSOM = REGISTRY.register(data.get(242));
-        BROWN_MUSHROOM = REGISTRY.register(data.get(243));
-        RED_MUSHROOM = REGISTRY.register(data.get(244));
-        CRIMSON_FUNGUS = REGISTRY.register(data.get(245));
-        WARPED_FUNGUS = REGISTRY.register(data.get(246));
-        CRIMSON_ROOTS = REGISTRY.register(data.get(247));
-        WARPED_ROOTS = REGISTRY.register(data.get(248));
-        NETHER_SPROUTS = REGISTRY.register(data.get(249));
-        WEEPING_VINES = REGISTRY.register(data.get(250));
-        TWISTING_VINES = REGISTRY.register(data.get(251));
-        SUGAR_CANE = REGISTRY.register(data.get(252));
-        KELP = REGISTRY.register(data.get(253));
-        PINK_PETALS = REGISTRY.register(data.get(254));
-        MOSS_CARPET = REGISTRY.register(data.get(255));
-        MOSS_BLOCK = REGISTRY.register(data.get(256));
-        PALE_MOSS_CARPET = REGISTRY.register(data.get(257));
-        PALE_HANGING_MOSS = REGISTRY.register(data.get(258));
-        PALE_MOSS_BLOCK = REGISTRY.register(data.get(259));
-        HANGING_ROOTS = REGISTRY.register(data.get(260));
-        BIG_DRIPLEAF = REGISTRY.register(data.get(261));
-        SMALL_DRIPLEAF = REGISTRY.register(data.get(262));
-        BAMBOO = REGISTRY.register(data.get(263));
-        OAK_SLAB = REGISTRY.register(data.get(264));
-        SPRUCE_SLAB = REGISTRY.register(data.get(265));
-        BIRCH_SLAB = REGISTRY.register(data.get(266));
-        JUNGLE_SLAB = REGISTRY.register(data.get(267));
-        ACACIA_SLAB = REGISTRY.register(data.get(268));
-        CHERRY_SLAB = REGISTRY.register(data.get(269));
-        DARK_OAK_SLAB = REGISTRY.register(data.get(270));
-        PALE_OAK_SLAB = REGISTRY.register(data.get(271));
-        MANGROVE_SLAB = REGISTRY.register(data.get(272));
-        BAMBOO_SLAB = REGISTRY.register(data.get(273));
-        BAMBOO_MOSAIC_SLAB = REGISTRY.register(data.get(274));
-        CRIMSON_SLAB = REGISTRY.register(data.get(275));
-        WARPED_SLAB = REGISTRY.register(data.get(276));
-        STONE_SLAB = REGISTRY.register(data.get(277));
-        SMOOTH_STONE_SLAB = REGISTRY.register(data.get(278));
-        SANDSTONE_SLAB = REGISTRY.register(data.get(279));
-        CUT_SANDSTONE_SLAB = REGISTRY.register(data.get(280));
-        PETRIFIED_OAK_SLAB = REGISTRY.register(data.get(281));
-        COBBLESTONE_SLAB = REGISTRY.register(data.get(282));
-        BRICK_SLAB = REGISTRY.register(data.get(283));
-        STONE_BRICK_SLAB = REGISTRY.register(data.get(284));
-        MUD_BRICK_SLAB = REGISTRY.register(data.get(285));
-        NETHER_BRICK_SLAB = REGISTRY.register(data.get(286));
-        QUARTZ_SLAB = REGISTRY.register(data.get(287));
-        RED_SANDSTONE_SLAB = REGISTRY.register(data.get(288));
-        CUT_RED_SANDSTONE_SLAB = REGISTRY.register(data.get(289));
-        PURPUR_SLAB = REGISTRY.register(data.get(290));
-        PRISMARINE_SLAB = REGISTRY.register(data.get(291));
-        PRISMARINE_BRICK_SLAB = REGISTRY.register(data.get(292));
-        DARK_PRISMARINE_SLAB = REGISTRY.register(data.get(293));
-        SMOOTH_QUARTZ = REGISTRY.register(data.get(294));
-        SMOOTH_RED_SANDSTONE = REGISTRY.register(data.get(295));
-        SMOOTH_SANDSTONE = REGISTRY.register(data.get(296));
-        SMOOTH_STONE = REGISTRY.register(data.get(297));
-        BRICKS = REGISTRY.register(data.get(298));
-        BOOKSHELF = REGISTRY.register(data.get(299));
-        CHISELED_BOOKSHELF = REGISTRY.register(data.get(300));
-        DECORATED_POT = REGISTRY.register(data.get(301));
-        MOSSY_COBBLESTONE = REGISTRY.register(data.get(302));
-        OBSIDIAN = REGISTRY.register(data.get(303));
-        TORCH = REGISTRY.register(data.get(304));
-        END_ROD = REGISTRY.register(data.get(305));
-        CHORUS_PLANT = REGISTRY.register(data.get(306));
-        CHORUS_FLOWER = REGISTRY.register(data.get(307));
-        PURPUR_BLOCK = REGISTRY.register(data.get(308));
-        PURPUR_PILLAR = REGISTRY.register(data.get(309));
-        PURPUR_STAIRS = REGISTRY.register(data.get(310));
-        SPAWNER = REGISTRY.register(data.get(311));
-        CREAKING_HEART = REGISTRY.register(data.get(312));
-        CHEST = REGISTRY.register(data.get(313));
-        CRAFTING_TABLE = REGISTRY.register(data.get(314));
-        FARMLAND = REGISTRY.register(data.get(315));
-        FURNACE = REGISTRY.register(data.get(316));
-        LADDER = REGISTRY.register(data.get(317));
-        COBBLESTONE_STAIRS = REGISTRY.register(data.get(318));
-        SNOW = REGISTRY.register(data.get(319));
-        ICE = REGISTRY.register(data.get(320));
-        SNOW_BLOCK = REGISTRY.register(data.get(321));
-        CACTUS = REGISTRY.register(data.get(322));
-        CLAY = REGISTRY.register(data.get(323));
-        JUKEBOX = REGISTRY.register(data.get(324));
-        OAK_FENCE = REGISTRY.register(data.get(325));
-        SPRUCE_FENCE = REGISTRY.register(data.get(326));
-        BIRCH_FENCE = REGISTRY.register(data.get(327));
-        JUNGLE_FENCE = REGISTRY.register(data.get(328));
-        ACACIA_FENCE = REGISTRY.register(data.get(329));
-        CHERRY_FENCE = REGISTRY.register(data.get(330));
-        DARK_OAK_FENCE = REGISTRY.register(data.get(331));
-        PALE_OAK_FENCE = REGISTRY.register(data.get(332));
-        MANGROVE_FENCE = REGISTRY.register(data.get(333));
-        BAMBOO_FENCE = REGISTRY.register(data.get(334));
-        CRIMSON_FENCE = REGISTRY.register(data.get(335));
-        WARPED_FENCE = REGISTRY.register(data.get(336));
-        PUMPKIN = REGISTRY.register(data.get(337));
-        CARVED_PUMPKIN = REGISTRY.register(data.get(338));
-        JACK_O_LANTERN = REGISTRY.register(data.get(339));
-        NETHERRACK = REGISTRY.register(data.get(340));
-        SOUL_SAND = REGISTRY.register(data.get(341));
-        SOUL_SOIL = REGISTRY.register(data.get(342));
-        BASALT = REGISTRY.register(data.get(343));
-        POLISHED_BASALT = REGISTRY.register(data.get(344));
-        SMOOTH_BASALT = REGISTRY.register(data.get(345));
-        SOUL_TORCH = REGISTRY.register(data.get(346));
-        GLOWSTONE = REGISTRY.register(data.get(347));
-        INFESTED_STONE = REGISTRY.register(data.get(348));
-        INFESTED_COBBLESTONE = REGISTRY.register(data.get(349));
-        INFESTED_STONE_BRICKS = REGISTRY.register(data.get(350));
-        INFESTED_MOSSY_STONE_BRICKS = REGISTRY.register(data.get(351));
-        INFESTED_CRACKED_STONE_BRICKS = REGISTRY.register(data.get(352));
-        INFESTED_CHISELED_STONE_BRICKS = REGISTRY.register(data.get(353));
-        INFESTED_DEEPSLATE = REGISTRY.register(data.get(354));
-        STONE_BRICKS = REGISTRY.register(data.get(355));
-        MOSSY_STONE_BRICKS = REGISTRY.register(data.get(356));
-        CRACKED_STONE_BRICKS = REGISTRY.register(data.get(357));
-        CHISELED_STONE_BRICKS = REGISTRY.register(data.get(358));
-        PACKED_MUD = REGISTRY.register(data.get(359));
-        MUD_BRICKS = REGISTRY.register(data.get(360));
-        DEEPSLATE_BRICKS = REGISTRY.register(data.get(361));
-        CRACKED_DEEPSLATE_BRICKS = REGISTRY.register(data.get(362));
-        DEEPSLATE_TILES = REGISTRY.register(data.get(363));
-        CRACKED_DEEPSLATE_TILES = REGISTRY.register(data.get(364));
-        CHISELED_DEEPSLATE = REGISTRY.register(data.get(365));
-        REINFORCED_DEEPSLATE = REGISTRY.register(data.get(366));
-        BROWN_MUSHROOM_BLOCK = REGISTRY.register(data.get(367));
-        RED_MUSHROOM_BLOCK = REGISTRY.register(data.get(368));
-        MUSHROOM_STEM = REGISTRY.register(data.get(369));
-        IRON_BARS = REGISTRY.register(data.get(370));
-        CHAIN = REGISTRY.register(data.get(371));
-        GLASS_PANE = REGISTRY.register(data.get(372));
-        MELON = REGISTRY.register(data.get(373));
-        VINE = REGISTRY.register(data.get(374));
-        GLOW_LICHEN = REGISTRY.register(data.get(375));
-        RESIN_CLUMP = REGISTRY.register(data.get(376));
-        RESIN_BLOCK = REGISTRY.register(data.get(377));
-        RESIN_BRICKS = REGISTRY.register(data.get(378));
-        RESIN_BRICK_STAIRS = REGISTRY.register(data.get(379));
-        RESIN_BRICK_SLAB = REGISTRY.register(data.get(380));
-        RESIN_BRICK_WALL = REGISTRY.register(data.get(381));
-        CHISELED_RESIN_BRICKS = REGISTRY.register(data.get(382));
-        BRICK_STAIRS = REGISTRY.register(data.get(383));
-        STONE_BRICK_STAIRS = REGISTRY.register(data.get(384));
-        MUD_BRICK_STAIRS = REGISTRY.register(data.get(385));
-        MYCELIUM = REGISTRY.register(data.get(386));
-        LILY_PAD = REGISTRY.register(data.get(387));
-        NETHER_BRICKS = REGISTRY.register(data.get(388));
-        CRACKED_NETHER_BRICKS = REGISTRY.register(data.get(389));
-        CHISELED_NETHER_BRICKS = REGISTRY.register(data.get(390));
-        NETHER_BRICK_FENCE = REGISTRY.register(data.get(391));
-        NETHER_BRICK_STAIRS = REGISTRY.register(data.get(392));
-        SCULK = REGISTRY.register(data.get(393));
-        SCULK_VEIN = REGISTRY.register(data.get(394));
-        SCULK_CATALYST = REGISTRY.register(data.get(395));
-        SCULK_SHRIEKER = REGISTRY.register(data.get(396));
-        ENCHANTING_TABLE = REGISTRY.register(data.get(397));
-        END_PORTAL_FRAME = REGISTRY.register(data.get(398));
-        END_STONE = REGISTRY.register(data.get(399));
-        END_STONE_BRICKS = REGISTRY.register(data.get(400));
-        DRAGON_EGG = REGISTRY.register(data.get(401));
-        SANDSTONE_STAIRS = REGISTRY.register(data.get(402));
-        ENDER_CHEST = REGISTRY.register(data.get(403));
-        EMERALD_BLOCK = REGISTRY.register(data.get(404));
-        OAK_STAIRS = REGISTRY.register(data.get(405));
-        SPRUCE_STAIRS = REGISTRY.register(data.get(406));
-        BIRCH_STAIRS = REGISTRY.register(data.get(407));
-        JUNGLE_STAIRS = REGISTRY.register(data.get(408));
-        ACACIA_STAIRS = REGISTRY.register(data.get(409));
-        CHERRY_STAIRS = REGISTRY.register(data.get(410));
-        DARK_OAK_STAIRS = REGISTRY.register(data.get(411));
-        PALE_OAK_STAIRS = REGISTRY.register(data.get(412));
-        MANGROVE_STAIRS = REGISTRY.register(data.get(413));
-        BAMBOO_STAIRS = REGISTRY.register(data.get(414));
-        BAMBOO_MOSAIC_STAIRS = REGISTRY.register(data.get(415));
-        CRIMSON_STAIRS = REGISTRY.register(data.get(416));
-        WARPED_STAIRS = REGISTRY.register(data.get(417));
-        COMMAND_BLOCK = REGISTRY.register(data.get(418));
-        BEACON = REGISTRY.register(data.get(419));
-        COBBLESTONE_WALL = REGISTRY.register(data.get(420));
-        MOSSY_COBBLESTONE_WALL = REGISTRY.register(data.get(421));
-        BRICK_WALL = REGISTRY.register(data.get(422));
-        PRISMARINE_WALL = REGISTRY.register(data.get(423));
-        RED_SANDSTONE_WALL = REGISTRY.register(data.get(424));
-        MOSSY_STONE_BRICK_WALL = REGISTRY.register(data.get(425));
-        GRANITE_WALL = REGISTRY.register(data.get(426));
-        STONE_BRICK_WALL = REGISTRY.register(data.get(427));
-        MUD_BRICK_WALL = REGISTRY.register(data.get(428));
-        NETHER_BRICK_WALL = REGISTRY.register(data.get(429));
-        ANDESITE_WALL = REGISTRY.register(data.get(430));
-        RED_NETHER_BRICK_WALL = REGISTRY.register(data.get(431));
-        SANDSTONE_WALL = REGISTRY.register(data.get(432));
-        END_STONE_BRICK_WALL = REGISTRY.register(data.get(433));
-        DIORITE_WALL = REGISTRY.register(data.get(434));
-        BLACKSTONE_WALL = REGISTRY.register(data.get(435));
-        POLISHED_BLACKSTONE_WALL = REGISTRY.register(data.get(436));
-        POLISHED_BLACKSTONE_BRICK_WALL = REGISTRY.register(data.get(437));
-        COBBLED_DEEPSLATE_WALL = REGISTRY.register(data.get(438));
-        POLISHED_DEEPSLATE_WALL = REGISTRY.register(data.get(439));
-        DEEPSLATE_BRICK_WALL = REGISTRY.register(data.get(440));
-        DEEPSLATE_TILE_WALL = REGISTRY.register(data.get(441));
-        ANVIL = REGISTRY.register(data.get(442));
-        CHIPPED_ANVIL = REGISTRY.register(data.get(443));
-        DAMAGED_ANVIL = REGISTRY.register(data.get(444));
-        CHISELED_QUARTZ_BLOCK = REGISTRY.register(data.get(445));
-        QUARTZ_BLOCK = REGISTRY.register(data.get(446));
-        QUARTZ_BRICKS = REGISTRY.register(data.get(447));
-        QUARTZ_PILLAR = REGISTRY.register(data.get(448));
-        QUARTZ_STAIRS = REGISTRY.register(data.get(449));
-        WHITE_TERRACOTTA = REGISTRY.register(data.get(450));
-        ORANGE_TERRACOTTA = REGISTRY.register(data.get(451));
-        MAGENTA_TERRACOTTA = REGISTRY.register(data.get(452));
-        LIGHT_BLUE_TERRACOTTA = REGISTRY.register(data.get(453));
-        YELLOW_TERRACOTTA = REGISTRY.register(data.get(454));
-        LIME_TERRACOTTA = REGISTRY.register(data.get(455));
-        PINK_TERRACOTTA = REGISTRY.register(data.get(456));
-        GRAY_TERRACOTTA = REGISTRY.register(data.get(457));
-        LIGHT_GRAY_TERRACOTTA = REGISTRY.register(data.get(458));
-        CYAN_TERRACOTTA = REGISTRY.register(data.get(459));
-        PURPLE_TERRACOTTA = REGISTRY.register(data.get(460));
-        BLUE_TERRACOTTA = REGISTRY.register(data.get(461));
-        BROWN_TERRACOTTA = REGISTRY.register(data.get(462));
-        GREEN_TERRACOTTA = REGISTRY.register(data.get(463));
-        RED_TERRACOTTA = REGISTRY.register(data.get(464));
-        BLACK_TERRACOTTA = REGISTRY.register(data.get(465));
-        BARRIER = REGISTRY.register(data.get(466));
-        LIGHT = REGISTRY.register(data.get(467));
-        HAY_BLOCK = REGISTRY.register(data.get(468));
-        WHITE_CARPET = REGISTRY.register(data.get(469));
-        ORANGE_CARPET = REGISTRY.register(data.get(470));
-        MAGENTA_CARPET = REGISTRY.register(data.get(471));
-        LIGHT_BLUE_CARPET = REGISTRY.register(data.get(472));
-        YELLOW_CARPET = REGISTRY.register(data.get(473));
-        LIME_CARPET = REGISTRY.register(data.get(474));
-        PINK_CARPET = REGISTRY.register(data.get(475));
-        GRAY_CARPET = REGISTRY.register(data.get(476));
-        LIGHT_GRAY_CARPET = REGISTRY.register(data.get(477));
-        CYAN_CARPET = REGISTRY.register(data.get(478));
-        PURPLE_CARPET = REGISTRY.register(data.get(479));
-        BLUE_CARPET = REGISTRY.register(data.get(480));
-        BROWN_CARPET = REGISTRY.register(data.get(481));
-        GREEN_CARPET = REGISTRY.register(data.get(482));
-        RED_CARPET = REGISTRY.register(data.get(483));
-        BLACK_CARPET = REGISTRY.register(data.get(484));
-        TERRACOTTA = REGISTRY.register(data.get(485));
-        PACKED_ICE = REGISTRY.register(data.get(486));
-        DIRT_PATH = REGISTRY.register(data.get(487));
-        SUNFLOWER = REGISTRY.register(data.get(488));
-        LILAC = REGISTRY.register(data.get(489));
-        ROSE_BUSH = REGISTRY.register(data.get(490));
-        PEONY = REGISTRY.register(data.get(491));
-        TALL_GRASS = REGISTRY.register(data.get(492));
-        LARGE_FERN = REGISTRY.register(data.get(493));
-        WHITE_STAINED_GLASS = REGISTRY.register(data.get(494));
-        ORANGE_STAINED_GLASS = REGISTRY.register(data.get(495));
-        MAGENTA_STAINED_GLASS = REGISTRY.register(data.get(496));
-        LIGHT_BLUE_STAINED_GLASS = REGISTRY.register(data.get(497));
-        YELLOW_STAINED_GLASS = REGISTRY.register(data.get(498));
-        LIME_STAINED_GLASS = REGISTRY.register(data.get(499));
-        PINK_STAINED_GLASS = REGISTRY.register(data.get(500));
-        GRAY_STAINED_GLASS = REGISTRY.register(data.get(501));
-        LIGHT_GRAY_STAINED_GLASS = REGISTRY.register(data.get(502));
-        CYAN_STAINED_GLASS = REGISTRY.register(data.get(503));
-        PURPLE_STAINED_GLASS = REGISTRY.register(data.get(504));
-        BLUE_STAINED_GLASS = REGISTRY.register(data.get(505));
-        BROWN_STAINED_GLASS = REGISTRY.register(data.get(506));
-        GREEN_STAINED_GLASS = REGISTRY.register(data.get(507));
-        RED_STAINED_GLASS = REGISTRY.register(data.get(508));
-        BLACK_STAINED_GLASS = REGISTRY.register(data.get(509));
-        WHITE_STAINED_GLASS_PANE = REGISTRY.register(data.get(510));
-        ORANGE_STAINED_GLASS_PANE = REGISTRY.register(data.get(511));
-        MAGENTA_STAINED_GLASS_PANE = REGISTRY.register(data.get(512));
-        LIGHT_BLUE_STAINED_GLASS_PANE = REGISTRY.register(data.get(513));
-        YELLOW_STAINED_GLASS_PANE = REGISTRY.register(data.get(514));
-        LIME_STAINED_GLASS_PANE = REGISTRY.register(data.get(515));
-        PINK_STAINED_GLASS_PANE = REGISTRY.register(data.get(516));
-        GRAY_STAINED_GLASS_PANE = REGISTRY.register(data.get(517));
-        LIGHT_GRAY_STAINED_GLASS_PANE = REGISTRY.register(data.get(518));
-        CYAN_STAINED_GLASS_PANE = REGISTRY.register(data.get(519));
-        PURPLE_STAINED_GLASS_PANE = REGISTRY.register(data.get(520));
-        BLUE_STAINED_GLASS_PANE = REGISTRY.register(data.get(521));
-        BROWN_STAINED_GLASS_PANE = REGISTRY.register(data.get(522));
-        GREEN_STAINED_GLASS_PANE = REGISTRY.register(data.get(523));
-        RED_STAINED_GLASS_PANE = REGISTRY.register(data.get(524));
-        BLACK_STAINED_GLASS_PANE = REGISTRY.register(data.get(525));
-        PRISMARINE = REGISTRY.register(data.get(526));
-        PRISMARINE_BRICKS = REGISTRY.register(data.get(527));
-        DARK_PRISMARINE = REGISTRY.register(data.get(528));
-        PRISMARINE_STAIRS = REGISTRY.register(data.get(529));
-        PRISMARINE_BRICK_STAIRS = REGISTRY.register(data.get(530));
-        DARK_PRISMARINE_STAIRS = REGISTRY.register(data.get(531));
-        SEA_LANTERN = REGISTRY.register(data.get(532));
-        RED_SANDSTONE = REGISTRY.register(data.get(533));
-        CHISELED_RED_SANDSTONE = REGISTRY.register(data.get(534));
-        CUT_RED_SANDSTONE = REGISTRY.register(data.get(535));
-        RED_SANDSTONE_STAIRS = REGISTRY.register(data.get(536));
-        REPEATING_COMMAND_BLOCK = REGISTRY.register(data.get(537));
-        CHAIN_COMMAND_BLOCK = REGISTRY.register(data.get(538));
-        MAGMA_BLOCK = REGISTRY.register(data.get(539));
-        NETHER_WART_BLOCK = REGISTRY.register(data.get(540));
-        WARPED_WART_BLOCK = REGISTRY.register(data.get(541));
-        RED_NETHER_BRICKS = REGISTRY.register(data.get(542));
-        BONE_BLOCK = REGISTRY.register(data.get(543));
-        STRUCTURE_VOID = REGISTRY.register(data.get(544));
-        SHULKER_BOX = REGISTRY.register(data.get(545));
-        WHITE_SHULKER_BOX = REGISTRY.register(data.get(546));
-        ORANGE_SHULKER_BOX = REGISTRY.register(data.get(547));
-        MAGENTA_SHULKER_BOX = REGISTRY.register(data.get(548));
-        LIGHT_BLUE_SHULKER_BOX = REGISTRY.register(data.get(549));
-        YELLOW_SHULKER_BOX = REGISTRY.register(data.get(550));
-        LIME_SHULKER_BOX = REGISTRY.register(data.get(551));
-        PINK_SHULKER_BOX = REGISTRY.register(data.get(552));
-        GRAY_SHULKER_BOX = REGISTRY.register(data.get(553));
-        LIGHT_GRAY_SHULKER_BOX = REGISTRY.register(data.get(554));
-        CYAN_SHULKER_BOX = REGISTRY.register(data.get(555));
-        PURPLE_SHULKER_BOX = REGISTRY.register(data.get(556));
-        BLUE_SHULKER_BOX = REGISTRY.register(data.get(557));
-        BROWN_SHULKER_BOX = REGISTRY.register(data.get(558));
-        GREEN_SHULKER_BOX = REGISTRY.register(data.get(559));
-        RED_SHULKER_BOX = REGISTRY.register(data.get(560));
-        BLACK_SHULKER_BOX = REGISTRY.register(data.get(561));
-        WHITE_GLAZED_TERRACOTTA = REGISTRY.register(data.get(562));
-        ORANGE_GLAZED_TERRACOTTA = REGISTRY.register(data.get(563));
-        MAGENTA_GLAZED_TERRACOTTA = REGISTRY.register(data.get(564));
-        LIGHT_BLUE_GLAZED_TERRACOTTA = REGISTRY.register(data.get(565));
-        YELLOW_GLAZED_TERRACOTTA = REGISTRY.register(data.get(566));
-        LIME_GLAZED_TERRACOTTA = REGISTRY.register(data.get(567));
-        PINK_GLAZED_TERRACOTTA = REGISTRY.register(data.get(568));
-        GRAY_GLAZED_TERRACOTTA = REGISTRY.register(data.get(569));
-        LIGHT_GRAY_GLAZED_TERRACOTTA = REGISTRY.register(data.get(570));
-        CYAN_GLAZED_TERRACOTTA = REGISTRY.register(data.get(571));
-        PURPLE_GLAZED_TERRACOTTA = REGISTRY.register(data.get(572));
-        BLUE_GLAZED_TERRACOTTA = REGISTRY.register(data.get(573));
-        BROWN_GLAZED_TERRACOTTA = REGISTRY.register(data.get(574));
-        GREEN_GLAZED_TERRACOTTA = REGISTRY.register(data.get(575));
-        RED_GLAZED_TERRACOTTA = REGISTRY.register(data.get(576));
-        BLACK_GLAZED_TERRACOTTA = REGISTRY.register(data.get(577));
-        WHITE_CONCRETE = REGISTRY.register(data.get(578));
-        ORANGE_CONCRETE = REGISTRY.register(data.get(579));
-        MAGENTA_CONCRETE = REGISTRY.register(data.get(580));
-        LIGHT_BLUE_CONCRETE = REGISTRY.register(data.get(581));
-        YELLOW_CONCRETE = REGISTRY.register(data.get(582));
-        LIME_CONCRETE = REGISTRY.register(data.get(583));
-        PINK_CONCRETE = REGISTRY.register(data.get(584));
-        GRAY_CONCRETE = REGISTRY.register(data.get(585));
-        LIGHT_GRAY_CONCRETE = REGISTRY.register(data.get(586));
-        CYAN_CONCRETE = REGISTRY.register(data.get(587));
-        PURPLE_CONCRETE = REGISTRY.register(data.get(588));
-        BLUE_CONCRETE = REGISTRY.register(data.get(589));
-        BROWN_CONCRETE = REGISTRY.register(data.get(590));
-        GREEN_CONCRETE = REGISTRY.register(data.get(591));
-        RED_CONCRETE = REGISTRY.register(data.get(592));
-        BLACK_CONCRETE = REGISTRY.register(data.get(593));
-        WHITE_CONCRETE_POWDER = REGISTRY.register(data.get(594));
-        ORANGE_CONCRETE_POWDER = REGISTRY.register(data.get(595));
-        MAGENTA_CONCRETE_POWDER = REGISTRY.register(data.get(596));
-        LIGHT_BLUE_CONCRETE_POWDER = REGISTRY.register(data.get(597));
-        YELLOW_CONCRETE_POWDER = REGISTRY.register(data.get(598));
-        LIME_CONCRETE_POWDER = REGISTRY.register(data.get(599));
-        PINK_CONCRETE_POWDER = REGISTRY.register(data.get(600));
-        GRAY_CONCRETE_POWDER = REGISTRY.register(data.get(601));
-        LIGHT_GRAY_CONCRETE_POWDER = REGISTRY.register(data.get(602));
-        CYAN_CONCRETE_POWDER = REGISTRY.register(data.get(603));
-        PURPLE_CONCRETE_POWDER = REGISTRY.register(data.get(604));
-        BLUE_CONCRETE_POWDER = REGISTRY.register(data.get(605));
-        BROWN_CONCRETE_POWDER = REGISTRY.register(data.get(606));
-        GREEN_CONCRETE_POWDER = REGISTRY.register(data.get(607));
-        RED_CONCRETE_POWDER = REGISTRY.register(data.get(608));
-        BLACK_CONCRETE_POWDER = REGISTRY.register(data.get(609));
-        TURTLE_EGG = REGISTRY.register(data.get(610));
-        SNIFFER_EGG = REGISTRY.register(data.get(611));
-        DEAD_TUBE_CORAL_BLOCK = REGISTRY.register(data.get(612));
-        DEAD_BRAIN_CORAL_BLOCK = REGISTRY.register(data.get(613));
-        DEAD_BUBBLE_CORAL_BLOCK = REGISTRY.register(data.get(614));
-        DEAD_FIRE_CORAL_BLOCK = REGISTRY.register(data.get(615));
-        DEAD_HORN_CORAL_BLOCK = REGISTRY.register(data.get(616));
-        TUBE_CORAL_BLOCK = REGISTRY.register(data.get(617));
-        BRAIN_CORAL_BLOCK = REGISTRY.register(data.get(618));
-        BUBBLE_CORAL_BLOCK = REGISTRY.register(data.get(619));
-        FIRE_CORAL_BLOCK = REGISTRY.register(data.get(620));
-        HORN_CORAL_BLOCK = REGISTRY.register(data.get(621));
-        TUBE_CORAL = REGISTRY.register(data.get(622));
-        BRAIN_CORAL = REGISTRY.register(data.get(623));
-        BUBBLE_CORAL = REGISTRY.register(data.get(624));
-        FIRE_CORAL = REGISTRY.register(data.get(625));
-        HORN_CORAL = REGISTRY.register(data.get(626));
-        DEAD_BRAIN_CORAL = REGISTRY.register(data.get(627));
-        DEAD_BUBBLE_CORAL = REGISTRY.register(data.get(628));
-        DEAD_FIRE_CORAL = REGISTRY.register(data.get(629));
-        DEAD_HORN_CORAL = REGISTRY.register(data.get(630));
-        DEAD_TUBE_CORAL = REGISTRY.register(data.get(631));
-        TUBE_CORAL_FAN = REGISTRY.register(data.get(632));
-        BRAIN_CORAL_FAN = REGISTRY.register(data.get(633));
-        BUBBLE_CORAL_FAN = REGISTRY.register(data.get(634));
-        FIRE_CORAL_FAN = REGISTRY.register(data.get(635));
-        HORN_CORAL_FAN = REGISTRY.register(data.get(636));
-        DEAD_TUBE_CORAL_FAN = REGISTRY.register(data.get(637));
-        DEAD_BRAIN_CORAL_FAN = REGISTRY.register(data.get(638));
-        DEAD_BUBBLE_CORAL_FAN = REGISTRY.register(data.get(639));
-        DEAD_FIRE_CORAL_FAN = REGISTRY.register(data.get(640));
-        DEAD_HORN_CORAL_FAN = REGISTRY.register(data.get(641));
-        BLUE_ICE = REGISTRY.register(data.get(642));
-        CONDUIT = REGISTRY.register(data.get(643));
-        POLISHED_GRANITE_STAIRS = REGISTRY.register(data.get(644));
-        SMOOTH_RED_SANDSTONE_STAIRS = REGISTRY.register(data.get(645));
-        MOSSY_STONE_BRICK_STAIRS = REGISTRY.register(data.get(646));
-        POLISHED_DIORITE_STAIRS = REGISTRY.register(data.get(647));
-        MOSSY_COBBLESTONE_STAIRS = REGISTRY.register(data.get(648));
-        END_STONE_BRICK_STAIRS = REGISTRY.register(data.get(649));
-        STONE_STAIRS = REGISTRY.register(data.get(650));
-        SMOOTH_SANDSTONE_STAIRS = REGISTRY.register(data.get(651));
-        SMOOTH_QUARTZ_STAIRS = REGISTRY.register(data.get(652));
-        GRANITE_STAIRS = REGISTRY.register(data.get(653));
-        ANDESITE_STAIRS = REGISTRY.register(data.get(654));
-        RED_NETHER_BRICK_STAIRS = REGISTRY.register(data.get(655));
-        POLISHED_ANDESITE_STAIRS = REGISTRY.register(data.get(656));
-        DIORITE_STAIRS = REGISTRY.register(data.get(657));
-        COBBLED_DEEPSLATE_STAIRS = REGISTRY.register(data.get(658));
-        POLISHED_DEEPSLATE_STAIRS = REGISTRY.register(data.get(659));
-        DEEPSLATE_BRICK_STAIRS = REGISTRY.register(data.get(660));
-        DEEPSLATE_TILE_STAIRS = REGISTRY.register(data.get(661));
-        POLISHED_GRANITE_SLAB = REGISTRY.register(data.get(662));
-        SMOOTH_RED_SANDSTONE_SLAB = REGISTRY.register(data.get(663));
-        MOSSY_STONE_BRICK_SLAB = REGISTRY.register(data.get(664));
-        POLISHED_DIORITE_SLAB = REGISTRY.register(data.get(665));
-        MOSSY_COBBLESTONE_SLAB = REGISTRY.register(data.get(666));
-        END_STONE_BRICK_SLAB = REGISTRY.register(data.get(667));
-        SMOOTH_SANDSTONE_SLAB = REGISTRY.register(data.get(668));
-        SMOOTH_QUARTZ_SLAB = REGISTRY.register(data.get(669));
-        GRANITE_SLAB = REGISTRY.register(data.get(670));
-        ANDESITE_SLAB = REGISTRY.register(data.get(671));
-        RED_NETHER_BRICK_SLAB = REGISTRY.register(data.get(672));
-        POLISHED_ANDESITE_SLAB = REGISTRY.register(data.get(673));
-        DIORITE_SLAB = REGISTRY.register(data.get(674));
-        COBBLED_DEEPSLATE_SLAB = REGISTRY.register(data.get(675));
-        POLISHED_DEEPSLATE_SLAB = REGISTRY.register(data.get(676));
-        DEEPSLATE_BRICK_SLAB = REGISTRY.register(data.get(677));
-        DEEPSLATE_TILE_SLAB = REGISTRY.register(data.get(678));
-        SCAFFOLDING = REGISTRY.register(data.get(679));
-        REDSTONE = REGISTRY.register(data.get(680));
-        REDSTONE_TORCH = REGISTRY.register(data.get(681));
-        REDSTONE_BLOCK = REGISTRY.register(data.get(682));
-        REPEATER = REGISTRY.register(data.get(683));
-        COMPARATOR = REGISTRY.register(data.get(684));
-        PISTON = REGISTRY.register(data.get(685));
-        STICKY_PISTON = REGISTRY.register(data.get(686));
-        SLIME_BLOCK = REGISTRY.register(data.get(687));
-        HONEY_BLOCK = REGISTRY.register(data.get(688));
-        OBSERVER = REGISTRY.register(data.get(689));
-        HOPPER = REGISTRY.register(data.get(690));
-        DISPENSER = REGISTRY.register(data.get(691));
-        DROPPER = REGISTRY.register(data.get(692));
-        LECTERN = REGISTRY.register(data.get(693));
-        TARGET = REGISTRY.register(data.get(694));
-        LEVER = REGISTRY.register(data.get(695));
-        LIGHTNING_ROD = REGISTRY.register(data.get(696));
-        DAYLIGHT_DETECTOR = REGISTRY.register(data.get(697));
-        SCULK_SENSOR = REGISTRY.register(data.get(698));
-        CALIBRATED_SCULK_SENSOR = REGISTRY.register(data.get(699));
-        TRIPWIRE_HOOK = REGISTRY.register(data.get(700));
-        TRAPPED_CHEST = REGISTRY.register(data.get(701));
-        TNT = REGISTRY.register(data.get(702));
-        REDSTONE_LAMP = REGISTRY.register(data.get(703));
-        NOTE_BLOCK = REGISTRY.register(data.get(704));
-        STONE_BUTTON = REGISTRY.register(data.get(705));
-        POLISHED_BLACKSTONE_BUTTON = REGISTRY.register(data.get(706));
-        OAK_BUTTON = REGISTRY.register(data.get(707));
-        SPRUCE_BUTTON = REGISTRY.register(data.get(708));
-        BIRCH_BUTTON = REGISTRY.register(data.get(709));
-        JUNGLE_BUTTON = REGISTRY.register(data.get(710));
-        ACACIA_BUTTON = REGISTRY.register(data.get(711));
-        CHERRY_BUTTON = REGISTRY.register(data.get(712));
-        DARK_OAK_BUTTON = REGISTRY.register(data.get(713));
-        PALE_OAK_BUTTON = REGISTRY.register(data.get(714));
-        MANGROVE_BUTTON = REGISTRY.register(data.get(715));
-        BAMBOO_BUTTON = REGISTRY.register(data.get(716));
-        CRIMSON_BUTTON = REGISTRY.register(data.get(717));
-        WARPED_BUTTON = REGISTRY.register(data.get(718));
-        STONE_PRESSURE_PLATE = REGISTRY.register(data.get(719));
-        POLISHED_BLACKSTONE_PRESSURE_PLATE = REGISTRY.register(data.get(720));
-        LIGHT_WEIGHTED_PRESSURE_PLATE = REGISTRY.register(data.get(721));
-        HEAVY_WEIGHTED_PRESSURE_PLATE = REGISTRY.register(data.get(722));
-        OAK_PRESSURE_PLATE = REGISTRY.register(data.get(723));
-        SPRUCE_PRESSURE_PLATE = REGISTRY.register(data.get(724));
-        BIRCH_PRESSURE_PLATE = REGISTRY.register(data.get(725));
-        JUNGLE_PRESSURE_PLATE = REGISTRY.register(data.get(726));
-        ACACIA_PRESSURE_PLATE = REGISTRY.register(data.get(727));
-        CHERRY_PRESSURE_PLATE = REGISTRY.register(data.get(728));
-        DARK_OAK_PRESSURE_PLATE = REGISTRY.register(data.get(729));
-        PALE_OAK_PRESSURE_PLATE = REGISTRY.register(data.get(730));
-        MANGROVE_PRESSURE_PLATE = REGISTRY.register(data.get(731));
-        BAMBOO_PRESSURE_PLATE = REGISTRY.register(data.get(732));
-        CRIMSON_PRESSURE_PLATE = REGISTRY.register(data.get(733));
-        WARPED_PRESSURE_PLATE = REGISTRY.register(data.get(734));
-        IRON_DOOR = REGISTRY.register(data.get(735));
-        OAK_DOOR = REGISTRY.register(data.get(736));
-        SPRUCE_DOOR = REGISTRY.register(data.get(737));
-        BIRCH_DOOR = REGISTRY.register(data.get(738));
-        JUNGLE_DOOR = REGISTRY.register(data.get(739));
-        ACACIA_DOOR = REGISTRY.register(data.get(740));
-        CHERRY_DOOR = REGISTRY.register(data.get(741));
-        DARK_OAK_DOOR = REGISTRY.register(data.get(742));
-        PALE_OAK_DOOR = REGISTRY.register(data.get(743));
-        MANGROVE_DOOR = REGISTRY.register(data.get(744));
-        BAMBOO_DOOR = REGISTRY.register(data.get(745));
-        CRIMSON_DOOR = REGISTRY.register(data.get(746));
-        WARPED_DOOR = REGISTRY.register(data.get(747));
-        COPPER_DOOR = REGISTRY.register(data.get(748));
-        EXPOSED_COPPER_DOOR = REGISTRY.register(data.get(749));
-        WEATHERED_COPPER_DOOR = REGISTRY.register(data.get(750));
-        OXIDIZED_COPPER_DOOR = REGISTRY.register(data.get(751));
-        WAXED_COPPER_DOOR = REGISTRY.register(data.get(752));
-        WAXED_EXPOSED_COPPER_DOOR = REGISTRY.register(data.get(753));
-        WAXED_WEATHERED_COPPER_DOOR = REGISTRY.register(data.get(754));
-        WAXED_OXIDIZED_COPPER_DOOR = REGISTRY.register(data.get(755));
-        IRON_TRAPDOOR = REGISTRY.register(data.get(756));
-        OAK_TRAPDOOR = REGISTRY.register(data.get(757));
-        SPRUCE_TRAPDOOR = REGISTRY.register(data.get(758));
-        BIRCH_TRAPDOOR = REGISTRY.register(data.get(759));
-        JUNGLE_TRAPDOOR = REGISTRY.register(data.get(760));
-        ACACIA_TRAPDOOR = REGISTRY.register(data.get(761));
-        CHERRY_TRAPDOOR = REGISTRY.register(data.get(762));
-        DARK_OAK_TRAPDOOR = REGISTRY.register(data.get(763));
-        PALE_OAK_TRAPDOOR = REGISTRY.register(data.get(764));
-        MANGROVE_TRAPDOOR = REGISTRY.register(data.get(765));
-        BAMBOO_TRAPDOOR = REGISTRY.register(data.get(766));
-        CRIMSON_TRAPDOOR = REGISTRY.register(data.get(767));
-        WARPED_TRAPDOOR = REGISTRY.register(data.get(768));
-        COPPER_TRAPDOOR = REGISTRY.register(data.get(769));
-        EXPOSED_COPPER_TRAPDOOR = REGISTRY.register(data.get(770));
-        WEATHERED_COPPER_TRAPDOOR = REGISTRY.register(data.get(771));
-        OXIDIZED_COPPER_TRAPDOOR = REGISTRY.register(data.get(772));
-        WAXED_COPPER_TRAPDOOR = REGISTRY.register(data.get(773));
-        WAXED_EXPOSED_COPPER_TRAPDOOR = REGISTRY.register(data.get(774));
-        WAXED_WEATHERED_COPPER_TRAPDOOR = REGISTRY.register(data.get(775));
-        WAXED_OXIDIZED_COPPER_TRAPDOOR = REGISTRY.register(data.get(776));
-        OAK_FENCE_GATE = REGISTRY.register(data.get(777));
-        SPRUCE_FENCE_GATE = REGISTRY.register(data.get(778));
-        BIRCH_FENCE_GATE = REGISTRY.register(data.get(779));
-        JUNGLE_FENCE_GATE = REGISTRY.register(data.get(780));
-        ACACIA_FENCE_GATE = REGISTRY.register(data.get(781));
-        CHERRY_FENCE_GATE = REGISTRY.register(data.get(782));
-        DARK_OAK_FENCE_GATE = REGISTRY.register(data.get(783));
-        PALE_OAK_FENCE_GATE = REGISTRY.register(data.get(784));
-        MANGROVE_FENCE_GATE = REGISTRY.register(data.get(785));
-        BAMBOO_FENCE_GATE = REGISTRY.register(data.get(786));
-        CRIMSON_FENCE_GATE = REGISTRY.register(data.get(787));
-        WARPED_FENCE_GATE = REGISTRY.register(data.get(788));
-        POWERED_RAIL = REGISTRY.register(data.get(789));
-        DETECTOR_RAIL = REGISTRY.register(data.get(790));
-        RAIL = REGISTRY.register(data.get(791));
-        ACTIVATOR_RAIL = REGISTRY.register(data.get(792));
-        SADDLE = REGISTRY.register(data.get(793));
-        MINECART = REGISTRY.register(data.get(794));
-        CHEST_MINECART = REGISTRY.register(data.get(795));
-        FURNACE_MINECART = REGISTRY.register(data.get(796));
-        TNT_MINECART = REGISTRY.register(data.get(797));
-        HOPPER_MINECART = REGISTRY.register(data.get(798));
-        CARROT_ON_A_STICK = REGISTRY.register(data.get(799));
-        WARPED_FUNGUS_ON_A_STICK = REGISTRY.register(data.get(800));
-        PHANTOM_MEMBRANE = REGISTRY.register(data.get(801));
-        ELYTRA = REGISTRY.register(data.get(802));
-        OAK_BOAT = REGISTRY.register(data.get(803));
-        OAK_CHEST_BOAT = REGISTRY.register(data.get(804));
-        SPRUCE_BOAT = REGISTRY.register(data.get(805));
-        SPRUCE_CHEST_BOAT = REGISTRY.register(data.get(806));
-        BIRCH_BOAT = REGISTRY.register(data.get(807));
-        BIRCH_CHEST_BOAT = REGISTRY.register(data.get(808));
-        JUNGLE_BOAT = REGISTRY.register(data.get(809));
-        JUNGLE_CHEST_BOAT = REGISTRY.register(data.get(810));
-        ACACIA_BOAT = REGISTRY.register(data.get(811));
-        ACACIA_CHEST_BOAT = REGISTRY.register(data.get(812));
-        CHERRY_BOAT = REGISTRY.register(data.get(813));
-        CHERRY_CHEST_BOAT = REGISTRY.register(data.get(814));
-        DARK_OAK_BOAT = REGISTRY.register(data.get(815));
-        DARK_OAK_CHEST_BOAT = REGISTRY.register(data.get(816));
-        PALE_OAK_BOAT = REGISTRY.register(data.get(817));
-        PALE_OAK_CHEST_BOAT = REGISTRY.register(data.get(818));
-        MANGROVE_BOAT = REGISTRY.register(data.get(819));
-        MANGROVE_CHEST_BOAT = REGISTRY.register(data.get(820));
-        BAMBOO_RAFT = REGISTRY.register(data.get(821));
-        BAMBOO_CHEST_RAFT = REGISTRY.register(data.get(822));
-        STRUCTURE_BLOCK = REGISTRY.register(data.get(823));
-        JIGSAW = REGISTRY.register(data.get(824));
-        TURTLE_HELMET = REGISTRY.register(data.get(825));
-        TURTLE_SCUTE = REGISTRY.register(data.get(826));
-        ARMADILLO_SCUTE = REGISTRY.register(data.get(827));
-        WOLF_ARMOR = REGISTRY.register(data.get(828));
-        FLINT_AND_STEEL = REGISTRY.register(data.get(829));
-        BOWL = REGISTRY.register(data.get(830));
-        APPLE = REGISTRY.register(data.get(831));
-        BOW = REGISTRY.register(data.get(832));
-        ARROW = REGISTRY.register(data.get(833));
-        COAL = REGISTRY.register(data.get(834));
-        CHARCOAL = REGISTRY.register(data.get(835));
-        DIAMOND = REGISTRY.register(data.get(836));
-        EMERALD = REGISTRY.register(data.get(837));
-        LAPIS_LAZULI = REGISTRY.register(data.get(838));
-        QUARTZ = REGISTRY.register(data.get(839));
-        AMETHYST_SHARD = REGISTRY.register(data.get(840));
-        RAW_IRON = REGISTRY.register(data.get(841));
-        IRON_INGOT = REGISTRY.register(data.get(842));
-        RAW_COPPER = REGISTRY.register(data.get(843));
-        COPPER_INGOT = REGISTRY.register(data.get(844));
-        RAW_GOLD = REGISTRY.register(data.get(845));
-        GOLD_INGOT = REGISTRY.register(data.get(846));
-        NETHERITE_INGOT = REGISTRY.register(data.get(847));
-        NETHERITE_SCRAP = REGISTRY.register(data.get(848));
-        WOODEN_SWORD = REGISTRY.register(data.get(849));
-        WOODEN_SHOVEL = REGISTRY.register(data.get(850));
-        WOODEN_PICKAXE = REGISTRY.register(data.get(851));
-        WOODEN_AXE = REGISTRY.register(data.get(852));
-        WOODEN_HOE = REGISTRY.register(data.get(853));
-        STONE_SWORD = REGISTRY.register(data.get(854));
-        STONE_SHOVEL = REGISTRY.register(data.get(855));
-        STONE_PICKAXE = REGISTRY.register(data.get(856));
-        STONE_AXE = REGISTRY.register(data.get(857));
-        STONE_HOE = REGISTRY.register(data.get(858));
-        GOLDEN_SWORD = REGISTRY.register(data.get(859));
-        GOLDEN_SHOVEL = REGISTRY.register(data.get(860));
-        GOLDEN_PICKAXE = REGISTRY.register(data.get(861));
-        GOLDEN_AXE = REGISTRY.register(data.get(862));
-        GOLDEN_HOE = REGISTRY.register(data.get(863));
-        IRON_SWORD = REGISTRY.register(data.get(864));
-        IRON_SHOVEL = REGISTRY.register(data.get(865));
-        IRON_PICKAXE = REGISTRY.register(data.get(866));
-        IRON_AXE = REGISTRY.register(data.get(867));
-        IRON_HOE = REGISTRY.register(data.get(868));
-        DIAMOND_SWORD = REGISTRY.register(data.get(869));
-        DIAMOND_SHOVEL = REGISTRY.register(data.get(870));
-        DIAMOND_PICKAXE = REGISTRY.register(data.get(871));
-        DIAMOND_AXE = REGISTRY.register(data.get(872));
-        DIAMOND_HOE = REGISTRY.register(data.get(873));
-        NETHERITE_SWORD = REGISTRY.register(data.get(874));
-        NETHERITE_SHOVEL = REGISTRY.register(data.get(875));
-        NETHERITE_PICKAXE = REGISTRY.register(data.get(876));
-        NETHERITE_AXE = REGISTRY.register(data.get(877));
-        NETHERITE_HOE = REGISTRY.register(data.get(878));
-        STICK = REGISTRY.register(data.get(879));
-        MUSHROOM_STEW = REGISTRY.register(data.get(880));
-        STRING = REGISTRY.register(data.get(881));
-        FEATHER = REGISTRY.register(data.get(882));
-        GUNPOWDER = REGISTRY.register(data.get(883));
-        WHEAT_SEEDS = REGISTRY.register(data.get(884));
-        WHEAT = REGISTRY.register(data.get(885));
-        BREAD = REGISTRY.register(data.get(886));
-        LEATHER_HELMET = REGISTRY.register(data.get(887));
-        LEATHER_CHESTPLATE = REGISTRY.register(data.get(888));
-        LEATHER_LEGGINGS = REGISTRY.register(data.get(889));
-        LEATHER_BOOTS = REGISTRY.register(data.get(890));
-        CHAINMAIL_HELMET = REGISTRY.register(data.get(891));
-        CHAINMAIL_CHESTPLATE = REGISTRY.register(data.get(892));
-        CHAINMAIL_LEGGINGS = REGISTRY.register(data.get(893));
-        CHAINMAIL_BOOTS = REGISTRY.register(data.get(894));
-        IRON_HELMET = REGISTRY.register(data.get(895));
-        IRON_CHESTPLATE = REGISTRY.register(data.get(896));
-        IRON_LEGGINGS = REGISTRY.register(data.get(897));
-        IRON_BOOTS = REGISTRY.register(data.get(898));
-        DIAMOND_HELMET = REGISTRY.register(data.get(899));
-        DIAMOND_CHESTPLATE = REGISTRY.register(data.get(900));
-        DIAMOND_LEGGINGS = REGISTRY.register(data.get(901));
-        DIAMOND_BOOTS = REGISTRY.register(data.get(902));
-        GOLDEN_HELMET = REGISTRY.register(data.get(903));
-        GOLDEN_CHESTPLATE = REGISTRY.register(data.get(904));
-        GOLDEN_LEGGINGS = REGISTRY.register(data.get(905));
-        GOLDEN_BOOTS = REGISTRY.register(data.get(906));
-        NETHERITE_HELMET = REGISTRY.register(data.get(907));
-        NETHERITE_CHESTPLATE = REGISTRY.register(data.get(908));
-        NETHERITE_LEGGINGS = REGISTRY.register(data.get(909));
-        NETHERITE_BOOTS = REGISTRY.register(data.get(910));
-        FLINT = REGISTRY.register(data.get(911));
-        PORKCHOP = REGISTRY.register(data.get(912));
-        COOKED_PORKCHOP = REGISTRY.register(data.get(913));
-        PAINTING = REGISTRY.register(data.get(914));
-        GOLDEN_APPLE = REGISTRY.register(data.get(915));
-        ENCHANTED_GOLDEN_APPLE = REGISTRY.register(data.get(916));
-        OAK_SIGN = REGISTRY.register(data.get(917));
-        SPRUCE_SIGN = REGISTRY.register(data.get(918));
-        BIRCH_SIGN = REGISTRY.register(data.get(919));
-        JUNGLE_SIGN = REGISTRY.register(data.get(920));
-        ACACIA_SIGN = REGISTRY.register(data.get(921));
-        CHERRY_SIGN = REGISTRY.register(data.get(922));
-        DARK_OAK_SIGN = REGISTRY.register(data.get(923));
-        PALE_OAK_SIGN = REGISTRY.register(data.get(924));
-        MANGROVE_SIGN = REGISTRY.register(data.get(925));
-        BAMBOO_SIGN = REGISTRY.register(data.get(926));
-        CRIMSON_SIGN = REGISTRY.register(data.get(927));
-        WARPED_SIGN = REGISTRY.register(data.get(928));
-        OAK_HANGING_SIGN = REGISTRY.register(data.get(929));
-        SPRUCE_HANGING_SIGN = REGISTRY.register(data.get(930));
-        BIRCH_HANGING_SIGN = REGISTRY.register(data.get(931));
-        JUNGLE_HANGING_SIGN = REGISTRY.register(data.get(932));
-        ACACIA_HANGING_SIGN = REGISTRY.register(data.get(933));
-        CHERRY_HANGING_SIGN = REGISTRY.register(data.get(934));
-        DARK_OAK_HANGING_SIGN = REGISTRY.register(data.get(935));
-        PALE_OAK_HANGING_SIGN = REGISTRY.register(data.get(936));
-        MANGROVE_HANGING_SIGN = REGISTRY.register(data.get(937));
-        BAMBOO_HANGING_SIGN = REGISTRY.register(data.get(938));
-        CRIMSON_HANGING_SIGN = REGISTRY.register(data.get(939));
-        WARPED_HANGING_SIGN = REGISTRY.register(data.get(940));
-        BUCKET = REGISTRY.register(data.get(941));
-        WATER_BUCKET = REGISTRY.register(data.get(942));
-        LAVA_BUCKET = REGISTRY.register(data.get(943));
-        POWDER_SNOW_BUCKET = REGISTRY.register(data.get(944));
-        SNOWBALL = REGISTRY.register(data.get(945));
-        LEATHER = REGISTRY.register(data.get(946));
-        MILK_BUCKET = REGISTRY.register(data.get(947));
-        PUFFERFISH_BUCKET = REGISTRY.register(data.get(948));
-        SALMON_BUCKET = REGISTRY.register(data.get(949));
-        COD_BUCKET = REGISTRY.register(data.get(950));
-        TROPICAL_FISH_BUCKET = REGISTRY.register(data.get(951));
-        AXOLOTL_BUCKET = REGISTRY.register(data.get(952));
-        TADPOLE_BUCKET = REGISTRY.register(data.get(953));
-        BRICK = REGISTRY.register(data.get(954));
-        CLAY_BALL = REGISTRY.register(data.get(955));
-        DRIED_KELP_BLOCK = REGISTRY.register(data.get(956));
-        PAPER = REGISTRY.register(data.get(957));
-        BOOK = REGISTRY.register(data.get(958));
-        SLIME_BALL = REGISTRY.register(data.get(959));
-        EGG = REGISTRY.register(data.get(960));
-        COMPASS = REGISTRY.register(data.get(961));
-        RECOVERY_COMPASS = REGISTRY.register(data.get(962));
-        BUNDLE = REGISTRY.register(data.get(963));
-        WHITE_BUNDLE = REGISTRY.register(data.get(964));
-        ORANGE_BUNDLE = REGISTRY.register(data.get(965));
-        MAGENTA_BUNDLE = REGISTRY.register(data.get(966));
-        LIGHT_BLUE_BUNDLE = REGISTRY.register(data.get(967));
-        YELLOW_BUNDLE = REGISTRY.register(data.get(968));
-        LIME_BUNDLE = REGISTRY.register(data.get(969));
-        PINK_BUNDLE = REGISTRY.register(data.get(970));
-        GRAY_BUNDLE = REGISTRY.register(data.get(971));
-        LIGHT_GRAY_BUNDLE = REGISTRY.register(data.get(972));
-        CYAN_BUNDLE = REGISTRY.register(data.get(973));
-        PURPLE_BUNDLE = REGISTRY.register(data.get(974));
-        BLUE_BUNDLE = REGISTRY.register(data.get(975));
-        BROWN_BUNDLE = REGISTRY.register(data.get(976));
-        GREEN_BUNDLE = REGISTRY.register(data.get(977));
-        RED_BUNDLE = REGISTRY.register(data.get(978));
-        BLACK_BUNDLE = REGISTRY.register(data.get(979));
-        FISHING_ROD = REGISTRY.register(data.get(980));
-        CLOCK = REGISTRY.register(data.get(981));
-        SPYGLASS = REGISTRY.register(data.get(982));
-        GLOWSTONE_DUST = REGISTRY.register(data.get(983));
-        COD = REGISTRY.register(data.get(984));
-        SALMON = REGISTRY.register(data.get(985));
-        TROPICAL_FISH = REGISTRY.register(data.get(986));
-        PUFFERFISH = REGISTRY.register(data.get(987));
-        COOKED_COD = REGISTRY.register(data.get(988));
-        COOKED_SALMON = REGISTRY.register(data.get(989));
-        INK_SAC = REGISTRY.register(data.get(990));
-        GLOW_INK_SAC = REGISTRY.register(data.get(991));
-        COCOA_BEANS = REGISTRY.register(data.get(992));
-        WHITE_DYE = REGISTRY.register(data.get(993));
-        ORANGE_DYE = REGISTRY.register(data.get(994));
-        MAGENTA_DYE = REGISTRY.register(data.get(995));
-        LIGHT_BLUE_DYE = REGISTRY.register(data.get(996));
-        YELLOW_DYE = REGISTRY.register(data.get(997));
-        LIME_DYE = REGISTRY.register(data.get(998));
-        PINK_DYE = REGISTRY.register(data.get(999));
-        GRAY_DYE = REGISTRY.register(data.get(1000));
-        LIGHT_GRAY_DYE = REGISTRY.register(data.get(1001));
-        CYAN_DYE = REGISTRY.register(data.get(1002));
-        PURPLE_DYE = REGISTRY.register(data.get(1003));
-        BLUE_DYE = REGISTRY.register(data.get(1004));
-        BROWN_DYE = REGISTRY.register(data.get(1005));
-        GREEN_DYE = REGISTRY.register(data.get(1006));
-        RED_DYE = REGISTRY.register(data.get(1007));
-        BLACK_DYE = REGISTRY.register(data.get(1008));
-        BONE_MEAL = REGISTRY.register(data.get(1009));
-        BONE = REGISTRY.register(data.get(1010));
-        SUGAR = REGISTRY.register(data.get(1011));
-        CAKE = REGISTRY.register(data.get(1012));
-        WHITE_BED = REGISTRY.register(data.get(1013));
-        ORANGE_BED = REGISTRY.register(data.get(1014));
-        MAGENTA_BED = REGISTRY.register(data.get(1015));
-        LIGHT_BLUE_BED = REGISTRY.register(data.get(1016));
-        YELLOW_BED = REGISTRY.register(data.get(1017));
-        LIME_BED = REGISTRY.register(data.get(1018));
-        PINK_BED = REGISTRY.register(data.get(1019));
-        GRAY_BED = REGISTRY.register(data.get(1020));
-        LIGHT_GRAY_BED = REGISTRY.register(data.get(1021));
-        CYAN_BED = REGISTRY.register(data.get(1022));
-        PURPLE_BED = REGISTRY.register(data.get(1023));
-        BLUE_BED = REGISTRY.register(data.get(1024));
-        BROWN_BED = REGISTRY.register(data.get(1025));
-        GREEN_BED = REGISTRY.register(data.get(1026));
-        RED_BED = REGISTRY.register(data.get(1027));
-        BLACK_BED = REGISTRY.register(data.get(1028));
-        COOKIE = REGISTRY.register(data.get(1029));
-        CRAFTER = REGISTRY.register(data.get(1030));
-        FILLED_MAP = REGISTRY.register(data.get(1031));
-        SHEARS = REGISTRY.register(data.get(1032));
-        MELON_SLICE = REGISTRY.register(data.get(1033));
-        DRIED_KELP = REGISTRY.register(data.get(1034));
-        PUMPKIN_SEEDS = REGISTRY.register(data.get(1035));
-        MELON_SEEDS = REGISTRY.register(data.get(1036));
-        BEEF = REGISTRY.register(data.get(1037));
-        COOKED_BEEF = REGISTRY.register(data.get(1038));
-        CHICKEN = REGISTRY.register(data.get(1039));
-        COOKED_CHICKEN = REGISTRY.register(data.get(1040));
-        ROTTEN_FLESH = REGISTRY.register(data.get(1041));
-        ENDER_PEARL = REGISTRY.register(data.get(1042));
-        BLAZE_ROD = REGISTRY.register(data.get(1043));
-        GHAST_TEAR = REGISTRY.register(data.get(1044));
-        GOLD_NUGGET = REGISTRY.register(data.get(1045));
-        NETHER_WART = REGISTRY.register(data.get(1046));
-        GLASS_BOTTLE = REGISTRY.register(data.get(1047));
-        POTION = REGISTRY.register(data.get(1048));
-        SPIDER_EYE = REGISTRY.register(data.get(1049));
-        FERMENTED_SPIDER_EYE = REGISTRY.register(data.get(1050));
-        BLAZE_POWDER = REGISTRY.register(data.get(1051));
-        MAGMA_CREAM = REGISTRY.register(data.get(1052));
-        BREWING_STAND = REGISTRY.register(data.get(1053));
-        CAULDRON = REGISTRY.register(data.get(1054));
-        ENDER_EYE = REGISTRY.register(data.get(1055));
-        GLISTERING_MELON_SLICE = REGISTRY.register(data.get(1056));
-        ARMADILLO_SPAWN_EGG = REGISTRY.register(data.get(1057));
-        ALLAY_SPAWN_EGG = REGISTRY.register(data.get(1058));
-        AXOLOTL_SPAWN_EGG = REGISTRY.register(data.get(1059));
-        BAT_SPAWN_EGG = REGISTRY.register(data.get(1060));
-        BEE_SPAWN_EGG = REGISTRY.register(data.get(1061));
-        BLAZE_SPAWN_EGG = REGISTRY.register(data.get(1062));
-        BOGGED_SPAWN_EGG = REGISTRY.register(data.get(1063));
-        BREEZE_SPAWN_EGG = REGISTRY.register(data.get(1064));
-        CAT_SPAWN_EGG = REGISTRY.register(data.get(1065));
-        CAMEL_SPAWN_EGG = REGISTRY.register(data.get(1066));
-        CAVE_SPIDER_SPAWN_EGG = REGISTRY.register(data.get(1067));
-        CHICKEN_SPAWN_EGG = REGISTRY.register(data.get(1068));
-        COD_SPAWN_EGG = REGISTRY.register(data.get(1069));
-        COW_SPAWN_EGG = REGISTRY.register(data.get(1070));
-        CREEPER_SPAWN_EGG = REGISTRY.register(data.get(1071));
-        DOLPHIN_SPAWN_EGG = REGISTRY.register(data.get(1072));
-        DONKEY_SPAWN_EGG = REGISTRY.register(data.get(1073));
-        DROWNED_SPAWN_EGG = REGISTRY.register(data.get(1074));
-        ELDER_GUARDIAN_SPAWN_EGG = REGISTRY.register(data.get(1075));
-        ENDER_DRAGON_SPAWN_EGG = REGISTRY.register(data.get(1076));
-        ENDERMAN_SPAWN_EGG = REGISTRY.register(data.get(1077));
-        ENDERMITE_SPAWN_EGG = REGISTRY.register(data.get(1078));
-        EVOKER_SPAWN_EGG = REGISTRY.register(data.get(1079));
-        FOX_SPAWN_EGG = REGISTRY.register(data.get(1080));
-        FROG_SPAWN_EGG = REGISTRY.register(data.get(1081));
-        GHAST_SPAWN_EGG = REGISTRY.register(data.get(1082));
-        GLOW_SQUID_SPAWN_EGG = REGISTRY.register(data.get(1083));
-        GOAT_SPAWN_EGG = REGISTRY.register(data.get(1084));
-        GUARDIAN_SPAWN_EGG = REGISTRY.register(data.get(1085));
-        HOGLIN_SPAWN_EGG = REGISTRY.register(data.get(1086));
-        HORSE_SPAWN_EGG = REGISTRY.register(data.get(1087));
-        HUSK_SPAWN_EGG = REGISTRY.register(data.get(1088));
-        IRON_GOLEM_SPAWN_EGG = REGISTRY.register(data.get(1089));
-        LLAMA_SPAWN_EGG = REGISTRY.register(data.get(1090));
-        MAGMA_CUBE_SPAWN_EGG = REGISTRY.register(data.get(1091));
-        MOOSHROOM_SPAWN_EGG = REGISTRY.register(data.get(1092));
-        MULE_SPAWN_EGG = REGISTRY.register(data.get(1093));
-        OCELOT_SPAWN_EGG = REGISTRY.register(data.get(1094));
-        PANDA_SPAWN_EGG = REGISTRY.register(data.get(1095));
-        PARROT_SPAWN_EGG = REGISTRY.register(data.get(1096));
-        PHANTOM_SPAWN_EGG = REGISTRY.register(data.get(1097));
-        PIG_SPAWN_EGG = REGISTRY.register(data.get(1098));
-        PIGLIN_SPAWN_EGG = REGISTRY.register(data.get(1099));
-        PIGLIN_BRUTE_SPAWN_EGG = REGISTRY.register(data.get(1100));
-        PILLAGER_SPAWN_EGG = REGISTRY.register(data.get(1101));
-        POLAR_BEAR_SPAWN_EGG = REGISTRY.register(data.get(1102));
-        PUFFERFISH_SPAWN_EGG = REGISTRY.register(data.get(1103));
-        RABBIT_SPAWN_EGG = REGISTRY.register(data.get(1104));
-        RAVAGER_SPAWN_EGG = REGISTRY.register(data.get(1105));
-        SALMON_SPAWN_EGG = REGISTRY.register(data.get(1106));
-        SHEEP_SPAWN_EGG = REGISTRY.register(data.get(1107));
-        SHULKER_SPAWN_EGG = REGISTRY.register(data.get(1108));
-        SILVERFISH_SPAWN_EGG = REGISTRY.register(data.get(1109));
-        SKELETON_SPAWN_EGG = REGISTRY.register(data.get(1110));
-        SKELETON_HORSE_SPAWN_EGG = REGISTRY.register(data.get(1111));
-        SLIME_SPAWN_EGG = REGISTRY.register(data.get(1112));
-        SNIFFER_SPAWN_EGG = REGISTRY.register(data.get(1113));
-        SNOW_GOLEM_SPAWN_EGG = REGISTRY.register(data.get(1114));
-        SPIDER_SPAWN_EGG = REGISTRY.register(data.get(1115));
-        SQUID_SPAWN_EGG = REGISTRY.register(data.get(1116));
-        STRAY_SPAWN_EGG = REGISTRY.register(data.get(1117));
-        STRIDER_SPAWN_EGG = REGISTRY.register(data.get(1118));
-        TADPOLE_SPAWN_EGG = REGISTRY.register(data.get(1119));
-        TRADER_LLAMA_SPAWN_EGG = REGISTRY.register(data.get(1120));
-        TROPICAL_FISH_SPAWN_EGG = REGISTRY.register(data.get(1121));
-        TURTLE_SPAWN_EGG = REGISTRY.register(data.get(1122));
-        VEX_SPAWN_EGG = REGISTRY.register(data.get(1123));
-        VILLAGER_SPAWN_EGG = REGISTRY.register(data.get(1124));
-        VINDICATOR_SPAWN_EGG = REGISTRY.register(data.get(1125));
-        WANDERING_TRADER_SPAWN_EGG = REGISTRY.register(data.get(1126));
-        WARDEN_SPAWN_EGG = REGISTRY.register(data.get(1127));
-        WITCH_SPAWN_EGG = REGISTRY.register(data.get(1128));
-        WITHER_SPAWN_EGG = REGISTRY.register(data.get(1129));
-        WITHER_SKELETON_SPAWN_EGG = REGISTRY.register(data.get(1130));
-        WOLF_SPAWN_EGG = REGISTRY.register(data.get(1131));
-        ZOGLIN_SPAWN_EGG = REGISTRY.register(data.get(1132));
-        CREAKING_SPAWN_EGG = REGISTRY.register(data.get(1133));
-        ZOMBIE_SPAWN_EGG = REGISTRY.register(data.get(1134));
-        ZOMBIE_HORSE_SPAWN_EGG = REGISTRY.register(data.get(1135));
-        ZOMBIE_VILLAGER_SPAWN_EGG = REGISTRY.register(data.get(1136));
-        ZOMBIFIED_PIGLIN_SPAWN_EGG = REGISTRY.register(data.get(1137));
-        EXPERIENCE_BOTTLE = REGISTRY.register(data.get(1138));
-        FIRE_CHARGE = REGISTRY.register(data.get(1139));
-        WIND_CHARGE = REGISTRY.register(data.get(1140));
-        WRITABLE_BOOK = REGISTRY.register(data.get(1141));
-        WRITTEN_BOOK = REGISTRY.register(data.get(1142));
-        BREEZE_ROD = REGISTRY.register(data.get(1143));
-        MACE = REGISTRY.register(data.get(1144));
-        ITEM_FRAME = REGISTRY.register(data.get(1145));
-        GLOW_ITEM_FRAME = REGISTRY.register(data.get(1146));
-        FLOWER_POT = REGISTRY.register(data.get(1147));
-        CARROT = REGISTRY.register(data.get(1148));
-        POTATO = REGISTRY.register(data.get(1149));
-        BAKED_POTATO = REGISTRY.register(data.get(1150));
-        POISONOUS_POTATO = REGISTRY.register(data.get(1151));
-        MAP = REGISTRY.register(data.get(1152));
-        GOLDEN_CARROT = REGISTRY.register(data.get(1153));
-        SKELETON_SKULL = REGISTRY.register(data.get(1154));
-        WITHER_SKELETON_SKULL = REGISTRY.register(data.get(1155));
-        PLAYER_HEAD = REGISTRY.register(data.get(1156));
-        ZOMBIE_HEAD = REGISTRY.register(data.get(1157));
-        CREEPER_HEAD = REGISTRY.register(data.get(1158));
-        DRAGON_HEAD = REGISTRY.register(data.get(1159));
-        PIGLIN_HEAD = REGISTRY.register(data.get(1160));
-        NETHER_STAR = REGISTRY.register(data.get(1161));
-        PUMPKIN_PIE = REGISTRY.register(data.get(1162));
-        FIREWORK_ROCKET = REGISTRY.register(data.get(1163));
-        FIREWORK_STAR = REGISTRY.register(data.get(1164));
-        ENCHANTED_BOOK = REGISTRY.register(data.get(1165));
-        NETHER_BRICK = REGISTRY.register(data.get(1166));
-        RESIN_BRICK = REGISTRY.register(data.get(1167));
-        PRISMARINE_SHARD = REGISTRY.register(data.get(1168));
-        PRISMARINE_CRYSTALS = REGISTRY.register(data.get(1169));
-        RABBIT = REGISTRY.register(data.get(1170));
-        COOKED_RABBIT = REGISTRY.register(data.get(1171));
-        RABBIT_STEW = REGISTRY.register(data.get(1172));
-        RABBIT_FOOT = REGISTRY.register(data.get(1173));
-        RABBIT_HIDE = REGISTRY.register(data.get(1174));
-        ARMOR_STAND = REGISTRY.register(data.get(1175));
-        IRON_HORSE_ARMOR = REGISTRY.register(data.get(1176));
-        GOLDEN_HORSE_ARMOR = REGISTRY.register(data.get(1177));
-        DIAMOND_HORSE_ARMOR = REGISTRY.register(data.get(1178));
-        LEATHER_HORSE_ARMOR = REGISTRY.register(data.get(1179));
-        LEAD = REGISTRY.register(data.get(1180));
-        NAME_TAG = REGISTRY.register(data.get(1181));
-        COMMAND_BLOCK_MINECART = REGISTRY.register(data.get(1182));
-        MUTTON = REGISTRY.register(data.get(1183));
-        COOKED_MUTTON = REGISTRY.register(data.get(1184));
-        WHITE_BANNER = REGISTRY.register(data.get(1185));
-        ORANGE_BANNER = REGISTRY.register(data.get(1186));
-        MAGENTA_BANNER = REGISTRY.register(data.get(1187));
-        LIGHT_BLUE_BANNER = REGISTRY.register(data.get(1188));
-        YELLOW_BANNER = REGISTRY.register(data.get(1189));
-        LIME_BANNER = REGISTRY.register(data.get(1190));
-        PINK_BANNER = REGISTRY.register(data.get(1191));
-        GRAY_BANNER = REGISTRY.register(data.get(1192));
-        LIGHT_GRAY_BANNER = REGISTRY.register(data.get(1193));
-        CYAN_BANNER = REGISTRY.register(data.get(1194));
-        PURPLE_BANNER = REGISTRY.register(data.get(1195));
-        BLUE_BANNER = REGISTRY.register(data.get(1196));
-        BROWN_BANNER = REGISTRY.register(data.get(1197));
-        GREEN_BANNER = REGISTRY.register(data.get(1198));
-        RED_BANNER = REGISTRY.register(data.get(1199));
-        BLACK_BANNER = REGISTRY.register(data.get(1200));
-        END_CRYSTAL = REGISTRY.register(data.get(1201));
-        CHORUS_FRUIT = REGISTRY.register(data.get(1202));
-        POPPED_CHORUS_FRUIT = REGISTRY.register(data.get(1203));
-        TORCHFLOWER_SEEDS = REGISTRY.register(data.get(1204));
-        PITCHER_POD = REGISTRY.register(data.get(1205));
-        BEETROOT = REGISTRY.register(data.get(1206));
-        BEETROOT_SEEDS = REGISTRY.register(data.get(1207));
-        BEETROOT_SOUP = REGISTRY.register(data.get(1208));
-        DRAGON_BREATH = REGISTRY.register(data.get(1209));
-        SPLASH_POTION = REGISTRY.register(data.get(1210));
-        SPECTRAL_ARROW = REGISTRY.register(data.get(1211));
-        TIPPED_ARROW = REGISTRY.register(data.get(1212));
-        LINGERING_POTION = REGISTRY.register(data.get(1213));
-        SHIELD = REGISTRY.register(data.get(1214));
-        TOTEM_OF_UNDYING = REGISTRY.register(data.get(1215));
-        SHULKER_SHELL = REGISTRY.register(data.get(1216));
-        IRON_NUGGET = REGISTRY.register(data.get(1217));
-        KNOWLEDGE_BOOK = REGISTRY.register(data.get(1218));
-        DEBUG_STICK = REGISTRY.register(data.get(1219));
-        MUSIC_DISC_13 = REGISTRY.register(data.get(1220));
-        MUSIC_DISC_CAT = REGISTRY.register(data.get(1221));
-        MUSIC_DISC_BLOCKS = REGISTRY.register(data.get(1222));
-        MUSIC_DISC_CHIRP = REGISTRY.register(data.get(1223));
-        MUSIC_DISC_CREATOR = REGISTRY.register(data.get(1224));
-        MUSIC_DISC_CREATOR_MUSIC_BOX = REGISTRY.register(data.get(1225));
-        MUSIC_DISC_FAR = REGISTRY.register(data.get(1226));
-        MUSIC_DISC_MALL = REGISTRY.register(data.get(1227));
-        MUSIC_DISC_MELLOHI = REGISTRY.register(data.get(1228));
-        MUSIC_DISC_STAL = REGISTRY.register(data.get(1229));
-        MUSIC_DISC_STRAD = REGISTRY.register(data.get(1230));
-        MUSIC_DISC_WARD = REGISTRY.register(data.get(1231));
-        MUSIC_DISC_11 = REGISTRY.register(data.get(1232));
-        MUSIC_DISC_WAIT = REGISTRY.register(data.get(1233));
-        MUSIC_DISC_OTHERSIDE = REGISTRY.register(data.get(1234));
-        MUSIC_DISC_RELIC = REGISTRY.register(data.get(1235));
-        MUSIC_DISC_5 = REGISTRY.register(data.get(1236));
-        MUSIC_DISC_PIGSTEP = REGISTRY.register(data.get(1237));
-        MUSIC_DISC_PRECIPICE = REGISTRY.register(data.get(1238));
-        DISC_FRAGMENT_5 = REGISTRY.register(data.get(1239));
-        TRIDENT = REGISTRY.register(data.get(1240));
-        NAUTILUS_SHELL = REGISTRY.register(data.get(1241));
-        HEART_OF_THE_SEA = REGISTRY.register(data.get(1242));
-        CROSSBOW = REGISTRY.register(data.get(1243));
-        SUSPICIOUS_STEW = REGISTRY.register(data.get(1244));
-        LOOM = REGISTRY.register(data.get(1245));
-        FLOWER_BANNER_PATTERN = REGISTRY.register(data.get(1246));
-        CREEPER_BANNER_PATTERN = REGISTRY.register(data.get(1247));
-        SKULL_BANNER_PATTERN = REGISTRY.register(data.get(1248));
-        MOJANG_BANNER_PATTERN = REGISTRY.register(data.get(1249));
-        GLOBE_BANNER_PATTERN = REGISTRY.register(data.get(1250));
-        PIGLIN_BANNER_PATTERN = REGISTRY.register(data.get(1251));
-        FLOW_BANNER_PATTERN = REGISTRY.register(data.get(1252));
-        GUSTER_BANNER_PATTERN = REGISTRY.register(data.get(1253));
-        FIELD_MASONED_BANNER_PATTERN = REGISTRY.register(data.get(1254));
-        BORDURE_INDENTED_BANNER_PATTERN = REGISTRY.register(data.get(1255));
-        GOAT_HORN = REGISTRY.register(data.get(1256));
-        COMPOSTER = REGISTRY.register(data.get(1257));
-        BARREL = REGISTRY.register(data.get(1258));
-        SMOKER = REGISTRY.register(data.get(1259));
-        BLAST_FURNACE = REGISTRY.register(data.get(1260));
-        CARTOGRAPHY_TABLE = REGISTRY.register(data.get(1261));
-        FLETCHING_TABLE = REGISTRY.register(data.get(1262));
-        GRINDSTONE = REGISTRY.register(data.get(1263));
-        SMITHING_TABLE = REGISTRY.register(data.get(1264));
-        STONECUTTER = REGISTRY.register(data.get(1265));
-        BELL = REGISTRY.register(data.get(1266));
-        LANTERN = REGISTRY.register(data.get(1267));
-        SOUL_LANTERN = REGISTRY.register(data.get(1268));
-        SWEET_BERRIES = REGISTRY.register(data.get(1269));
-        GLOW_BERRIES = REGISTRY.register(data.get(1270));
-        CAMPFIRE = REGISTRY.register(data.get(1271));
-        SOUL_CAMPFIRE = REGISTRY.register(data.get(1272));
-        SHROOMLIGHT = REGISTRY.register(data.get(1273));
-        HONEYCOMB = REGISTRY.register(data.get(1274));
-        BEE_NEST = REGISTRY.register(data.get(1275));
-        BEEHIVE = REGISTRY.register(data.get(1276));
-        HONEY_BOTTLE = REGISTRY.register(data.get(1277));
-        HONEYCOMB_BLOCK = REGISTRY.register(data.get(1278));
-        LODESTONE = REGISTRY.register(data.get(1279));
-        CRYING_OBSIDIAN = REGISTRY.register(data.get(1280));
-        BLACKSTONE = REGISTRY.register(data.get(1281));
-        BLACKSTONE_SLAB = REGISTRY.register(data.get(1282));
-        BLACKSTONE_STAIRS = REGISTRY.register(data.get(1283));
-        GILDED_BLACKSTONE = REGISTRY.register(data.get(1284));
-        POLISHED_BLACKSTONE = REGISTRY.register(data.get(1285));
-        POLISHED_BLACKSTONE_SLAB = REGISTRY.register(data.get(1286));
-        POLISHED_BLACKSTONE_STAIRS = REGISTRY.register(data.get(1287));
-        CHISELED_POLISHED_BLACKSTONE = REGISTRY.register(data.get(1288));
-        POLISHED_BLACKSTONE_BRICKS = REGISTRY.register(data.get(1289));
-        POLISHED_BLACKSTONE_BRICK_SLAB = REGISTRY.register(data.get(1290));
-        POLISHED_BLACKSTONE_BRICK_STAIRS = REGISTRY.register(data.get(1291));
-        CRACKED_POLISHED_BLACKSTONE_BRICKS = REGISTRY.register(data.get(1292));
-        RESPAWN_ANCHOR = REGISTRY.register(data.get(1293));
-        CANDLE = REGISTRY.register(data.get(1294));
-        WHITE_CANDLE = REGISTRY.register(data.get(1295));
-        ORANGE_CANDLE = REGISTRY.register(data.get(1296));
-        MAGENTA_CANDLE = REGISTRY.register(data.get(1297));
-        LIGHT_BLUE_CANDLE = REGISTRY.register(data.get(1298));
-        YELLOW_CANDLE = REGISTRY.register(data.get(1299));
-        LIME_CANDLE = REGISTRY.register(data.get(1300));
-        PINK_CANDLE = REGISTRY.register(data.get(1301));
-        GRAY_CANDLE = REGISTRY.register(data.get(1302));
-        LIGHT_GRAY_CANDLE = REGISTRY.register(data.get(1303));
-        CYAN_CANDLE = REGISTRY.register(data.get(1304));
-        PURPLE_CANDLE = REGISTRY.register(data.get(1305));
-        BLUE_CANDLE = REGISTRY.register(data.get(1306));
-        BROWN_CANDLE = REGISTRY.register(data.get(1307));
-        GREEN_CANDLE = REGISTRY.register(data.get(1308));
-        RED_CANDLE = REGISTRY.register(data.get(1309));
-        BLACK_CANDLE = REGISTRY.register(data.get(1310));
-        SMALL_AMETHYST_BUD = REGISTRY.register(data.get(1311));
-        MEDIUM_AMETHYST_BUD = REGISTRY.register(data.get(1312));
-        LARGE_AMETHYST_BUD = REGISTRY.register(data.get(1313));
-        AMETHYST_CLUSTER = REGISTRY.register(data.get(1314));
-        POINTED_DRIPSTONE = REGISTRY.register(data.get(1315));
-        OCHRE_FROGLIGHT = REGISTRY.register(data.get(1316));
-        VERDANT_FROGLIGHT = REGISTRY.register(data.get(1317));
-        PEARLESCENT_FROGLIGHT = REGISTRY.register(data.get(1318));
-        FROGSPAWN = REGISTRY.register(data.get(1319));
-        ECHO_SHARD = REGISTRY.register(data.get(1320));
-        BRUSH = REGISTRY.register(data.get(1321));
-        NETHERITE_UPGRADE_SMITHING_TEMPLATE = REGISTRY.register(data.get(1322));
-        SENTRY_ARMOR_TRIM_SMITHING_TEMPLATE = REGISTRY.register(data.get(1323));
-        DUNE_ARMOR_TRIM_SMITHING_TEMPLATE = REGISTRY.register(data.get(1324));
-        COAST_ARMOR_TRIM_SMITHING_TEMPLATE = REGISTRY.register(data.get(1325));
-        WILD_ARMOR_TRIM_SMITHING_TEMPLATE = REGISTRY.register(data.get(1326));
-        WARD_ARMOR_TRIM_SMITHING_TEMPLATE = REGISTRY.register(data.get(1327));
-        EYE_ARMOR_TRIM_SMITHING_TEMPLATE = REGISTRY.register(data.get(1328));
-        VEX_ARMOR_TRIM_SMITHING_TEMPLATE = REGISTRY.register(data.get(1329));
-        TIDE_ARMOR_TRIM_SMITHING_TEMPLATE = REGISTRY.register(data.get(1330));
-        SNOUT_ARMOR_TRIM_SMITHING_TEMPLATE = REGISTRY.register(data.get(1331));
-        RIB_ARMOR_TRIM_SMITHING_TEMPLATE = REGISTRY.register(data.get(1332));
-        SPIRE_ARMOR_TRIM_SMITHING_TEMPLATE = REGISTRY.register(data.get(1333));
-        WAYFINDER_ARMOR_TRIM_SMITHING_TEMPLATE = REGISTRY.register(data.get(1334));
-        SHAPER_ARMOR_TRIM_SMITHING_TEMPLATE = REGISTRY.register(data.get(1335));
-        SILENCE_ARMOR_TRIM_SMITHING_TEMPLATE = REGISTRY.register(data.get(1336));
-        RAISER_ARMOR_TRIM_SMITHING_TEMPLATE = REGISTRY.register(data.get(1337));
-        HOST_ARMOR_TRIM_SMITHING_TEMPLATE = REGISTRY.register(data.get(1338));
-        FLOW_ARMOR_TRIM_SMITHING_TEMPLATE = REGISTRY.register(data.get(1339));
-        BOLT_ARMOR_TRIM_SMITHING_TEMPLATE = REGISTRY.register(data.get(1340));
-        ANGLER_POTTERY_SHERD = REGISTRY.register(data.get(1341));
-        ARCHER_POTTERY_SHERD = REGISTRY.register(data.get(1342));
-        ARMS_UP_POTTERY_SHERD = REGISTRY.register(data.get(1343));
-        BLADE_POTTERY_SHERD = REGISTRY.register(data.get(1344));
-        BREWER_POTTERY_SHERD = REGISTRY.register(data.get(1345));
-        BURN_POTTERY_SHERD = REGISTRY.register(data.get(1346));
-        DANGER_POTTERY_SHERD = REGISTRY.register(data.get(1347));
-        EXPLORER_POTTERY_SHERD = REGISTRY.register(data.get(1348));
-        FLOW_POTTERY_SHERD = REGISTRY.register(data.get(1349));
-        FRIEND_POTTERY_SHERD = REGISTRY.register(data.get(1350));
-        GUSTER_POTTERY_SHERD = REGISTRY.register(data.get(1351));
-        HEART_POTTERY_SHERD = REGISTRY.register(data.get(1352));
-        HEARTBREAK_POTTERY_SHERD = REGISTRY.register(data.get(1353));
-        HOWL_POTTERY_SHERD = REGISTRY.register(data.get(1354));
-        MINER_POTTERY_SHERD = REGISTRY.register(data.get(1355));
-        MOURNER_POTTERY_SHERD = REGISTRY.register(data.get(1356));
-        PLENTY_POTTERY_SHERD = REGISTRY.register(data.get(1357));
-        PRIZE_POTTERY_SHERD = REGISTRY.register(data.get(1358));
-        SCRAPE_POTTERY_SHERD = REGISTRY.register(data.get(1359));
-        SHEAF_POTTERY_SHERD = REGISTRY.register(data.get(1360));
-        SHELTER_POTTERY_SHERD = REGISTRY.register(data.get(1361));
-        SKULL_POTTERY_SHERD = REGISTRY.register(data.get(1362));
-        SNORT_POTTERY_SHERD = REGISTRY.register(data.get(1363));
-        COPPER_GRATE = REGISTRY.register(data.get(1364));
-        EXPOSED_COPPER_GRATE = REGISTRY.register(data.get(1365));
-        WEATHERED_COPPER_GRATE = REGISTRY.register(data.get(1366));
-        OXIDIZED_COPPER_GRATE = REGISTRY.register(data.get(1367));
-        WAXED_COPPER_GRATE = REGISTRY.register(data.get(1368));
-        WAXED_EXPOSED_COPPER_GRATE = REGISTRY.register(data.get(1369));
-        WAXED_WEATHERED_COPPER_GRATE = REGISTRY.register(data.get(1370));
-        WAXED_OXIDIZED_COPPER_GRATE = REGISTRY.register(data.get(1371));
-        COPPER_BULB = REGISTRY.register(data.get(1372));
-        EXPOSED_COPPER_BULB = REGISTRY.register(data.get(1373));
-        WEATHERED_COPPER_BULB = REGISTRY.register(data.get(1374));
-        OXIDIZED_COPPER_BULB = REGISTRY.register(data.get(1375));
-        WAXED_COPPER_BULB = REGISTRY.register(data.get(1376));
-        WAXED_EXPOSED_COPPER_BULB = REGISTRY.register(data.get(1377));
-        WAXED_WEATHERED_COPPER_BULB = REGISTRY.register(data.get(1378));
-        WAXED_OXIDIZED_COPPER_BULB = REGISTRY.register(data.get(1379));
-        TRIAL_SPAWNER = REGISTRY.register(data.get(1380));
-        TRIAL_KEY = REGISTRY.register(data.get(1381));
-        OMINOUS_TRIAL_KEY = REGISTRY.register(data.get(1382));
-        VAULT = REGISTRY.register(data.get(1383));
-        OMINOUS_BOTTLE = REGISTRY.register(data.get(1384));
+        SULFUR = REGISTRY.register(data.get(26));
+        POTENT_SULFUR = REGISTRY.register(data.get(27));
+        SULFUR_SLAB = REGISTRY.register(data.get(28));
+        SULFUR_STAIRS = REGISTRY.register(data.get(29));
+        SULFUR_WALL = REGISTRY.register(data.get(30));
+        POLISHED_SULFUR = REGISTRY.register(data.get(31));
+        POLISHED_SULFUR_SLAB = REGISTRY.register(data.get(32));
+        POLISHED_SULFUR_STAIRS = REGISTRY.register(data.get(33));
+        POLISHED_SULFUR_WALL = REGISTRY.register(data.get(34));
+        SULFUR_BRICKS = REGISTRY.register(data.get(35));
+        SULFUR_BRICK_SLAB = REGISTRY.register(data.get(36));
+        SULFUR_BRICK_STAIRS = REGISTRY.register(data.get(37));
+        SULFUR_BRICK_WALL = REGISTRY.register(data.get(38));
+        CHISELED_SULFUR = REGISTRY.register(data.get(39));
+        CINNABAR = REGISTRY.register(data.get(40));
+        CINNABAR_SLAB = REGISTRY.register(data.get(41));
+        CINNABAR_STAIRS = REGISTRY.register(data.get(42));
+        CINNABAR_WALL = REGISTRY.register(data.get(43));
+        POLISHED_CINNABAR = REGISTRY.register(data.get(44));
+        POLISHED_CINNABAR_SLAB = REGISTRY.register(data.get(45));
+        POLISHED_CINNABAR_STAIRS = REGISTRY.register(data.get(46));
+        POLISHED_CINNABAR_WALL = REGISTRY.register(data.get(47));
+        CINNABAR_BRICKS = REGISTRY.register(data.get(48));
+        CINNABAR_BRICK_SLAB = REGISTRY.register(data.get(49));
+        CINNABAR_BRICK_STAIRS = REGISTRY.register(data.get(50));
+        CINNABAR_BRICK_WALL = REGISTRY.register(data.get(51));
+        CHISELED_CINNABAR = REGISTRY.register(data.get(52));
+        DRIPSTONE_BLOCK = REGISTRY.register(data.get(53));
+        GRASS_BLOCK = REGISTRY.register(data.get(54));
+        DIRT = REGISTRY.register(data.get(55));
+        COARSE_DIRT = REGISTRY.register(data.get(56));
+        PODZOL = REGISTRY.register(data.get(57));
+        ROOTED_DIRT = REGISTRY.register(data.get(58));
+        MUD = REGISTRY.register(data.get(59));
+        CRIMSON_NYLIUM = REGISTRY.register(data.get(60));
+        WARPED_NYLIUM = REGISTRY.register(data.get(61));
+        COBBLESTONE = REGISTRY.register(data.get(62));
+        OAK_PLANKS = REGISTRY.register(data.get(63));
+        SPRUCE_PLANKS = REGISTRY.register(data.get(64));
+        BIRCH_PLANKS = REGISTRY.register(data.get(65));
+        JUNGLE_PLANKS = REGISTRY.register(data.get(66));
+        ACACIA_PLANKS = REGISTRY.register(data.get(67));
+        CHERRY_PLANKS = REGISTRY.register(data.get(68));
+        DARK_OAK_PLANKS = REGISTRY.register(data.get(69));
+        PALE_OAK_PLANKS = REGISTRY.register(data.get(70));
+        MANGROVE_PLANKS = REGISTRY.register(data.get(71));
+        POPLAR_PLANKS = REGISTRY.register(data.get(72));
+        BAMBOO_PLANKS = REGISTRY.register(data.get(73));
+        CRIMSON_PLANKS = REGISTRY.register(data.get(74));
+        WARPED_PLANKS = REGISTRY.register(data.get(75));
+        BAMBOO_MOSAIC = REGISTRY.register(data.get(76));
+        OAK_SAPLING = REGISTRY.register(data.get(77));
+        SPRUCE_SAPLING = REGISTRY.register(data.get(78));
+        BIRCH_SAPLING = REGISTRY.register(data.get(79));
+        JUNGLE_SAPLING = REGISTRY.register(data.get(80));
+        ACACIA_SAPLING = REGISTRY.register(data.get(81));
+        CHERRY_SAPLING = REGISTRY.register(data.get(82));
+        DARK_OAK_SAPLING = REGISTRY.register(data.get(83));
+        PALE_OAK_SAPLING = REGISTRY.register(data.get(84));
+        MANGROVE_PROPAGULE = REGISTRY.register(data.get(85));
+        POPLAR_SAPLING = REGISTRY.register(data.get(86));
+        BEDROCK = REGISTRY.register(data.get(87));
+        SAND = REGISTRY.register(data.get(88));
+        SUSPICIOUS_SAND = REGISTRY.register(data.get(89));
+        SUSPICIOUS_GRAVEL = REGISTRY.register(data.get(90));
+        RED_SAND = REGISTRY.register(data.get(91));
+        GRAVEL = REGISTRY.register(data.get(92));
+        COAL_ORE = REGISTRY.register(data.get(93));
+        DEEPSLATE_COAL_ORE = REGISTRY.register(data.get(94));
+        IRON_ORE = REGISTRY.register(data.get(95));
+        DEEPSLATE_IRON_ORE = REGISTRY.register(data.get(96));
+        COPPER_ORE = REGISTRY.register(data.get(97));
+        DEEPSLATE_COPPER_ORE = REGISTRY.register(data.get(98));
+        GOLD_ORE = REGISTRY.register(data.get(99));
+        DEEPSLATE_GOLD_ORE = REGISTRY.register(data.get(100));
+        REDSTONE_ORE = REGISTRY.register(data.get(101));
+        DEEPSLATE_REDSTONE_ORE = REGISTRY.register(data.get(102));
+        EMERALD_ORE = REGISTRY.register(data.get(103));
+        DEEPSLATE_EMERALD_ORE = REGISTRY.register(data.get(104));
+        LAPIS_ORE = REGISTRY.register(data.get(105));
+        DEEPSLATE_LAPIS_ORE = REGISTRY.register(data.get(106));
+        DIAMOND_ORE = REGISTRY.register(data.get(107));
+        DEEPSLATE_DIAMOND_ORE = REGISTRY.register(data.get(108));
+        NETHER_GOLD_ORE = REGISTRY.register(data.get(109));
+        NETHER_QUARTZ_ORE = REGISTRY.register(data.get(110));
+        ANCIENT_DEBRIS = REGISTRY.register(data.get(111));
+        COAL_BLOCK = REGISTRY.register(data.get(112));
+        RAW_IRON_BLOCK = REGISTRY.register(data.get(113));
+        RAW_COPPER_BLOCK = REGISTRY.register(data.get(114));
+        RAW_GOLD_BLOCK = REGISTRY.register(data.get(115));
+        HEAVY_CORE = REGISTRY.register(data.get(116));
+        AMETHYST_BLOCK = REGISTRY.register(data.get(117));
+        BUDDING_AMETHYST = REGISTRY.register(data.get(118));
+        IRON_BLOCK = REGISTRY.register(data.get(119));
+        COPPER_BLOCK = REGISTRY.register(data.get(120));
+        EXPOSED_COPPER = REGISTRY.register(data.get(121));
+        WEATHERED_COPPER = REGISTRY.register(data.get(122));
+        OXIDIZED_COPPER = REGISTRY.register(data.get(123));
+        WAXED_COPPER_BLOCK = REGISTRY.register(data.get(124));
+        WAXED_EXPOSED_COPPER = REGISTRY.register(data.get(125));
+        WAXED_WEATHERED_COPPER = REGISTRY.register(data.get(126));
+        WAXED_OXIDIZED_COPPER = REGISTRY.register(data.get(127));
+        GOLD_BLOCK = REGISTRY.register(data.get(128));
+        DIAMOND_BLOCK = REGISTRY.register(data.get(129));
+        NETHERITE_BLOCK = REGISTRY.register(data.get(130));
+        CHISELED_COPPER = REGISTRY.register(data.get(131));
+        EXPOSED_CHISELED_COPPER = REGISTRY.register(data.get(132));
+        WEATHERED_CHISELED_COPPER = REGISTRY.register(data.get(133));
+        OXIDIZED_CHISELED_COPPER = REGISTRY.register(data.get(134));
+        WAXED_CHISELED_COPPER = REGISTRY.register(data.get(135));
+        WAXED_EXPOSED_CHISELED_COPPER = REGISTRY.register(data.get(136));
+        WAXED_WEATHERED_CHISELED_COPPER = REGISTRY.register(data.get(137));
+        WAXED_OXIDIZED_CHISELED_COPPER = REGISTRY.register(data.get(138));
+        CUT_COPPER = REGISTRY.register(data.get(139));
+        EXPOSED_CUT_COPPER = REGISTRY.register(data.get(140));
+        WEATHERED_CUT_COPPER = REGISTRY.register(data.get(141));
+        OXIDIZED_CUT_COPPER = REGISTRY.register(data.get(142));
+        WAXED_CUT_COPPER = REGISTRY.register(data.get(143));
+        WAXED_EXPOSED_CUT_COPPER = REGISTRY.register(data.get(144));
+        WAXED_WEATHERED_CUT_COPPER = REGISTRY.register(data.get(145));
+        WAXED_OXIDIZED_CUT_COPPER = REGISTRY.register(data.get(146));
+        CUT_COPPER_STAIRS = REGISTRY.register(data.get(147));
+        EXPOSED_CUT_COPPER_STAIRS = REGISTRY.register(data.get(148));
+        WEATHERED_CUT_COPPER_STAIRS = REGISTRY.register(data.get(149));
+        OXIDIZED_CUT_COPPER_STAIRS = REGISTRY.register(data.get(150));
+        WAXED_CUT_COPPER_STAIRS = REGISTRY.register(data.get(151));
+        WAXED_EXPOSED_CUT_COPPER_STAIRS = REGISTRY.register(data.get(152));
+        WAXED_WEATHERED_CUT_COPPER_STAIRS = REGISTRY.register(data.get(153));
+        WAXED_OXIDIZED_CUT_COPPER_STAIRS = REGISTRY.register(data.get(154));
+        CUT_COPPER_SLAB = REGISTRY.register(data.get(155));
+        EXPOSED_CUT_COPPER_SLAB = REGISTRY.register(data.get(156));
+        WEATHERED_CUT_COPPER_SLAB = REGISTRY.register(data.get(157));
+        OXIDIZED_CUT_COPPER_SLAB = REGISTRY.register(data.get(158));
+        WAXED_CUT_COPPER_SLAB = REGISTRY.register(data.get(159));
+        WAXED_EXPOSED_CUT_COPPER_SLAB = REGISTRY.register(data.get(160));
+        WAXED_WEATHERED_CUT_COPPER_SLAB = REGISTRY.register(data.get(161));
+        WAXED_OXIDIZED_CUT_COPPER_SLAB = REGISTRY.register(data.get(162));
+        OAK_LOG = REGISTRY.register(data.get(163));
+        SPRUCE_LOG = REGISTRY.register(data.get(164));
+        BIRCH_LOG = REGISTRY.register(data.get(165));
+        JUNGLE_LOG = REGISTRY.register(data.get(166));
+        ACACIA_LOG = REGISTRY.register(data.get(167));
+        CHERRY_LOG = REGISTRY.register(data.get(168));
+        PALE_OAK_LOG = REGISTRY.register(data.get(169));
+        DARK_OAK_LOG = REGISTRY.register(data.get(170));
+        MANGROVE_LOG = REGISTRY.register(data.get(171));
+        POPLAR_LOG = REGISTRY.register(data.get(172));
+        MANGROVE_ROOTS = REGISTRY.register(data.get(173));
+        MUDDY_MANGROVE_ROOTS = REGISTRY.register(data.get(174));
+        CRIMSON_STEM = REGISTRY.register(data.get(175));
+        WARPED_STEM = REGISTRY.register(data.get(176));
+        BAMBOO_BLOCK = REGISTRY.register(data.get(177));
+        STRIPPED_OAK_LOG = REGISTRY.register(data.get(178));
+        STRIPPED_SPRUCE_LOG = REGISTRY.register(data.get(179));
+        STRIPPED_BIRCH_LOG = REGISTRY.register(data.get(180));
+        STRIPPED_JUNGLE_LOG = REGISTRY.register(data.get(181));
+        STRIPPED_ACACIA_LOG = REGISTRY.register(data.get(182));
+        STRIPPED_CHERRY_LOG = REGISTRY.register(data.get(183));
+        STRIPPED_DARK_OAK_LOG = REGISTRY.register(data.get(184));
+        STRIPPED_PALE_OAK_LOG = REGISTRY.register(data.get(185));
+        STRIPPED_MANGROVE_LOG = REGISTRY.register(data.get(186));
+        STRIPPED_POPLAR_LOG = REGISTRY.register(data.get(187));
+        STRIPPED_CRIMSON_STEM = REGISTRY.register(data.get(188));
+        STRIPPED_WARPED_STEM = REGISTRY.register(data.get(189));
+        STRIPPED_OAK_WOOD = REGISTRY.register(data.get(190));
+        STRIPPED_SPRUCE_WOOD = REGISTRY.register(data.get(191));
+        STRIPPED_BIRCH_WOOD = REGISTRY.register(data.get(192));
+        STRIPPED_JUNGLE_WOOD = REGISTRY.register(data.get(193));
+        STRIPPED_ACACIA_WOOD = REGISTRY.register(data.get(194));
+        STRIPPED_CHERRY_WOOD = REGISTRY.register(data.get(195));
+        STRIPPED_DARK_OAK_WOOD = REGISTRY.register(data.get(196));
+        STRIPPED_PALE_OAK_WOOD = REGISTRY.register(data.get(197));
+        STRIPPED_MANGROVE_WOOD = REGISTRY.register(data.get(198));
+        STRIPPED_POPLAR_WOOD = REGISTRY.register(data.get(199));
+        STRIPPED_CRIMSON_HYPHAE = REGISTRY.register(data.get(200));
+        STRIPPED_WARPED_HYPHAE = REGISTRY.register(data.get(201));
+        STRIPPED_BAMBOO_BLOCK = REGISTRY.register(data.get(202));
+        OAK_WOOD = REGISTRY.register(data.get(203));
+        SPRUCE_WOOD = REGISTRY.register(data.get(204));
+        BIRCH_WOOD = REGISTRY.register(data.get(205));
+        JUNGLE_WOOD = REGISTRY.register(data.get(206));
+        ACACIA_WOOD = REGISTRY.register(data.get(207));
+        CHERRY_WOOD = REGISTRY.register(data.get(208));
+        PALE_OAK_WOOD = REGISTRY.register(data.get(209));
+        DARK_OAK_WOOD = REGISTRY.register(data.get(210));
+        MANGROVE_WOOD = REGISTRY.register(data.get(211));
+        POPLAR_WOOD = REGISTRY.register(data.get(212));
+        CRIMSON_HYPHAE = REGISTRY.register(data.get(213));
+        WARPED_HYPHAE = REGISTRY.register(data.get(214));
+        OAK_LEAVES = REGISTRY.register(data.get(215));
+        SPRUCE_LEAVES = REGISTRY.register(data.get(216));
+        BIRCH_LEAVES = REGISTRY.register(data.get(217));
+        JUNGLE_LEAVES = REGISTRY.register(data.get(218));
+        ACACIA_LEAVES = REGISTRY.register(data.get(219));
+        CHERRY_LEAVES = REGISTRY.register(data.get(220));
+        DARK_OAK_LEAVES = REGISTRY.register(data.get(221));
+        PALE_OAK_LEAVES = REGISTRY.register(data.get(222));
+        MANGROVE_LEAVES = REGISTRY.register(data.get(223));
+        RED_POPLAR_LEAVES = REGISTRY.register(data.get(224));
+        ORANGE_POPLAR_LEAVES = REGISTRY.register(data.get(225));
+        YELLOW_POPLAR_LEAVES = REGISTRY.register(data.get(226));
+        AZALEA_LEAVES = REGISTRY.register(data.get(227));
+        FLOWERING_AZALEA_LEAVES = REGISTRY.register(data.get(228));
+        SPONGE = REGISTRY.register(data.get(229));
+        WET_SPONGE = REGISTRY.register(data.get(230));
+        GLASS = REGISTRY.register(data.get(231));
+        TINTED_GLASS = REGISTRY.register(data.get(232));
+        LAPIS_BLOCK = REGISTRY.register(data.get(233));
+        SANDSTONE = REGISTRY.register(data.get(234));
+        CHISELED_SANDSTONE = REGISTRY.register(data.get(235));
+        CUT_SANDSTONE = REGISTRY.register(data.get(236));
+        COBWEB = REGISTRY.register(data.get(237));
+        SHORT_GRASS = REGISTRY.register(data.get(238));
+        FERN = REGISTRY.register(data.get(239));
+        BUSH = REGISTRY.register(data.get(240));
+        RED_SHRUB = REGISTRY.register(data.get(241));
+        AZALEA = REGISTRY.register(data.get(242));
+        FLOWERING_AZALEA = REGISTRY.register(data.get(243));
+        DEAD_BUSH = REGISTRY.register(data.get(244));
+        FIREFLY_BUSH = REGISTRY.register(data.get(245));
+        SHORT_DRY_GRASS = REGISTRY.register(data.get(246));
+        TALL_DRY_GRASS = REGISTRY.register(data.get(247));
+        SEAGRASS = REGISTRY.register(data.get(248));
+        SEA_PICKLE = REGISTRY.register(data.get(249));
+        WHITE_WOOL = REGISTRY.register(data.get(250));
+        ORANGE_WOOL = REGISTRY.register(data.get(251));
+        MAGENTA_WOOL = REGISTRY.register(data.get(252));
+        LIGHT_BLUE_WOOL = REGISTRY.register(data.get(253));
+        YELLOW_WOOL = REGISTRY.register(data.get(254));
+        LIME_WOOL = REGISTRY.register(data.get(255));
+        PINK_WOOL = REGISTRY.register(data.get(256));
+        GRAY_WOOL = REGISTRY.register(data.get(257));
+        LIGHT_GRAY_WOOL = REGISTRY.register(data.get(258));
+        CYAN_WOOL = REGISTRY.register(data.get(259));
+        PURPLE_WOOL = REGISTRY.register(data.get(260));
+        BLUE_WOOL = REGISTRY.register(data.get(261));
+        BROWN_WOOL = REGISTRY.register(data.get(262));
+        GREEN_WOOL = REGISTRY.register(data.get(263));
+        RED_WOOL = REGISTRY.register(data.get(264));
+        BLACK_WOOL = REGISTRY.register(data.get(265));
+        WHITE_WOOL_STAIRS = REGISTRY.register(data.get(266));
+        ORANGE_WOOL_STAIRS = REGISTRY.register(data.get(267));
+        MAGENTA_WOOL_STAIRS = REGISTRY.register(data.get(268));
+        LIGHT_BLUE_WOOL_STAIRS = REGISTRY.register(data.get(269));
+        YELLOW_WOOL_STAIRS = REGISTRY.register(data.get(270));
+        LIME_WOOL_STAIRS = REGISTRY.register(data.get(271));
+        PINK_WOOL_STAIRS = REGISTRY.register(data.get(272));
+        GRAY_WOOL_STAIRS = REGISTRY.register(data.get(273));
+        LIGHT_GRAY_WOOL_STAIRS = REGISTRY.register(data.get(274));
+        CYAN_WOOL_STAIRS = REGISTRY.register(data.get(275));
+        PURPLE_WOOL_STAIRS = REGISTRY.register(data.get(276));
+        BLUE_WOOL_STAIRS = REGISTRY.register(data.get(277));
+        BROWN_WOOL_STAIRS = REGISTRY.register(data.get(278));
+        GREEN_WOOL_STAIRS = REGISTRY.register(data.get(279));
+        RED_WOOL_STAIRS = REGISTRY.register(data.get(280));
+        BLACK_WOOL_STAIRS = REGISTRY.register(data.get(281));
+        WHITE_WOOL_SLAB = REGISTRY.register(data.get(282));
+        ORANGE_WOOL_SLAB = REGISTRY.register(data.get(283));
+        MAGENTA_WOOL_SLAB = REGISTRY.register(data.get(284));
+        LIGHT_BLUE_WOOL_SLAB = REGISTRY.register(data.get(285));
+        YELLOW_WOOL_SLAB = REGISTRY.register(data.get(286));
+        LIME_WOOL_SLAB = REGISTRY.register(data.get(287));
+        PINK_WOOL_SLAB = REGISTRY.register(data.get(288));
+        GRAY_WOOL_SLAB = REGISTRY.register(data.get(289));
+        LIGHT_GRAY_WOOL_SLAB = REGISTRY.register(data.get(290));
+        CYAN_WOOL_SLAB = REGISTRY.register(data.get(291));
+        PURPLE_WOOL_SLAB = REGISTRY.register(data.get(292));
+        BLUE_WOOL_SLAB = REGISTRY.register(data.get(293));
+        BROWN_WOOL_SLAB = REGISTRY.register(data.get(294));
+        GREEN_WOOL_SLAB = REGISTRY.register(data.get(295));
+        RED_WOOL_SLAB = REGISTRY.register(data.get(296));
+        BLACK_WOOL_SLAB = REGISTRY.register(data.get(297));
+        DANDELION = REGISTRY.register(data.get(298));
+        GOLDEN_DANDELION = REGISTRY.register(data.get(299));
+        OPEN_EYEBLOSSOM = REGISTRY.register(data.get(300));
+        CLOSED_EYEBLOSSOM = REGISTRY.register(data.get(301));
+        POPPY = REGISTRY.register(data.get(302));
+        BLUE_ORCHID = REGISTRY.register(data.get(303));
+        ALLIUM = REGISTRY.register(data.get(304));
+        AZURE_BLUET = REGISTRY.register(data.get(305));
+        RED_TULIP = REGISTRY.register(data.get(306));
+        ORANGE_TULIP = REGISTRY.register(data.get(307));
+        WHITE_TULIP = REGISTRY.register(data.get(308));
+        PINK_TULIP = REGISTRY.register(data.get(309));
+        OXEYE_DAISY = REGISTRY.register(data.get(310));
+        CORNFLOWER = REGISTRY.register(data.get(311));
+        LILY_OF_THE_VALLEY = REGISTRY.register(data.get(312));
+        WITHER_ROSE = REGISTRY.register(data.get(313));
+        TORCHFLOWER = REGISTRY.register(data.get(314));
+        PITCHER_PLANT = REGISTRY.register(data.get(315));
+        SPORE_BLOSSOM = REGISTRY.register(data.get(316));
+        BROWN_MUSHROOM = REGISTRY.register(data.get(317));
+        RED_MUSHROOM = REGISTRY.register(data.get(318));
+        SHELF_MUSHROOM = REGISTRY.register(data.get(319));
+        CRIMSON_FUNGUS = REGISTRY.register(data.get(320));
+        WARPED_FUNGUS = REGISTRY.register(data.get(321));
+        CRIMSON_ROOTS = REGISTRY.register(data.get(322));
+        WARPED_ROOTS = REGISTRY.register(data.get(323));
+        NETHER_SPROUTS = REGISTRY.register(data.get(324));
+        WEEPING_VINES = REGISTRY.register(data.get(325));
+        TWISTING_VINES = REGISTRY.register(data.get(326));
+        SUGAR_CANE = REGISTRY.register(data.get(327));
+        KELP = REGISTRY.register(data.get(328));
+        PINK_PETALS = REGISTRY.register(data.get(329));
+        WILDFLOWERS = REGISTRY.register(data.get(330));
+        LEAF_LITTER = REGISTRY.register(data.get(331));
+        MOSS_CARPET = REGISTRY.register(data.get(332));
+        MOSS_BLOCK = REGISTRY.register(data.get(333));
+        PALE_MOSS_CARPET = REGISTRY.register(data.get(334));
+        PALE_HANGING_MOSS = REGISTRY.register(data.get(335));
+        PALE_MOSS_BLOCK = REGISTRY.register(data.get(336));
+        HANGING_ROOTS = REGISTRY.register(data.get(337));
+        BIG_DRIPLEAF = REGISTRY.register(data.get(338));
+        SMALL_DRIPLEAF = REGISTRY.register(data.get(339));
+        BAMBOO = REGISTRY.register(data.get(340));
+        OAK_SLAB = REGISTRY.register(data.get(341));
+        SPRUCE_SLAB = REGISTRY.register(data.get(342));
+        BIRCH_SLAB = REGISTRY.register(data.get(343));
+        JUNGLE_SLAB = REGISTRY.register(data.get(344));
+        ACACIA_SLAB = REGISTRY.register(data.get(345));
+        CHERRY_SLAB = REGISTRY.register(data.get(346));
+        DARK_OAK_SLAB = REGISTRY.register(data.get(347));
+        PALE_OAK_SLAB = REGISTRY.register(data.get(348));
+        MANGROVE_SLAB = REGISTRY.register(data.get(349));
+        POPLAR_SLAB = REGISTRY.register(data.get(350));
+        BAMBOO_SLAB = REGISTRY.register(data.get(351));
+        BAMBOO_MOSAIC_SLAB = REGISTRY.register(data.get(352));
+        CRIMSON_SLAB = REGISTRY.register(data.get(353));
+        WARPED_SLAB = REGISTRY.register(data.get(354));
+        STONE_SLAB = REGISTRY.register(data.get(355));
+        SMOOTH_STONE_SLAB = REGISTRY.register(data.get(356));
+        SANDSTONE_SLAB = REGISTRY.register(data.get(357));
+        CUT_SANDSTONE_SLAB = REGISTRY.register(data.get(358));
+        PETRIFIED_OAK_SLAB = REGISTRY.register(data.get(359));
+        COBBLESTONE_SLAB = REGISTRY.register(data.get(360));
+        BRICK_SLAB = REGISTRY.register(data.get(361));
+        STONE_BRICK_SLAB = REGISTRY.register(data.get(362));
+        MUD_BRICK_SLAB = REGISTRY.register(data.get(363));
+        NETHER_BRICK_SLAB = REGISTRY.register(data.get(364));
+        QUARTZ_SLAB = REGISTRY.register(data.get(365));
+        RED_SANDSTONE_SLAB = REGISTRY.register(data.get(366));
+        CUT_RED_SANDSTONE_SLAB = REGISTRY.register(data.get(367));
+        PURPUR_SLAB = REGISTRY.register(data.get(368));
+        PRISMARINE_SLAB = REGISTRY.register(data.get(369));
+        PRISMARINE_BRICK_SLAB = REGISTRY.register(data.get(370));
+        DARK_PRISMARINE_SLAB = REGISTRY.register(data.get(371));
+        SMOOTH_QUARTZ = REGISTRY.register(data.get(372));
+        SMOOTH_RED_SANDSTONE = REGISTRY.register(data.get(373));
+        SMOOTH_SANDSTONE = REGISTRY.register(data.get(374));
+        SMOOTH_STONE = REGISTRY.register(data.get(375));
+        BRICKS = REGISTRY.register(data.get(376));
+        ACACIA_SHELF = REGISTRY.register(data.get(377));
+        BAMBOO_SHELF = REGISTRY.register(data.get(378));
+        BIRCH_SHELF = REGISTRY.register(data.get(379));
+        CHERRY_SHELF = REGISTRY.register(data.get(380));
+        CRIMSON_SHELF = REGISTRY.register(data.get(381));
+        DARK_OAK_SHELF = REGISTRY.register(data.get(382));
+        JUNGLE_SHELF = REGISTRY.register(data.get(383));
+        MANGROVE_SHELF = REGISTRY.register(data.get(384));
+        POPLAR_SHELF = REGISTRY.register(data.get(385));
+        OAK_SHELF = REGISTRY.register(data.get(386));
+        PALE_OAK_SHELF = REGISTRY.register(data.get(387));
+        SPRUCE_SHELF = REGISTRY.register(data.get(388));
+        WARPED_SHELF = REGISTRY.register(data.get(389));
+        BOOKSHELF = REGISTRY.register(data.get(390));
+        CHISELED_BOOKSHELF = REGISTRY.register(data.get(391));
+        DECORATED_POT = REGISTRY.register(data.get(392));
+        MOSSY_COBBLESTONE = REGISTRY.register(data.get(393));
+        OBSIDIAN = REGISTRY.register(data.get(394));
+        TORCH = REGISTRY.register(data.get(395));
+        END_ROD = REGISTRY.register(data.get(396));
+        CHORUS_PLANT = REGISTRY.register(data.get(397));
+        CHORUS_FLOWER = REGISTRY.register(data.get(398));
+        PURPUR_BLOCK = REGISTRY.register(data.get(399));
+        PURPUR_PILLAR = REGISTRY.register(data.get(400));
+        PURPUR_STAIRS = REGISTRY.register(data.get(401));
+        SPAWNER = REGISTRY.register(data.get(402));
+        CREAKING_HEART = REGISTRY.register(data.get(403));
+        CHEST = REGISTRY.register(data.get(404));
+        CRAFTING_TABLE = REGISTRY.register(data.get(405));
+        FARMLAND = REGISTRY.register(data.get(406));
+        FURNACE = REGISTRY.register(data.get(407));
+        LADDER = REGISTRY.register(data.get(408));
+        COBBLESTONE_STAIRS = REGISTRY.register(data.get(409));
+        SNOW = REGISTRY.register(data.get(410));
+        ICE = REGISTRY.register(data.get(411));
+        SNOW_BLOCK = REGISTRY.register(data.get(412));
+        CACTUS = REGISTRY.register(data.get(413));
+        CACTUS_FLOWER = REGISTRY.register(data.get(414));
+        CLAY = REGISTRY.register(data.get(415));
+        JUKEBOX = REGISTRY.register(data.get(416));
+        OAK_FENCE = REGISTRY.register(data.get(417));
+        SPRUCE_FENCE = REGISTRY.register(data.get(418));
+        BIRCH_FENCE = REGISTRY.register(data.get(419));
+        JUNGLE_FENCE = REGISTRY.register(data.get(420));
+        ACACIA_FENCE = REGISTRY.register(data.get(421));
+        CHERRY_FENCE = REGISTRY.register(data.get(422));
+        DARK_OAK_FENCE = REGISTRY.register(data.get(423));
+        PALE_OAK_FENCE = REGISTRY.register(data.get(424));
+        MANGROVE_FENCE = REGISTRY.register(data.get(425));
+        POPLAR_FENCE = REGISTRY.register(data.get(426));
+        BAMBOO_FENCE = REGISTRY.register(data.get(427));
+        CRIMSON_FENCE = REGISTRY.register(data.get(428));
+        WARPED_FENCE = REGISTRY.register(data.get(429));
+        PUMPKIN = REGISTRY.register(data.get(430));
+        CARVED_PUMPKIN = REGISTRY.register(data.get(431));
+        JACK_O_LANTERN = REGISTRY.register(data.get(432));
+        NETHERRACK = REGISTRY.register(data.get(433));
+        SOUL_SAND = REGISTRY.register(data.get(434));
+        SOUL_SOIL = REGISTRY.register(data.get(435));
+        BASALT = REGISTRY.register(data.get(436));
+        POLISHED_BASALT = REGISTRY.register(data.get(437));
+        SMOOTH_BASALT = REGISTRY.register(data.get(438));
+        SOUL_TORCH = REGISTRY.register(data.get(439));
+        COPPER_TORCH = REGISTRY.register(data.get(440));
+        GLOWSTONE = REGISTRY.register(data.get(441));
+        INFESTED_STONE = REGISTRY.register(data.get(442));
+        INFESTED_COBBLESTONE = REGISTRY.register(data.get(443));
+        INFESTED_STONE_BRICKS = REGISTRY.register(data.get(444));
+        INFESTED_MOSSY_STONE_BRICKS = REGISTRY.register(data.get(445));
+        INFESTED_CRACKED_STONE_BRICKS = REGISTRY.register(data.get(446));
+        INFESTED_CHISELED_STONE_BRICKS = REGISTRY.register(data.get(447));
+        INFESTED_DEEPSLATE = REGISTRY.register(data.get(448));
+        STONE_BRICKS = REGISTRY.register(data.get(449));
+        MOSSY_STONE_BRICKS = REGISTRY.register(data.get(450));
+        CRACKED_STONE_BRICKS = REGISTRY.register(data.get(451));
+        CHISELED_STONE_BRICKS = REGISTRY.register(data.get(452));
+        PACKED_MUD = REGISTRY.register(data.get(453));
+        MUD_BRICKS = REGISTRY.register(data.get(454));
+        DEEPSLATE_BRICKS = REGISTRY.register(data.get(455));
+        CRACKED_DEEPSLATE_BRICKS = REGISTRY.register(data.get(456));
+        DEEPSLATE_TILES = REGISTRY.register(data.get(457));
+        CRACKED_DEEPSLATE_TILES = REGISTRY.register(data.get(458));
+        CHISELED_DEEPSLATE = REGISTRY.register(data.get(459));
+        REINFORCED_DEEPSLATE = REGISTRY.register(data.get(460));
+        BROWN_MUSHROOM_BLOCK = REGISTRY.register(data.get(461));
+        RED_MUSHROOM_BLOCK = REGISTRY.register(data.get(462));
+        MUSHROOM_STEM = REGISTRY.register(data.get(463));
+        IRON_BARS = REGISTRY.register(data.get(464));
+        COPPER_BARS = REGISTRY.register(data.get(465));
+        EXPOSED_COPPER_BARS = REGISTRY.register(data.get(466));
+        WEATHERED_COPPER_BARS = REGISTRY.register(data.get(467));
+        OXIDIZED_COPPER_BARS = REGISTRY.register(data.get(468));
+        WAXED_COPPER_BARS = REGISTRY.register(data.get(469));
+        WAXED_EXPOSED_COPPER_BARS = REGISTRY.register(data.get(470));
+        WAXED_WEATHERED_COPPER_BARS = REGISTRY.register(data.get(471));
+        WAXED_OXIDIZED_COPPER_BARS = REGISTRY.register(data.get(472));
+        IRON_CHAIN = REGISTRY.register(data.get(473));
+        COPPER_CHAIN = REGISTRY.register(data.get(474));
+        EXPOSED_COPPER_CHAIN = REGISTRY.register(data.get(475));
+        WEATHERED_COPPER_CHAIN = REGISTRY.register(data.get(476));
+        OXIDIZED_COPPER_CHAIN = REGISTRY.register(data.get(477));
+        WAXED_COPPER_CHAIN = REGISTRY.register(data.get(478));
+        WAXED_EXPOSED_COPPER_CHAIN = REGISTRY.register(data.get(479));
+        WAXED_WEATHERED_COPPER_CHAIN = REGISTRY.register(data.get(480));
+        WAXED_OXIDIZED_COPPER_CHAIN = REGISTRY.register(data.get(481));
+        GLASS_PANE = REGISTRY.register(data.get(482));
+        MELON = REGISTRY.register(data.get(483));
+        VINE = REGISTRY.register(data.get(484));
+        GLOW_LICHEN = REGISTRY.register(data.get(485));
+        RESIN_CLUMP = REGISTRY.register(data.get(486));
+        RESIN_BLOCK = REGISTRY.register(data.get(487));
+        RESIN_BRICKS = REGISTRY.register(data.get(488));
+        RESIN_BRICK_STAIRS = REGISTRY.register(data.get(489));
+        RESIN_BRICK_SLAB = REGISTRY.register(data.get(490));
+        RESIN_BRICK_WALL = REGISTRY.register(data.get(491));
+        CHISELED_RESIN_BRICKS = REGISTRY.register(data.get(492));
+        BRICK_STAIRS = REGISTRY.register(data.get(493));
+        STONE_BRICK_STAIRS = REGISTRY.register(data.get(494));
+        MUD_BRICK_STAIRS = REGISTRY.register(data.get(495));
+        MYCELIUM = REGISTRY.register(data.get(496));
+        LILY_PAD = REGISTRY.register(data.get(497));
+        NETHER_BRICKS = REGISTRY.register(data.get(498));
+        CRACKED_NETHER_BRICKS = REGISTRY.register(data.get(499));
+        CHISELED_NETHER_BRICKS = REGISTRY.register(data.get(500));
+        NETHER_BRICK_FENCE = REGISTRY.register(data.get(501));
+        NETHER_BRICK_STAIRS = REGISTRY.register(data.get(502));
+        SCULK = REGISTRY.register(data.get(503));
+        SCULK_VEIN = REGISTRY.register(data.get(504));
+        SCULK_CATALYST = REGISTRY.register(data.get(505));
+        SCULK_SHRIEKER = REGISTRY.register(data.get(506));
+        ENCHANTING_TABLE = REGISTRY.register(data.get(507));
+        END_PORTAL_FRAME = REGISTRY.register(data.get(508));
+        END_STONE = REGISTRY.register(data.get(509));
+        END_STONE_BRICKS = REGISTRY.register(data.get(510));
+        DRAGON_EGG = REGISTRY.register(data.get(511));
+        SANDSTONE_STAIRS = REGISTRY.register(data.get(512));
+        ENDER_CHEST = REGISTRY.register(data.get(513));
+        EMERALD_BLOCK = REGISTRY.register(data.get(514));
+        OAK_STAIRS = REGISTRY.register(data.get(515));
+        SPRUCE_STAIRS = REGISTRY.register(data.get(516));
+        BIRCH_STAIRS = REGISTRY.register(data.get(517));
+        JUNGLE_STAIRS = REGISTRY.register(data.get(518));
+        ACACIA_STAIRS = REGISTRY.register(data.get(519));
+        CHERRY_STAIRS = REGISTRY.register(data.get(520));
+        DARK_OAK_STAIRS = REGISTRY.register(data.get(521));
+        PALE_OAK_STAIRS = REGISTRY.register(data.get(522));
+        MANGROVE_STAIRS = REGISTRY.register(data.get(523));
+        POPLAR_STAIRS = REGISTRY.register(data.get(524));
+        BAMBOO_STAIRS = REGISTRY.register(data.get(525));
+        BAMBOO_MOSAIC_STAIRS = REGISTRY.register(data.get(526));
+        CRIMSON_STAIRS = REGISTRY.register(data.get(527));
+        WARPED_STAIRS = REGISTRY.register(data.get(528));
+        COMMAND_BLOCK = REGISTRY.register(data.get(529));
+        BEACON = REGISTRY.register(data.get(530));
+        COBBLESTONE_WALL = REGISTRY.register(data.get(531));
+        MOSSY_COBBLESTONE_WALL = REGISTRY.register(data.get(532));
+        BRICK_WALL = REGISTRY.register(data.get(533));
+        PRISMARINE_WALL = REGISTRY.register(data.get(534));
+        RED_SANDSTONE_WALL = REGISTRY.register(data.get(535));
+        MOSSY_STONE_BRICK_WALL = REGISTRY.register(data.get(536));
+        GRANITE_WALL = REGISTRY.register(data.get(537));
+        STONE_BRICK_WALL = REGISTRY.register(data.get(538));
+        MUD_BRICK_WALL = REGISTRY.register(data.get(539));
+        NETHER_BRICK_WALL = REGISTRY.register(data.get(540));
+        ANDESITE_WALL = REGISTRY.register(data.get(541));
+        RED_NETHER_BRICK_WALL = REGISTRY.register(data.get(542));
+        SANDSTONE_WALL = REGISTRY.register(data.get(543));
+        END_STONE_BRICK_WALL = REGISTRY.register(data.get(544));
+        DIORITE_WALL = REGISTRY.register(data.get(545));
+        BLACKSTONE_WALL = REGISTRY.register(data.get(546));
+        POLISHED_BLACKSTONE_WALL = REGISTRY.register(data.get(547));
+        POLISHED_BLACKSTONE_BRICK_WALL = REGISTRY.register(data.get(548));
+        COBBLED_DEEPSLATE_WALL = REGISTRY.register(data.get(549));
+        POLISHED_DEEPSLATE_WALL = REGISTRY.register(data.get(550));
+        DEEPSLATE_BRICK_WALL = REGISTRY.register(data.get(551));
+        DEEPSLATE_TILE_WALL = REGISTRY.register(data.get(552));
+        ANVIL = REGISTRY.register(data.get(553));
+        CHIPPED_ANVIL = REGISTRY.register(data.get(554));
+        DAMAGED_ANVIL = REGISTRY.register(data.get(555));
+        CHISELED_QUARTZ_BLOCK = REGISTRY.register(data.get(556));
+        QUARTZ_BLOCK = REGISTRY.register(data.get(557));
+        QUARTZ_BRICKS = REGISTRY.register(data.get(558));
+        QUARTZ_PILLAR = REGISTRY.register(data.get(559));
+        QUARTZ_STAIRS = REGISTRY.register(data.get(560));
+        WHITE_TERRACOTTA = REGISTRY.register(data.get(561));
+        ORANGE_TERRACOTTA = REGISTRY.register(data.get(562));
+        MAGENTA_TERRACOTTA = REGISTRY.register(data.get(563));
+        LIGHT_BLUE_TERRACOTTA = REGISTRY.register(data.get(564));
+        YELLOW_TERRACOTTA = REGISTRY.register(data.get(565));
+        LIME_TERRACOTTA = REGISTRY.register(data.get(566));
+        PINK_TERRACOTTA = REGISTRY.register(data.get(567));
+        GRAY_TERRACOTTA = REGISTRY.register(data.get(568));
+        LIGHT_GRAY_TERRACOTTA = REGISTRY.register(data.get(569));
+        CYAN_TERRACOTTA = REGISTRY.register(data.get(570));
+        PURPLE_TERRACOTTA = REGISTRY.register(data.get(571));
+        BLUE_TERRACOTTA = REGISTRY.register(data.get(572));
+        BROWN_TERRACOTTA = REGISTRY.register(data.get(573));
+        GREEN_TERRACOTTA = REGISTRY.register(data.get(574));
+        RED_TERRACOTTA = REGISTRY.register(data.get(575));
+        BLACK_TERRACOTTA = REGISTRY.register(data.get(576));
+        BARRIER = REGISTRY.register(data.get(577));
+        LIGHT = REGISTRY.register(data.get(578));
+        HAY_BLOCK = REGISTRY.register(data.get(579));
+        WHITE_CARPET = REGISTRY.register(data.get(580));
+        ORANGE_CARPET = REGISTRY.register(data.get(581));
+        MAGENTA_CARPET = REGISTRY.register(data.get(582));
+        LIGHT_BLUE_CARPET = REGISTRY.register(data.get(583));
+        YELLOW_CARPET = REGISTRY.register(data.get(584));
+        LIME_CARPET = REGISTRY.register(data.get(585));
+        PINK_CARPET = REGISTRY.register(data.get(586));
+        GRAY_CARPET = REGISTRY.register(data.get(587));
+        LIGHT_GRAY_CARPET = REGISTRY.register(data.get(588));
+        CYAN_CARPET = REGISTRY.register(data.get(589));
+        PURPLE_CARPET = REGISTRY.register(data.get(590));
+        BLUE_CARPET = REGISTRY.register(data.get(591));
+        BROWN_CARPET = REGISTRY.register(data.get(592));
+        GREEN_CARPET = REGISTRY.register(data.get(593));
+        RED_CARPET = REGISTRY.register(data.get(594));
+        BLACK_CARPET = REGISTRY.register(data.get(595));
+        TERRACOTTA = REGISTRY.register(data.get(596));
+        PACKED_ICE = REGISTRY.register(data.get(597));
+        DIRT_PATH = REGISTRY.register(data.get(598));
+        SUNFLOWER = REGISTRY.register(data.get(599));
+        LILAC = REGISTRY.register(data.get(600));
+        ROSE_BUSH = REGISTRY.register(data.get(601));
+        PEONY = REGISTRY.register(data.get(602));
+        TALL_GRASS = REGISTRY.register(data.get(603));
+        LARGE_FERN = REGISTRY.register(data.get(604));
+        WHITE_STAINED_GLASS = REGISTRY.register(data.get(605));
+        ORANGE_STAINED_GLASS = REGISTRY.register(data.get(606));
+        MAGENTA_STAINED_GLASS = REGISTRY.register(data.get(607));
+        LIGHT_BLUE_STAINED_GLASS = REGISTRY.register(data.get(608));
+        YELLOW_STAINED_GLASS = REGISTRY.register(data.get(609));
+        LIME_STAINED_GLASS = REGISTRY.register(data.get(610));
+        PINK_STAINED_GLASS = REGISTRY.register(data.get(611));
+        GRAY_STAINED_GLASS = REGISTRY.register(data.get(612));
+        LIGHT_GRAY_STAINED_GLASS = REGISTRY.register(data.get(613));
+        CYAN_STAINED_GLASS = REGISTRY.register(data.get(614));
+        PURPLE_STAINED_GLASS = REGISTRY.register(data.get(615));
+        BLUE_STAINED_GLASS = REGISTRY.register(data.get(616));
+        BROWN_STAINED_GLASS = REGISTRY.register(data.get(617));
+        GREEN_STAINED_GLASS = REGISTRY.register(data.get(618));
+        RED_STAINED_GLASS = REGISTRY.register(data.get(619));
+        BLACK_STAINED_GLASS = REGISTRY.register(data.get(620));
+        WHITE_STAINED_GLASS_PANE = REGISTRY.register(data.get(621));
+        ORANGE_STAINED_GLASS_PANE = REGISTRY.register(data.get(622));
+        MAGENTA_STAINED_GLASS_PANE = REGISTRY.register(data.get(623));
+        LIGHT_BLUE_STAINED_GLASS_PANE = REGISTRY.register(data.get(624));
+        YELLOW_STAINED_GLASS_PANE = REGISTRY.register(data.get(625));
+        LIME_STAINED_GLASS_PANE = REGISTRY.register(data.get(626));
+        PINK_STAINED_GLASS_PANE = REGISTRY.register(data.get(627));
+        GRAY_STAINED_GLASS_PANE = REGISTRY.register(data.get(628));
+        LIGHT_GRAY_STAINED_GLASS_PANE = REGISTRY.register(data.get(629));
+        CYAN_STAINED_GLASS_PANE = REGISTRY.register(data.get(630));
+        PURPLE_STAINED_GLASS_PANE = REGISTRY.register(data.get(631));
+        BLUE_STAINED_GLASS_PANE = REGISTRY.register(data.get(632));
+        BROWN_STAINED_GLASS_PANE = REGISTRY.register(data.get(633));
+        GREEN_STAINED_GLASS_PANE = REGISTRY.register(data.get(634));
+        RED_STAINED_GLASS_PANE = REGISTRY.register(data.get(635));
+        BLACK_STAINED_GLASS_PANE = REGISTRY.register(data.get(636));
+        PRISMARINE = REGISTRY.register(data.get(637));
+        PRISMARINE_BRICKS = REGISTRY.register(data.get(638));
+        DARK_PRISMARINE = REGISTRY.register(data.get(639));
+        PRISMARINE_STAIRS = REGISTRY.register(data.get(640));
+        PRISMARINE_BRICK_STAIRS = REGISTRY.register(data.get(641));
+        DARK_PRISMARINE_STAIRS = REGISTRY.register(data.get(642));
+        SEA_LANTERN = REGISTRY.register(data.get(643));
+        RED_SANDSTONE = REGISTRY.register(data.get(644));
+        CHISELED_RED_SANDSTONE = REGISTRY.register(data.get(645));
+        CUT_RED_SANDSTONE = REGISTRY.register(data.get(646));
+        RED_SANDSTONE_STAIRS = REGISTRY.register(data.get(647));
+        REPEATING_COMMAND_BLOCK = REGISTRY.register(data.get(648));
+        CHAIN_COMMAND_BLOCK = REGISTRY.register(data.get(649));
+        MAGMA_BLOCK = REGISTRY.register(data.get(650));
+        NETHER_WART_BLOCK = REGISTRY.register(data.get(651));
+        WARPED_WART_BLOCK = REGISTRY.register(data.get(652));
+        RED_NETHER_BRICKS = REGISTRY.register(data.get(653));
+        BONE_BLOCK = REGISTRY.register(data.get(654));
+        STRUCTURE_VOID = REGISTRY.register(data.get(655));
+        SHULKER_BOX = REGISTRY.register(data.get(656));
+        WHITE_SHULKER_BOX = REGISTRY.register(data.get(657));
+        ORANGE_SHULKER_BOX = REGISTRY.register(data.get(658));
+        MAGENTA_SHULKER_BOX = REGISTRY.register(data.get(659));
+        LIGHT_BLUE_SHULKER_BOX = REGISTRY.register(data.get(660));
+        YELLOW_SHULKER_BOX = REGISTRY.register(data.get(661));
+        LIME_SHULKER_BOX = REGISTRY.register(data.get(662));
+        PINK_SHULKER_BOX = REGISTRY.register(data.get(663));
+        GRAY_SHULKER_BOX = REGISTRY.register(data.get(664));
+        LIGHT_GRAY_SHULKER_BOX = REGISTRY.register(data.get(665));
+        CYAN_SHULKER_BOX = REGISTRY.register(data.get(666));
+        PURPLE_SHULKER_BOX = REGISTRY.register(data.get(667));
+        BLUE_SHULKER_BOX = REGISTRY.register(data.get(668));
+        BROWN_SHULKER_BOX = REGISTRY.register(data.get(669));
+        GREEN_SHULKER_BOX = REGISTRY.register(data.get(670));
+        RED_SHULKER_BOX = REGISTRY.register(data.get(671));
+        BLACK_SHULKER_BOX = REGISTRY.register(data.get(672));
+        WHITE_GLAZED_TERRACOTTA = REGISTRY.register(data.get(673));
+        ORANGE_GLAZED_TERRACOTTA = REGISTRY.register(data.get(674));
+        MAGENTA_GLAZED_TERRACOTTA = REGISTRY.register(data.get(675));
+        LIGHT_BLUE_GLAZED_TERRACOTTA = REGISTRY.register(data.get(676));
+        YELLOW_GLAZED_TERRACOTTA = REGISTRY.register(data.get(677));
+        LIME_GLAZED_TERRACOTTA = REGISTRY.register(data.get(678));
+        PINK_GLAZED_TERRACOTTA = REGISTRY.register(data.get(679));
+        GRAY_GLAZED_TERRACOTTA = REGISTRY.register(data.get(680));
+        LIGHT_GRAY_GLAZED_TERRACOTTA = REGISTRY.register(data.get(681));
+        CYAN_GLAZED_TERRACOTTA = REGISTRY.register(data.get(682));
+        PURPLE_GLAZED_TERRACOTTA = REGISTRY.register(data.get(683));
+        BLUE_GLAZED_TERRACOTTA = REGISTRY.register(data.get(684));
+        BROWN_GLAZED_TERRACOTTA = REGISTRY.register(data.get(685));
+        GREEN_GLAZED_TERRACOTTA = REGISTRY.register(data.get(686));
+        RED_GLAZED_TERRACOTTA = REGISTRY.register(data.get(687));
+        BLACK_GLAZED_TERRACOTTA = REGISTRY.register(data.get(688));
+        WHITE_CONCRETE = REGISTRY.register(data.get(689));
+        ORANGE_CONCRETE = REGISTRY.register(data.get(690));
+        MAGENTA_CONCRETE = REGISTRY.register(data.get(691));
+        LIGHT_BLUE_CONCRETE = REGISTRY.register(data.get(692));
+        YELLOW_CONCRETE = REGISTRY.register(data.get(693));
+        LIME_CONCRETE = REGISTRY.register(data.get(694));
+        PINK_CONCRETE = REGISTRY.register(data.get(695));
+        GRAY_CONCRETE = REGISTRY.register(data.get(696));
+        LIGHT_GRAY_CONCRETE = REGISTRY.register(data.get(697));
+        CYAN_CONCRETE = REGISTRY.register(data.get(698));
+        PURPLE_CONCRETE = REGISTRY.register(data.get(699));
+        BLUE_CONCRETE = REGISTRY.register(data.get(700));
+        BROWN_CONCRETE = REGISTRY.register(data.get(701));
+        GREEN_CONCRETE = REGISTRY.register(data.get(702));
+        RED_CONCRETE = REGISTRY.register(data.get(703));
+        BLACK_CONCRETE = REGISTRY.register(data.get(704));
+        WHITE_CONCRETE_STAIRS = REGISTRY.register(data.get(705));
+        ORANGE_CONCRETE_STAIRS = REGISTRY.register(data.get(706));
+        MAGENTA_CONCRETE_STAIRS = REGISTRY.register(data.get(707));
+        LIGHT_BLUE_CONCRETE_STAIRS = REGISTRY.register(data.get(708));
+        YELLOW_CONCRETE_STAIRS = REGISTRY.register(data.get(709));
+        LIME_CONCRETE_STAIRS = REGISTRY.register(data.get(710));
+        PINK_CONCRETE_STAIRS = REGISTRY.register(data.get(711));
+        GRAY_CONCRETE_STAIRS = REGISTRY.register(data.get(712));
+        LIGHT_GRAY_CONCRETE_STAIRS = REGISTRY.register(data.get(713));
+        CYAN_CONCRETE_STAIRS = REGISTRY.register(data.get(714));
+        PURPLE_CONCRETE_STAIRS = REGISTRY.register(data.get(715));
+        BLUE_CONCRETE_STAIRS = REGISTRY.register(data.get(716));
+        BROWN_CONCRETE_STAIRS = REGISTRY.register(data.get(717));
+        GREEN_CONCRETE_STAIRS = REGISTRY.register(data.get(718));
+        RED_CONCRETE_STAIRS = REGISTRY.register(data.get(719));
+        BLACK_CONCRETE_STAIRS = REGISTRY.register(data.get(720));
+        WHITE_CONCRETE_SLAB = REGISTRY.register(data.get(721));
+        ORANGE_CONCRETE_SLAB = REGISTRY.register(data.get(722));
+        MAGENTA_CONCRETE_SLAB = REGISTRY.register(data.get(723));
+        LIGHT_BLUE_CONCRETE_SLAB = REGISTRY.register(data.get(724));
+        YELLOW_CONCRETE_SLAB = REGISTRY.register(data.get(725));
+        LIME_CONCRETE_SLAB = REGISTRY.register(data.get(726));
+        PINK_CONCRETE_SLAB = REGISTRY.register(data.get(727));
+        GRAY_CONCRETE_SLAB = REGISTRY.register(data.get(728));
+        LIGHT_GRAY_CONCRETE_SLAB = REGISTRY.register(data.get(729));
+        CYAN_CONCRETE_SLAB = REGISTRY.register(data.get(730));
+        PURPLE_CONCRETE_SLAB = REGISTRY.register(data.get(731));
+        BLUE_CONCRETE_SLAB = REGISTRY.register(data.get(732));
+        BROWN_CONCRETE_SLAB = REGISTRY.register(data.get(733));
+        GREEN_CONCRETE_SLAB = REGISTRY.register(data.get(734));
+        RED_CONCRETE_SLAB = REGISTRY.register(data.get(735));
+        BLACK_CONCRETE_SLAB = REGISTRY.register(data.get(736));
+        WHITE_CONCRETE_POWDER = REGISTRY.register(data.get(737));
+        ORANGE_CONCRETE_POWDER = REGISTRY.register(data.get(738));
+        MAGENTA_CONCRETE_POWDER = REGISTRY.register(data.get(739));
+        LIGHT_BLUE_CONCRETE_POWDER = REGISTRY.register(data.get(740));
+        YELLOW_CONCRETE_POWDER = REGISTRY.register(data.get(741));
+        LIME_CONCRETE_POWDER = REGISTRY.register(data.get(742));
+        PINK_CONCRETE_POWDER = REGISTRY.register(data.get(743));
+        GRAY_CONCRETE_POWDER = REGISTRY.register(data.get(744));
+        LIGHT_GRAY_CONCRETE_POWDER = REGISTRY.register(data.get(745));
+        CYAN_CONCRETE_POWDER = REGISTRY.register(data.get(746));
+        PURPLE_CONCRETE_POWDER = REGISTRY.register(data.get(747));
+        BLUE_CONCRETE_POWDER = REGISTRY.register(data.get(748));
+        BROWN_CONCRETE_POWDER = REGISTRY.register(data.get(749));
+        GREEN_CONCRETE_POWDER = REGISTRY.register(data.get(750));
+        RED_CONCRETE_POWDER = REGISTRY.register(data.get(751));
+        BLACK_CONCRETE_POWDER = REGISTRY.register(data.get(752));
+        TURTLE_EGG = REGISTRY.register(data.get(753));
+        SNIFFER_EGG = REGISTRY.register(data.get(754));
+        DRIED_GHAST = REGISTRY.register(data.get(755));
+        DEAD_TUBE_CORAL_BLOCK = REGISTRY.register(data.get(756));
+        DEAD_BRAIN_CORAL_BLOCK = REGISTRY.register(data.get(757));
+        DEAD_BUBBLE_CORAL_BLOCK = REGISTRY.register(data.get(758));
+        DEAD_FIRE_CORAL_BLOCK = REGISTRY.register(data.get(759));
+        DEAD_HORN_CORAL_BLOCK = REGISTRY.register(data.get(760));
+        TUBE_CORAL_BLOCK = REGISTRY.register(data.get(761));
+        BRAIN_CORAL_BLOCK = REGISTRY.register(data.get(762));
+        BUBBLE_CORAL_BLOCK = REGISTRY.register(data.get(763));
+        FIRE_CORAL_BLOCK = REGISTRY.register(data.get(764));
+        HORN_CORAL_BLOCK = REGISTRY.register(data.get(765));
+        TUBE_CORAL = REGISTRY.register(data.get(766));
+        BRAIN_CORAL = REGISTRY.register(data.get(767));
+        BUBBLE_CORAL = REGISTRY.register(data.get(768));
+        FIRE_CORAL = REGISTRY.register(data.get(769));
+        HORN_CORAL = REGISTRY.register(data.get(770));
+        DEAD_BRAIN_CORAL = REGISTRY.register(data.get(771));
+        DEAD_BUBBLE_CORAL = REGISTRY.register(data.get(772));
+        DEAD_FIRE_CORAL = REGISTRY.register(data.get(773));
+        DEAD_HORN_CORAL = REGISTRY.register(data.get(774));
+        DEAD_TUBE_CORAL = REGISTRY.register(data.get(775));
+        TUBE_CORAL_FAN = REGISTRY.register(data.get(776));
+        BRAIN_CORAL_FAN = REGISTRY.register(data.get(777));
+        BUBBLE_CORAL_FAN = REGISTRY.register(data.get(778));
+        FIRE_CORAL_FAN = REGISTRY.register(data.get(779));
+        HORN_CORAL_FAN = REGISTRY.register(data.get(780));
+        DEAD_TUBE_CORAL_FAN = REGISTRY.register(data.get(781));
+        DEAD_BRAIN_CORAL_FAN = REGISTRY.register(data.get(782));
+        DEAD_BUBBLE_CORAL_FAN = REGISTRY.register(data.get(783));
+        DEAD_FIRE_CORAL_FAN = REGISTRY.register(data.get(784));
+        DEAD_HORN_CORAL_FAN = REGISTRY.register(data.get(785));
+        BLUE_ICE = REGISTRY.register(data.get(786));
+        CONDUIT = REGISTRY.register(data.get(787));
+        POLISHED_GRANITE_STAIRS = REGISTRY.register(data.get(788));
+        SMOOTH_RED_SANDSTONE_STAIRS = REGISTRY.register(data.get(789));
+        MOSSY_STONE_BRICK_STAIRS = REGISTRY.register(data.get(790));
+        POLISHED_DIORITE_STAIRS = REGISTRY.register(data.get(791));
+        MOSSY_COBBLESTONE_STAIRS = REGISTRY.register(data.get(792));
+        END_STONE_BRICK_STAIRS = REGISTRY.register(data.get(793));
+        STONE_STAIRS = REGISTRY.register(data.get(794));
+        SMOOTH_SANDSTONE_STAIRS = REGISTRY.register(data.get(795));
+        SMOOTH_QUARTZ_STAIRS = REGISTRY.register(data.get(796));
+        GRANITE_STAIRS = REGISTRY.register(data.get(797));
+        ANDESITE_STAIRS = REGISTRY.register(data.get(798));
+        RED_NETHER_BRICK_STAIRS = REGISTRY.register(data.get(799));
+        POLISHED_ANDESITE_STAIRS = REGISTRY.register(data.get(800));
+        DIORITE_STAIRS = REGISTRY.register(data.get(801));
+        COBBLED_DEEPSLATE_STAIRS = REGISTRY.register(data.get(802));
+        POLISHED_DEEPSLATE_STAIRS = REGISTRY.register(data.get(803));
+        DEEPSLATE_BRICK_STAIRS = REGISTRY.register(data.get(804));
+        DEEPSLATE_TILE_STAIRS = REGISTRY.register(data.get(805));
+        POLISHED_GRANITE_SLAB = REGISTRY.register(data.get(806));
+        SMOOTH_RED_SANDSTONE_SLAB = REGISTRY.register(data.get(807));
+        MOSSY_STONE_BRICK_SLAB = REGISTRY.register(data.get(808));
+        POLISHED_DIORITE_SLAB = REGISTRY.register(data.get(809));
+        MOSSY_COBBLESTONE_SLAB = REGISTRY.register(data.get(810));
+        END_STONE_BRICK_SLAB = REGISTRY.register(data.get(811));
+        SMOOTH_SANDSTONE_SLAB = REGISTRY.register(data.get(812));
+        SMOOTH_QUARTZ_SLAB = REGISTRY.register(data.get(813));
+        GRANITE_SLAB = REGISTRY.register(data.get(814));
+        ANDESITE_SLAB = REGISTRY.register(data.get(815));
+        RED_NETHER_BRICK_SLAB = REGISTRY.register(data.get(816));
+        POLISHED_ANDESITE_SLAB = REGISTRY.register(data.get(817));
+        DIORITE_SLAB = REGISTRY.register(data.get(818));
+        COBBLED_DEEPSLATE_SLAB = REGISTRY.register(data.get(819));
+        POLISHED_DEEPSLATE_SLAB = REGISTRY.register(data.get(820));
+        DEEPSLATE_BRICK_SLAB = REGISTRY.register(data.get(821));
+        DEEPSLATE_TILE_SLAB = REGISTRY.register(data.get(822));
+        SCAFFOLDING = REGISTRY.register(data.get(823));
+        REDSTONE = REGISTRY.register(data.get(824));
+        REDSTONE_TORCH = REGISTRY.register(data.get(825));
+        REDSTONE_BLOCK = REGISTRY.register(data.get(826));
+        REPEATER = REGISTRY.register(data.get(827));
+        COMPARATOR = REGISTRY.register(data.get(828));
+        PISTON = REGISTRY.register(data.get(829));
+        STICKY_PISTON = REGISTRY.register(data.get(830));
+        SLIME_BLOCK = REGISTRY.register(data.get(831));
+        HONEY_BLOCK = REGISTRY.register(data.get(832));
+        OBSERVER = REGISTRY.register(data.get(833));
+        HOPPER = REGISTRY.register(data.get(834));
+        DISPENSER = REGISTRY.register(data.get(835));
+        DROPPER = REGISTRY.register(data.get(836));
+        LECTERN = REGISTRY.register(data.get(837));
+        TARGET = REGISTRY.register(data.get(838));
+        LEVER = REGISTRY.register(data.get(839));
+        LIGHTNING_ROD = REGISTRY.register(data.get(840));
+        EXPOSED_LIGHTNING_ROD = REGISTRY.register(data.get(841));
+        WEATHERED_LIGHTNING_ROD = REGISTRY.register(data.get(842));
+        OXIDIZED_LIGHTNING_ROD = REGISTRY.register(data.get(843));
+        WAXED_LIGHTNING_ROD = REGISTRY.register(data.get(844));
+        WAXED_EXPOSED_LIGHTNING_ROD = REGISTRY.register(data.get(845));
+        WAXED_WEATHERED_LIGHTNING_ROD = REGISTRY.register(data.get(846));
+        WAXED_OXIDIZED_LIGHTNING_ROD = REGISTRY.register(data.get(847));
+        DAYLIGHT_DETECTOR = REGISTRY.register(data.get(848));
+        SCULK_SENSOR = REGISTRY.register(data.get(849));
+        CALIBRATED_SCULK_SENSOR = REGISTRY.register(data.get(850));
+        TRIPWIRE_HOOK = REGISTRY.register(data.get(851));
+        TRAPPED_CHEST = REGISTRY.register(data.get(852));
+        TNT = REGISTRY.register(data.get(853));
+        REDSTONE_LAMP = REGISTRY.register(data.get(854));
+        NOTE_BLOCK = REGISTRY.register(data.get(855));
+        STONE_BUTTON = REGISTRY.register(data.get(856));
+        POLISHED_BLACKSTONE_BUTTON = REGISTRY.register(data.get(857));
+        OAK_BUTTON = REGISTRY.register(data.get(858));
+        SPRUCE_BUTTON = REGISTRY.register(data.get(859));
+        BIRCH_BUTTON = REGISTRY.register(data.get(860));
+        JUNGLE_BUTTON = REGISTRY.register(data.get(861));
+        ACACIA_BUTTON = REGISTRY.register(data.get(862));
+        CHERRY_BUTTON = REGISTRY.register(data.get(863));
+        DARK_OAK_BUTTON = REGISTRY.register(data.get(864));
+        PALE_OAK_BUTTON = REGISTRY.register(data.get(865));
+        MANGROVE_BUTTON = REGISTRY.register(data.get(866));
+        POPLAR_BUTTON = REGISTRY.register(data.get(867));
+        BAMBOO_BUTTON = REGISTRY.register(data.get(868));
+        CRIMSON_BUTTON = REGISTRY.register(data.get(869));
+        WARPED_BUTTON = REGISTRY.register(data.get(870));
+        STONE_PRESSURE_PLATE = REGISTRY.register(data.get(871));
+        POLISHED_BLACKSTONE_PRESSURE_PLATE = REGISTRY.register(data.get(872));
+        LIGHT_WEIGHTED_PRESSURE_PLATE = REGISTRY.register(data.get(873));
+        HEAVY_WEIGHTED_PRESSURE_PLATE = REGISTRY.register(data.get(874));
+        OAK_PRESSURE_PLATE = REGISTRY.register(data.get(875));
+        SPRUCE_PRESSURE_PLATE = REGISTRY.register(data.get(876));
+        BIRCH_PRESSURE_PLATE = REGISTRY.register(data.get(877));
+        JUNGLE_PRESSURE_PLATE = REGISTRY.register(data.get(878));
+        ACACIA_PRESSURE_PLATE = REGISTRY.register(data.get(879));
+        CHERRY_PRESSURE_PLATE = REGISTRY.register(data.get(880));
+        DARK_OAK_PRESSURE_PLATE = REGISTRY.register(data.get(881));
+        PALE_OAK_PRESSURE_PLATE = REGISTRY.register(data.get(882));
+        MANGROVE_PRESSURE_PLATE = REGISTRY.register(data.get(883));
+        POPLAR_PRESSURE_PLATE = REGISTRY.register(data.get(884));
+        BAMBOO_PRESSURE_PLATE = REGISTRY.register(data.get(885));
+        CRIMSON_PRESSURE_PLATE = REGISTRY.register(data.get(886));
+        WARPED_PRESSURE_PLATE = REGISTRY.register(data.get(887));
+        IRON_DOOR = REGISTRY.register(data.get(888));
+        OAK_DOOR = REGISTRY.register(data.get(889));
+        SPRUCE_DOOR = REGISTRY.register(data.get(890));
+        BIRCH_DOOR = REGISTRY.register(data.get(891));
+        JUNGLE_DOOR = REGISTRY.register(data.get(892));
+        ACACIA_DOOR = REGISTRY.register(data.get(893));
+        CHERRY_DOOR = REGISTRY.register(data.get(894));
+        DARK_OAK_DOOR = REGISTRY.register(data.get(895));
+        PALE_OAK_DOOR = REGISTRY.register(data.get(896));
+        MANGROVE_DOOR = REGISTRY.register(data.get(897));
+        POPLAR_DOOR = REGISTRY.register(data.get(898));
+        BAMBOO_DOOR = REGISTRY.register(data.get(899));
+        CRIMSON_DOOR = REGISTRY.register(data.get(900));
+        WARPED_DOOR = REGISTRY.register(data.get(901));
+        COPPER_DOOR = REGISTRY.register(data.get(902));
+        EXPOSED_COPPER_DOOR = REGISTRY.register(data.get(903));
+        WEATHERED_COPPER_DOOR = REGISTRY.register(data.get(904));
+        OXIDIZED_COPPER_DOOR = REGISTRY.register(data.get(905));
+        WAXED_COPPER_DOOR = REGISTRY.register(data.get(906));
+        WAXED_EXPOSED_COPPER_DOOR = REGISTRY.register(data.get(907));
+        WAXED_WEATHERED_COPPER_DOOR = REGISTRY.register(data.get(908));
+        WAXED_OXIDIZED_COPPER_DOOR = REGISTRY.register(data.get(909));
+        IRON_TRAPDOOR = REGISTRY.register(data.get(910));
+        OAK_TRAPDOOR = REGISTRY.register(data.get(911));
+        SPRUCE_TRAPDOOR = REGISTRY.register(data.get(912));
+        BIRCH_TRAPDOOR = REGISTRY.register(data.get(913));
+        JUNGLE_TRAPDOOR = REGISTRY.register(data.get(914));
+        ACACIA_TRAPDOOR = REGISTRY.register(data.get(915));
+        CHERRY_TRAPDOOR = REGISTRY.register(data.get(916));
+        DARK_OAK_TRAPDOOR = REGISTRY.register(data.get(917));
+        PALE_OAK_TRAPDOOR = REGISTRY.register(data.get(918));
+        MANGROVE_TRAPDOOR = REGISTRY.register(data.get(919));
+        POPLAR_TRAPDOOR = REGISTRY.register(data.get(920));
+        BAMBOO_TRAPDOOR = REGISTRY.register(data.get(921));
+        CRIMSON_TRAPDOOR = REGISTRY.register(data.get(922));
+        WARPED_TRAPDOOR = REGISTRY.register(data.get(923));
+        COPPER_TRAPDOOR = REGISTRY.register(data.get(924));
+        EXPOSED_COPPER_TRAPDOOR = REGISTRY.register(data.get(925));
+        WEATHERED_COPPER_TRAPDOOR = REGISTRY.register(data.get(926));
+        OXIDIZED_COPPER_TRAPDOOR = REGISTRY.register(data.get(927));
+        WAXED_COPPER_TRAPDOOR = REGISTRY.register(data.get(928));
+        WAXED_EXPOSED_COPPER_TRAPDOOR = REGISTRY.register(data.get(929));
+        WAXED_WEATHERED_COPPER_TRAPDOOR = REGISTRY.register(data.get(930));
+        WAXED_OXIDIZED_COPPER_TRAPDOOR = REGISTRY.register(data.get(931));
+        OAK_FENCE_GATE = REGISTRY.register(data.get(932));
+        SPRUCE_FENCE_GATE = REGISTRY.register(data.get(933));
+        BIRCH_FENCE_GATE = REGISTRY.register(data.get(934));
+        JUNGLE_FENCE_GATE = REGISTRY.register(data.get(935));
+        ACACIA_FENCE_GATE = REGISTRY.register(data.get(936));
+        CHERRY_FENCE_GATE = REGISTRY.register(data.get(937));
+        DARK_OAK_FENCE_GATE = REGISTRY.register(data.get(938));
+        PALE_OAK_FENCE_GATE = REGISTRY.register(data.get(939));
+        MANGROVE_FENCE_GATE = REGISTRY.register(data.get(940));
+        POPLAR_FENCE_GATE = REGISTRY.register(data.get(941));
+        BAMBOO_FENCE_GATE = REGISTRY.register(data.get(942));
+        CRIMSON_FENCE_GATE = REGISTRY.register(data.get(943));
+        WARPED_FENCE_GATE = REGISTRY.register(data.get(944));
+        POWERED_RAIL = REGISTRY.register(data.get(945));
+        DETECTOR_RAIL = REGISTRY.register(data.get(946));
+        RAIL = REGISTRY.register(data.get(947));
+        ACTIVATOR_RAIL = REGISTRY.register(data.get(948));
+        SADDLE = REGISTRY.register(data.get(949));
+        WHITE_HARNESS = REGISTRY.register(data.get(950));
+        ORANGE_HARNESS = REGISTRY.register(data.get(951));
+        MAGENTA_HARNESS = REGISTRY.register(data.get(952));
+        LIGHT_BLUE_HARNESS = REGISTRY.register(data.get(953));
+        YELLOW_HARNESS = REGISTRY.register(data.get(954));
+        LIME_HARNESS = REGISTRY.register(data.get(955));
+        PINK_HARNESS = REGISTRY.register(data.get(956));
+        GRAY_HARNESS = REGISTRY.register(data.get(957));
+        LIGHT_GRAY_HARNESS = REGISTRY.register(data.get(958));
+        CYAN_HARNESS = REGISTRY.register(data.get(959));
+        PURPLE_HARNESS = REGISTRY.register(data.get(960));
+        BLUE_HARNESS = REGISTRY.register(data.get(961));
+        BROWN_HARNESS = REGISTRY.register(data.get(962));
+        GREEN_HARNESS = REGISTRY.register(data.get(963));
+        RED_HARNESS = REGISTRY.register(data.get(964));
+        BLACK_HARNESS = REGISTRY.register(data.get(965));
+        MINECART = REGISTRY.register(data.get(966));
+        CHEST_MINECART = REGISTRY.register(data.get(967));
+        FURNACE_MINECART = REGISTRY.register(data.get(968));
+        TNT_MINECART = REGISTRY.register(data.get(969));
+        HOPPER_MINECART = REGISTRY.register(data.get(970));
+        CARROT_ON_A_STICK = REGISTRY.register(data.get(971));
+        WARPED_FUNGUS_ON_A_STICK = REGISTRY.register(data.get(972));
+        PHANTOM_MEMBRANE = REGISTRY.register(data.get(973));
+        ELYTRA = REGISTRY.register(data.get(974));
+        OAK_BOAT = REGISTRY.register(data.get(975));
+        OAK_CHEST_BOAT = REGISTRY.register(data.get(976));
+        SPRUCE_BOAT = REGISTRY.register(data.get(977));
+        SPRUCE_CHEST_BOAT = REGISTRY.register(data.get(978));
+        BIRCH_BOAT = REGISTRY.register(data.get(979));
+        BIRCH_CHEST_BOAT = REGISTRY.register(data.get(980));
+        JUNGLE_BOAT = REGISTRY.register(data.get(981));
+        JUNGLE_CHEST_BOAT = REGISTRY.register(data.get(982));
+        ACACIA_BOAT = REGISTRY.register(data.get(983));
+        ACACIA_CHEST_BOAT = REGISTRY.register(data.get(984));
+        CHERRY_BOAT = REGISTRY.register(data.get(985));
+        CHERRY_CHEST_BOAT = REGISTRY.register(data.get(986));
+        DARK_OAK_BOAT = REGISTRY.register(data.get(987));
+        DARK_OAK_CHEST_BOAT = REGISTRY.register(data.get(988));
+        PALE_OAK_BOAT = REGISTRY.register(data.get(989));
+        PALE_OAK_CHEST_BOAT = REGISTRY.register(data.get(990));
+        MANGROVE_BOAT = REGISTRY.register(data.get(991));
+        MANGROVE_CHEST_BOAT = REGISTRY.register(data.get(992));
+        POPLAR_BOAT = REGISTRY.register(data.get(993));
+        POPLAR_CHEST_BOAT = REGISTRY.register(data.get(994));
+        BAMBOO_RAFT = REGISTRY.register(data.get(995));
+        BAMBOO_CHEST_RAFT = REGISTRY.register(data.get(996));
+        STRUCTURE_BLOCK = REGISTRY.register(data.get(997));
+        JIGSAW = REGISTRY.register(data.get(998));
+        TEST_BLOCK = REGISTRY.register(data.get(999));
+        TEST_INSTANCE_BLOCK = REGISTRY.register(data.get(1000));
+        TURTLE_HELMET = REGISTRY.register(data.get(1001));
+        TURTLE_SCUTE = REGISTRY.register(data.get(1002));
+        ARMADILLO_SCUTE = REGISTRY.register(data.get(1003));
+        WOLF_ARMOR = REGISTRY.register(data.get(1004));
+        FLINT_AND_STEEL = REGISTRY.register(data.get(1005));
+        BOWL = REGISTRY.register(data.get(1006));
+        APPLE = REGISTRY.register(data.get(1007));
+        BOW = REGISTRY.register(data.get(1008));
+        ARROW = REGISTRY.register(data.get(1009));
+        COAL = REGISTRY.register(data.get(1010));
+        CHARCOAL = REGISTRY.register(data.get(1011));
+        DIAMOND = REGISTRY.register(data.get(1012));
+        EMERALD = REGISTRY.register(data.get(1013));
+        LAPIS_LAZULI = REGISTRY.register(data.get(1014));
+        QUARTZ = REGISTRY.register(data.get(1015));
+        AMETHYST_SHARD = REGISTRY.register(data.get(1016));
+        RAW_IRON = REGISTRY.register(data.get(1017));
+        IRON_INGOT = REGISTRY.register(data.get(1018));
+        RAW_COPPER = REGISTRY.register(data.get(1019));
+        COPPER_INGOT = REGISTRY.register(data.get(1020));
+        RAW_GOLD = REGISTRY.register(data.get(1021));
+        GOLD_INGOT = REGISTRY.register(data.get(1022));
+        NETHERITE_INGOT = REGISTRY.register(data.get(1023));
+        NETHERITE_SCRAP = REGISTRY.register(data.get(1024));
+        WOODEN_SWORD = REGISTRY.register(data.get(1025));
+        WOODEN_SHOVEL = REGISTRY.register(data.get(1026));
+        WOODEN_PICKAXE = REGISTRY.register(data.get(1027));
+        WOODEN_AXE = REGISTRY.register(data.get(1028));
+        WOODEN_HOE = REGISTRY.register(data.get(1029));
+        COPPER_SWORD = REGISTRY.register(data.get(1030));
+        COPPER_SHOVEL = REGISTRY.register(data.get(1031));
+        COPPER_PICKAXE = REGISTRY.register(data.get(1032));
+        COPPER_AXE = REGISTRY.register(data.get(1033));
+        COPPER_HOE = REGISTRY.register(data.get(1034));
+        STONE_SWORD = REGISTRY.register(data.get(1035));
+        STONE_SHOVEL = REGISTRY.register(data.get(1036));
+        STONE_PICKAXE = REGISTRY.register(data.get(1037));
+        STONE_AXE = REGISTRY.register(data.get(1038));
+        STONE_HOE = REGISTRY.register(data.get(1039));
+        GOLDEN_SWORD = REGISTRY.register(data.get(1040));
+        GOLDEN_SHOVEL = REGISTRY.register(data.get(1041));
+        GOLDEN_PICKAXE = REGISTRY.register(data.get(1042));
+        GOLDEN_AXE = REGISTRY.register(data.get(1043));
+        GOLDEN_HOE = REGISTRY.register(data.get(1044));
+        IRON_SWORD = REGISTRY.register(data.get(1045));
+        IRON_SHOVEL = REGISTRY.register(data.get(1046));
+        IRON_PICKAXE = REGISTRY.register(data.get(1047));
+        IRON_AXE = REGISTRY.register(data.get(1048));
+        IRON_HOE = REGISTRY.register(data.get(1049));
+        DIAMOND_SWORD = REGISTRY.register(data.get(1050));
+        DIAMOND_SHOVEL = REGISTRY.register(data.get(1051));
+        DIAMOND_PICKAXE = REGISTRY.register(data.get(1052));
+        DIAMOND_AXE = REGISTRY.register(data.get(1053));
+        DIAMOND_HOE = REGISTRY.register(data.get(1054));
+        NETHERITE_SWORD = REGISTRY.register(data.get(1055));
+        NETHERITE_SHOVEL = REGISTRY.register(data.get(1056));
+        NETHERITE_PICKAXE = REGISTRY.register(data.get(1057));
+        NETHERITE_AXE = REGISTRY.register(data.get(1058));
+        NETHERITE_HOE = REGISTRY.register(data.get(1059));
+        STICK = REGISTRY.register(data.get(1060));
+        MUSHROOM_STEW = REGISTRY.register(data.get(1061));
+        STRING = REGISTRY.register(data.get(1062));
+        FEATHER = REGISTRY.register(data.get(1063));
+        GUNPOWDER = REGISTRY.register(data.get(1064));
+        WHEAT_SEEDS = REGISTRY.register(data.get(1065));
+        WHEAT = REGISTRY.register(data.get(1066));
+        BREAD = REGISTRY.register(data.get(1067));
+        LEATHER_HELMET = REGISTRY.register(data.get(1068));
+        LEATHER_CHESTPLATE = REGISTRY.register(data.get(1069));
+        LEATHER_LEGGINGS = REGISTRY.register(data.get(1070));
+        LEATHER_BOOTS = REGISTRY.register(data.get(1071));
+        COPPER_HELMET = REGISTRY.register(data.get(1072));
+        COPPER_CHESTPLATE = REGISTRY.register(data.get(1073));
+        COPPER_LEGGINGS = REGISTRY.register(data.get(1074));
+        COPPER_BOOTS = REGISTRY.register(data.get(1075));
+        CHAINMAIL_HELMET = REGISTRY.register(data.get(1076));
+        CHAINMAIL_CHESTPLATE = REGISTRY.register(data.get(1077));
+        CHAINMAIL_LEGGINGS = REGISTRY.register(data.get(1078));
+        CHAINMAIL_BOOTS = REGISTRY.register(data.get(1079));
+        IRON_HELMET = REGISTRY.register(data.get(1080));
+        IRON_CHESTPLATE = REGISTRY.register(data.get(1081));
+        IRON_LEGGINGS = REGISTRY.register(data.get(1082));
+        IRON_BOOTS = REGISTRY.register(data.get(1083));
+        DIAMOND_HELMET = REGISTRY.register(data.get(1084));
+        DIAMOND_CHESTPLATE = REGISTRY.register(data.get(1085));
+        DIAMOND_LEGGINGS = REGISTRY.register(data.get(1086));
+        DIAMOND_BOOTS = REGISTRY.register(data.get(1087));
+        GOLDEN_HELMET = REGISTRY.register(data.get(1088));
+        GOLDEN_CHESTPLATE = REGISTRY.register(data.get(1089));
+        GOLDEN_LEGGINGS = REGISTRY.register(data.get(1090));
+        GOLDEN_BOOTS = REGISTRY.register(data.get(1091));
+        NETHERITE_HELMET = REGISTRY.register(data.get(1092));
+        NETHERITE_CHESTPLATE = REGISTRY.register(data.get(1093));
+        NETHERITE_LEGGINGS = REGISTRY.register(data.get(1094));
+        NETHERITE_BOOTS = REGISTRY.register(data.get(1095));
+        FLINT = REGISTRY.register(data.get(1096));
+        PORKCHOP = REGISTRY.register(data.get(1097));
+        COOKED_PORKCHOP = REGISTRY.register(data.get(1098));
+        PAINTING = REGISTRY.register(data.get(1099));
+        GOLDEN_APPLE = REGISTRY.register(data.get(1100));
+        ENCHANTED_GOLDEN_APPLE = REGISTRY.register(data.get(1101));
+        OAK_SIGN = REGISTRY.register(data.get(1102));
+        SPRUCE_SIGN = REGISTRY.register(data.get(1103));
+        BIRCH_SIGN = REGISTRY.register(data.get(1104));
+        JUNGLE_SIGN = REGISTRY.register(data.get(1105));
+        ACACIA_SIGN = REGISTRY.register(data.get(1106));
+        CHERRY_SIGN = REGISTRY.register(data.get(1107));
+        DARK_OAK_SIGN = REGISTRY.register(data.get(1108));
+        PALE_OAK_SIGN = REGISTRY.register(data.get(1109));
+        MANGROVE_SIGN = REGISTRY.register(data.get(1110));
+        POPLAR_SIGN = REGISTRY.register(data.get(1111));
+        BAMBOO_SIGN = REGISTRY.register(data.get(1112));
+        CRIMSON_SIGN = REGISTRY.register(data.get(1113));
+        WARPED_SIGN = REGISTRY.register(data.get(1114));
+        OAK_HANGING_SIGN = REGISTRY.register(data.get(1115));
+        SPRUCE_HANGING_SIGN = REGISTRY.register(data.get(1116));
+        BIRCH_HANGING_SIGN = REGISTRY.register(data.get(1117));
+        JUNGLE_HANGING_SIGN = REGISTRY.register(data.get(1118));
+        ACACIA_HANGING_SIGN = REGISTRY.register(data.get(1119));
+        CHERRY_HANGING_SIGN = REGISTRY.register(data.get(1120));
+        DARK_OAK_HANGING_SIGN = REGISTRY.register(data.get(1121));
+        PALE_OAK_HANGING_SIGN = REGISTRY.register(data.get(1122));
+        MANGROVE_HANGING_SIGN = REGISTRY.register(data.get(1123));
+        POPLAR_HANGING_SIGN = REGISTRY.register(data.get(1124));
+        BAMBOO_HANGING_SIGN = REGISTRY.register(data.get(1125));
+        CRIMSON_HANGING_SIGN = REGISTRY.register(data.get(1126));
+        WARPED_HANGING_SIGN = REGISTRY.register(data.get(1127));
+        BUCKET = REGISTRY.register(data.get(1128));
+        WATER_BUCKET = REGISTRY.register(data.get(1129));
+        LAVA_BUCKET = REGISTRY.register(data.get(1130));
+        POWDER_SNOW_BUCKET = REGISTRY.register(data.get(1131));
+        SNOWBALL = REGISTRY.register(data.get(1132));
+        LEATHER = REGISTRY.register(data.get(1133));
+        MILK_BUCKET = REGISTRY.register(data.get(1134));
+        PUFFERFISH_BUCKET = REGISTRY.register(data.get(1135));
+        SALMON_BUCKET = REGISTRY.register(data.get(1136));
+        COD_BUCKET = REGISTRY.register(data.get(1137));
+        TROPICAL_FISH_BUCKET = REGISTRY.register(data.get(1138));
+        AXOLOTL_BUCKET = REGISTRY.register(data.get(1139));
+        SULFUR_CUBE_BUCKET = REGISTRY.register(data.get(1140));
+        TADPOLE_BUCKET = REGISTRY.register(data.get(1141));
+        BRICK = REGISTRY.register(data.get(1142));
+        CLAY_BALL = REGISTRY.register(data.get(1143));
+        DRIED_KELP_BLOCK = REGISTRY.register(data.get(1144));
+        PAPER = REGISTRY.register(data.get(1145));
+        BOOK = REGISTRY.register(data.get(1146));
+        SLIME_BALL = REGISTRY.register(data.get(1147));
+        EGG = REGISTRY.register(data.get(1148));
+        BLUE_EGG = REGISTRY.register(data.get(1149));
+        BROWN_EGG = REGISTRY.register(data.get(1150));
+        COMPASS = REGISTRY.register(data.get(1151));
+        RECOVERY_COMPASS = REGISTRY.register(data.get(1152));
+        BUNDLE = REGISTRY.register(data.get(1153));
+        WHITE_BUNDLE = REGISTRY.register(data.get(1154));
+        ORANGE_BUNDLE = REGISTRY.register(data.get(1155));
+        MAGENTA_BUNDLE = REGISTRY.register(data.get(1156));
+        LIGHT_BLUE_BUNDLE = REGISTRY.register(data.get(1157));
+        YELLOW_BUNDLE = REGISTRY.register(data.get(1158));
+        LIME_BUNDLE = REGISTRY.register(data.get(1159));
+        PINK_BUNDLE = REGISTRY.register(data.get(1160));
+        GRAY_BUNDLE = REGISTRY.register(data.get(1161));
+        LIGHT_GRAY_BUNDLE = REGISTRY.register(data.get(1162));
+        CYAN_BUNDLE = REGISTRY.register(data.get(1163));
+        PURPLE_BUNDLE = REGISTRY.register(data.get(1164));
+        BLUE_BUNDLE = REGISTRY.register(data.get(1165));
+        BROWN_BUNDLE = REGISTRY.register(data.get(1166));
+        GREEN_BUNDLE = REGISTRY.register(data.get(1167));
+        RED_BUNDLE = REGISTRY.register(data.get(1168));
+        BLACK_BUNDLE = REGISTRY.register(data.get(1169));
+        WHITE_CUSHION = REGISTRY.register(data.get(1170));
+        ORANGE_CUSHION = REGISTRY.register(data.get(1171));
+        MAGENTA_CUSHION = REGISTRY.register(data.get(1172));
+        LIGHT_BLUE_CUSHION = REGISTRY.register(data.get(1173));
+        YELLOW_CUSHION = REGISTRY.register(data.get(1174));
+        LIME_CUSHION = REGISTRY.register(data.get(1175));
+        PINK_CUSHION = REGISTRY.register(data.get(1176));
+        GRAY_CUSHION = REGISTRY.register(data.get(1177));
+        LIGHT_GRAY_CUSHION = REGISTRY.register(data.get(1178));
+        CYAN_CUSHION = REGISTRY.register(data.get(1179));
+        PURPLE_CUSHION = REGISTRY.register(data.get(1180));
+        BLUE_CUSHION = REGISTRY.register(data.get(1181));
+        BROWN_CUSHION = REGISTRY.register(data.get(1182));
+        GREEN_CUSHION = REGISTRY.register(data.get(1183));
+        RED_CUSHION = REGISTRY.register(data.get(1184));
+        BLACK_CUSHION = REGISTRY.register(data.get(1185));
+        FISHING_ROD = REGISTRY.register(data.get(1186));
+        CLOCK = REGISTRY.register(data.get(1187));
+        SPYGLASS = REGISTRY.register(data.get(1188));
+        GLOWSTONE_DUST = REGISTRY.register(data.get(1189));
+        COD = REGISTRY.register(data.get(1190));
+        SALMON = REGISTRY.register(data.get(1191));
+        TROPICAL_FISH = REGISTRY.register(data.get(1192));
+        PUFFERFISH = REGISTRY.register(data.get(1193));
+        COOKED_COD = REGISTRY.register(data.get(1194));
+        COOKED_SALMON = REGISTRY.register(data.get(1195));
+        INK_SAC = REGISTRY.register(data.get(1196));
+        GLOW_INK_SAC = REGISTRY.register(data.get(1197));
+        COCOA_BEANS = REGISTRY.register(data.get(1198));
+        WHITE_DYE = REGISTRY.register(data.get(1199));
+        ORANGE_DYE = REGISTRY.register(data.get(1200));
+        MAGENTA_DYE = REGISTRY.register(data.get(1201));
+        LIGHT_BLUE_DYE = REGISTRY.register(data.get(1202));
+        YELLOW_DYE = REGISTRY.register(data.get(1203));
+        LIME_DYE = REGISTRY.register(data.get(1204));
+        PINK_DYE = REGISTRY.register(data.get(1205));
+        GRAY_DYE = REGISTRY.register(data.get(1206));
+        LIGHT_GRAY_DYE = REGISTRY.register(data.get(1207));
+        CYAN_DYE = REGISTRY.register(data.get(1208));
+        PURPLE_DYE = REGISTRY.register(data.get(1209));
+        BLUE_DYE = REGISTRY.register(data.get(1210));
+        BROWN_DYE = REGISTRY.register(data.get(1211));
+        GREEN_DYE = REGISTRY.register(data.get(1212));
+        RED_DYE = REGISTRY.register(data.get(1213));
+        BLACK_DYE = REGISTRY.register(data.get(1214));
+        BONE_MEAL = REGISTRY.register(data.get(1215));
+        BONE = REGISTRY.register(data.get(1216));
+        SUGAR = REGISTRY.register(data.get(1217));
+        CAKE = REGISTRY.register(data.get(1218));
+        WHITE_BED = REGISTRY.register(data.get(1219));
+        ORANGE_BED = REGISTRY.register(data.get(1220));
+        MAGENTA_BED = REGISTRY.register(data.get(1221));
+        LIGHT_BLUE_BED = REGISTRY.register(data.get(1222));
+        YELLOW_BED = REGISTRY.register(data.get(1223));
+        LIME_BED = REGISTRY.register(data.get(1224));
+        PINK_BED = REGISTRY.register(data.get(1225));
+        GRAY_BED = REGISTRY.register(data.get(1226));
+        LIGHT_GRAY_BED = REGISTRY.register(data.get(1227));
+        CYAN_BED = REGISTRY.register(data.get(1228));
+        PURPLE_BED = REGISTRY.register(data.get(1229));
+        BLUE_BED = REGISTRY.register(data.get(1230));
+        BROWN_BED = REGISTRY.register(data.get(1231));
+        GREEN_BED = REGISTRY.register(data.get(1232));
+        RED_BED = REGISTRY.register(data.get(1233));
+        BLACK_BED = REGISTRY.register(data.get(1234));
+        STRAW_BED = REGISTRY.register(data.get(1235));
+        COOKIE = REGISTRY.register(data.get(1236));
+        CRAFTER = REGISTRY.register(data.get(1237));
+        FILLED_MAP = REGISTRY.register(data.get(1238));
+        OCEAN_MONUMENT_MAP = REGISTRY.register(data.get(1239));
+        WOODLAND_MANSION_MAP = REGISTRY.register(data.get(1240));
+        BURIED_TRIAL_CHAMBERS_MAP = REGISTRY.register(data.get(1241));
+        JUNGLE_PYRAMID_MAP = REGISTRY.register(data.get(1242));
+        SWAMP_HUT_MAP = REGISTRY.register(data.get(1243));
+        DESERT_VILLAGE_MAP = REGISTRY.register(data.get(1244));
+        PLAINS_VILLAGE_MAP = REGISTRY.register(data.get(1245));
+        SAVANNA_VILLAGE_MAP = REGISTRY.register(data.get(1246));
+        SNOWY_VILLAGE_MAP = REGISTRY.register(data.get(1247));
+        TAIGA_VILLAGE_MAP = REGISTRY.register(data.get(1248));
+        BURIED_TREASURE_MAP = REGISTRY.register(data.get(1249));
+        BURIED_ANCIENT_CITY_MAP = REGISTRY.register(data.get(1250));
+        BURIED_MINESHAFT_MAP = REGISTRY.register(data.get(1251));
+        DESERT_PYRAMID_MAP = REGISTRY.register(data.get(1252));
+        ABANDONED_CAMP_MAP = REGISTRY.register(data.get(1253));
+        WARM_OCEAN_RUINS_MAP = REGISTRY.register(data.get(1254));
+        SHEARS = REGISTRY.register(data.get(1255));
+        MELON_SLICE = REGISTRY.register(data.get(1256));
+        DRIED_KELP = REGISTRY.register(data.get(1257));
+        PUMPKIN_SEEDS = REGISTRY.register(data.get(1258));
+        MELON_SEEDS = REGISTRY.register(data.get(1259));
+        BEEF = REGISTRY.register(data.get(1260));
+        COOKED_BEEF = REGISTRY.register(data.get(1261));
+        CHICKEN = REGISTRY.register(data.get(1262));
+        COOKED_CHICKEN = REGISTRY.register(data.get(1263));
+        ROTTEN_FLESH = REGISTRY.register(data.get(1264));
+        ENDER_PEARL = REGISTRY.register(data.get(1265));
+        BLAZE_ROD = REGISTRY.register(data.get(1266));
+        GHAST_TEAR = REGISTRY.register(data.get(1267));
+        GOLD_NUGGET = REGISTRY.register(data.get(1268));
+        NETHER_WART = REGISTRY.register(data.get(1269));
+        GLASS_BOTTLE = REGISTRY.register(data.get(1270));
+        POTION = REGISTRY.register(data.get(1271));
+        SPIDER_EYE = REGISTRY.register(data.get(1272));
+        FERMENTED_SPIDER_EYE = REGISTRY.register(data.get(1273));
+        BLAZE_POWDER = REGISTRY.register(data.get(1274));
+        MAGMA_CREAM = REGISTRY.register(data.get(1275));
+        BREWING_STAND = REGISTRY.register(data.get(1276));
+        CAULDRON = REGISTRY.register(data.get(1277));
+        ENDER_EYE = REGISTRY.register(data.get(1278));
+        GLISTERING_MELON_SLICE = REGISTRY.register(data.get(1279));
+        CHICKEN_SPAWN_EGG = REGISTRY.register(data.get(1280));
+        COW_SPAWN_EGG = REGISTRY.register(data.get(1281));
+        PIG_SPAWN_EGG = REGISTRY.register(data.get(1282));
+        SHEEP_SPAWN_EGG = REGISTRY.register(data.get(1283));
+        CAMEL_SPAWN_EGG = REGISTRY.register(data.get(1284));
+        DONKEY_SPAWN_EGG = REGISTRY.register(data.get(1285));
+        HORSE_SPAWN_EGG = REGISTRY.register(data.get(1286));
+        MULE_SPAWN_EGG = REGISTRY.register(data.get(1287));
+        CAT_SPAWN_EGG = REGISTRY.register(data.get(1288));
+        PARROT_SPAWN_EGG = REGISTRY.register(data.get(1289));
+        WOLF_SPAWN_EGG = REGISTRY.register(data.get(1290));
+        ARMADILLO_SPAWN_EGG = REGISTRY.register(data.get(1291));
+        BAT_SPAWN_EGG = REGISTRY.register(data.get(1292));
+        BEE_SPAWN_EGG = REGISTRY.register(data.get(1293));
+        FOX_SPAWN_EGG = REGISTRY.register(data.get(1294));
+        GOAT_SPAWN_EGG = REGISTRY.register(data.get(1295));
+        LLAMA_SPAWN_EGG = REGISTRY.register(data.get(1296));
+        OCELOT_SPAWN_EGG = REGISTRY.register(data.get(1297));
+        PANDA_SPAWN_EGG = REGISTRY.register(data.get(1298));
+        POLAR_BEAR_SPAWN_EGG = REGISTRY.register(data.get(1299));
+        RABBIT_SPAWN_EGG = REGISTRY.register(data.get(1300));
+        AXOLOTL_SPAWN_EGG = REGISTRY.register(data.get(1301));
+        COD_SPAWN_EGG = REGISTRY.register(data.get(1302));
+        DOLPHIN_SPAWN_EGG = REGISTRY.register(data.get(1303));
+        FROG_SPAWN_EGG = REGISTRY.register(data.get(1304));
+        GLOW_SQUID_SPAWN_EGG = REGISTRY.register(data.get(1305));
+        NAUTILUS_SPAWN_EGG = REGISTRY.register(data.get(1306));
+        PUFFERFISH_SPAWN_EGG = REGISTRY.register(data.get(1307));
+        SALMON_SPAWN_EGG = REGISTRY.register(data.get(1308));
+        SQUID_SPAWN_EGG = REGISTRY.register(data.get(1309));
+        TADPOLE_SPAWN_EGG = REGISTRY.register(data.get(1310));
+        TROPICAL_FISH_SPAWN_EGG = REGISTRY.register(data.get(1311));
+        TURTLE_SPAWN_EGG = REGISTRY.register(data.get(1312));
+        ALLAY_SPAWN_EGG = REGISTRY.register(data.get(1313));
+        MOOSHROOM_SPAWN_EGG = REGISTRY.register(data.get(1314));
+        SNIFFER_SPAWN_EGG = REGISTRY.register(data.get(1315));
+        SULFUR_CUBE_SPAWN_EGG = REGISTRY.register(data.get(1316));
+        COPPER_GOLEM_SPAWN_EGG = REGISTRY.register(data.get(1317));
+        IRON_GOLEM_SPAWN_EGG = REGISTRY.register(data.get(1318));
+        SNOW_GOLEM_SPAWN_EGG = REGISTRY.register(data.get(1319));
+        TRADER_LLAMA_SPAWN_EGG = REGISTRY.register(data.get(1320));
+        VILLAGER_SPAWN_EGG = REGISTRY.register(data.get(1321));
+        WANDERING_TRADER_SPAWN_EGG = REGISTRY.register(data.get(1322));
+        BOGGED_SPAWN_EGG = REGISTRY.register(data.get(1323));
+        CAMEL_HUSK_SPAWN_EGG = REGISTRY.register(data.get(1324));
+        DROWNED_SPAWN_EGG = REGISTRY.register(data.get(1325));
+        HUSK_SPAWN_EGG = REGISTRY.register(data.get(1326));
+        PARCHED_SPAWN_EGG = REGISTRY.register(data.get(1327));
+        SKELETON_SPAWN_EGG = REGISTRY.register(data.get(1328));
+        SKELETON_HORSE_SPAWN_EGG = REGISTRY.register(data.get(1329));
+        STRAY_SPAWN_EGG = REGISTRY.register(data.get(1330));
+        WITHER_SPAWN_EGG = REGISTRY.register(data.get(1331));
+        WITHER_SKELETON_SPAWN_EGG = REGISTRY.register(data.get(1332));
+        ZOMBIE_SPAWN_EGG = REGISTRY.register(data.get(1333));
+        ZOMBIE_HORSE_SPAWN_EGG = REGISTRY.register(data.get(1334));
+        ZOMBIE_NAUTILUS_SPAWN_EGG = REGISTRY.register(data.get(1335));
+        ZOMBIE_VILLAGER_SPAWN_EGG = REGISTRY.register(data.get(1336));
+        CAVE_SPIDER_SPAWN_EGG = REGISTRY.register(data.get(1337));
+        SPIDER_SPAWN_EGG = REGISTRY.register(data.get(1338));
+        BREEZE_SPAWN_EGG = REGISTRY.register(data.get(1339));
+        CREAKING_SPAWN_EGG = REGISTRY.register(data.get(1340));
+        CREEPER_SPAWN_EGG = REGISTRY.register(data.get(1341));
+        ELDER_GUARDIAN_SPAWN_EGG = REGISTRY.register(data.get(1342));
+        GUARDIAN_SPAWN_EGG = REGISTRY.register(data.get(1343));
+        PHANTOM_SPAWN_EGG = REGISTRY.register(data.get(1344));
+        SILVERFISH_SPAWN_EGG = REGISTRY.register(data.get(1345));
+        SLIME_SPAWN_EGG = REGISTRY.register(data.get(1346));
+        WARDEN_SPAWN_EGG = REGISTRY.register(data.get(1347));
+        WITCH_SPAWN_EGG = REGISTRY.register(data.get(1348));
+        EVOKER_SPAWN_EGG = REGISTRY.register(data.get(1349));
+        PILLAGER_SPAWN_EGG = REGISTRY.register(data.get(1350));
+        RAVAGER_SPAWN_EGG = REGISTRY.register(data.get(1351));
+        VINDICATOR_SPAWN_EGG = REGISTRY.register(data.get(1352));
+        VEX_SPAWN_EGG = REGISTRY.register(data.get(1353));
+        BLAZE_SPAWN_EGG = REGISTRY.register(data.get(1354));
+        GHAST_SPAWN_EGG = REGISTRY.register(data.get(1355));
+        HAPPY_GHAST_SPAWN_EGG = REGISTRY.register(data.get(1356));
+        HOGLIN_SPAWN_EGG = REGISTRY.register(data.get(1357));
+        MAGMA_CUBE_SPAWN_EGG = REGISTRY.register(data.get(1358));
+        PIGLIN_SPAWN_EGG = REGISTRY.register(data.get(1359));
+        PIGLIN_BRUTE_SPAWN_EGG = REGISTRY.register(data.get(1360));
+        STRIDER_SPAWN_EGG = REGISTRY.register(data.get(1361));
+        ZOGLIN_SPAWN_EGG = REGISTRY.register(data.get(1362));
+        ZOMBIFIED_PIGLIN_SPAWN_EGG = REGISTRY.register(data.get(1363));
+        ENDER_DRAGON_SPAWN_EGG = REGISTRY.register(data.get(1364));
+        ENDERMAN_SPAWN_EGG = REGISTRY.register(data.get(1365));
+        ENDERMITE_SPAWN_EGG = REGISTRY.register(data.get(1366));
+        SHULKER_SPAWN_EGG = REGISTRY.register(data.get(1367));
+        EXPERIENCE_BOTTLE = REGISTRY.register(data.get(1368));
+        FIRE_CHARGE = REGISTRY.register(data.get(1369));
+        WIND_CHARGE = REGISTRY.register(data.get(1370));
+        WRITABLE_BOOK = REGISTRY.register(data.get(1371));
+        WRITTEN_BOOK = REGISTRY.register(data.get(1372));
+        BREEZE_ROD = REGISTRY.register(data.get(1373));
+        MACE = REGISTRY.register(data.get(1374));
+        ITEM_FRAME = REGISTRY.register(data.get(1375));
+        GLOW_ITEM_FRAME = REGISTRY.register(data.get(1376));
+        FLOWER_POT = REGISTRY.register(data.get(1377));
+        CARROT = REGISTRY.register(data.get(1378));
+        POTATO = REGISTRY.register(data.get(1379));
+        BAKED_POTATO = REGISTRY.register(data.get(1380));
+        POISONOUS_POTATO = REGISTRY.register(data.get(1381));
+        MAP = REGISTRY.register(data.get(1382));
+        GOLDEN_CARROT = REGISTRY.register(data.get(1383));
+        SKELETON_SKULL = REGISTRY.register(data.get(1384));
+        WITHER_SKELETON_SKULL = REGISTRY.register(data.get(1385));
+        PLAYER_HEAD = REGISTRY.register(data.get(1386));
+        ZOMBIE_HEAD = REGISTRY.register(data.get(1387));
+        CREEPER_HEAD = REGISTRY.register(data.get(1388));
+        DRAGON_HEAD = REGISTRY.register(data.get(1389));
+        PIGLIN_HEAD = REGISTRY.register(data.get(1390));
+        NETHER_STAR = REGISTRY.register(data.get(1391));
+        PUMPKIN_PIE = REGISTRY.register(data.get(1392));
+        FIREWORK_ROCKET = REGISTRY.register(data.get(1393));
+        FIREWORK_STAR = REGISTRY.register(data.get(1394));
+        ENCHANTED_BOOK = REGISTRY.register(data.get(1395));
+        NETHER_BRICK = REGISTRY.register(data.get(1396));
+        RESIN_BRICK = REGISTRY.register(data.get(1397));
+        PRISMARINE_SHARD = REGISTRY.register(data.get(1398));
+        PRISMARINE_CRYSTALS = REGISTRY.register(data.get(1399));
+        RABBIT = REGISTRY.register(data.get(1400));
+        COOKED_RABBIT = REGISTRY.register(data.get(1401));
+        RABBIT_STEW = REGISTRY.register(data.get(1402));
+        RABBIT_FOOT = REGISTRY.register(data.get(1403));
+        RABBIT_HIDE = REGISTRY.register(data.get(1404));
+        ARMOR_STAND = REGISTRY.register(data.get(1405));
+        COPPER_HORSE_ARMOR = REGISTRY.register(data.get(1406));
+        IRON_HORSE_ARMOR = REGISTRY.register(data.get(1407));
+        GOLDEN_HORSE_ARMOR = REGISTRY.register(data.get(1408));
+        DIAMOND_HORSE_ARMOR = REGISTRY.register(data.get(1409));
+        NETHERITE_HORSE_ARMOR = REGISTRY.register(data.get(1410));
+        LEATHER_HORSE_ARMOR = REGISTRY.register(data.get(1411));
+        LEAD = REGISTRY.register(data.get(1412));
+        NAME_TAG = REGISTRY.register(data.get(1413));
+        COMMAND_BLOCK_MINECART = REGISTRY.register(data.get(1414));
+        MUTTON = REGISTRY.register(data.get(1415));
+        COOKED_MUTTON = REGISTRY.register(data.get(1416));
+        WHITE_BANNER = REGISTRY.register(data.get(1417));
+        ORANGE_BANNER = REGISTRY.register(data.get(1418));
+        MAGENTA_BANNER = REGISTRY.register(data.get(1419));
+        LIGHT_BLUE_BANNER = REGISTRY.register(data.get(1420));
+        YELLOW_BANNER = REGISTRY.register(data.get(1421));
+        LIME_BANNER = REGISTRY.register(data.get(1422));
+        PINK_BANNER = REGISTRY.register(data.get(1423));
+        GRAY_BANNER = REGISTRY.register(data.get(1424));
+        LIGHT_GRAY_BANNER = REGISTRY.register(data.get(1425));
+        CYAN_BANNER = REGISTRY.register(data.get(1426));
+        PURPLE_BANNER = REGISTRY.register(data.get(1427));
+        BLUE_BANNER = REGISTRY.register(data.get(1428));
+        BROWN_BANNER = REGISTRY.register(data.get(1429));
+        GREEN_BANNER = REGISTRY.register(data.get(1430));
+        RED_BANNER = REGISTRY.register(data.get(1431));
+        BLACK_BANNER = REGISTRY.register(data.get(1432));
+        END_CRYSTAL = REGISTRY.register(data.get(1433));
+        CHORUS_FRUIT = REGISTRY.register(data.get(1434));
+        POPPED_CHORUS_FRUIT = REGISTRY.register(data.get(1435));
+        TORCHFLOWER_SEEDS = REGISTRY.register(data.get(1436));
+        PITCHER_POD = REGISTRY.register(data.get(1437));
+        BEETROOT = REGISTRY.register(data.get(1438));
+        BEETROOT_SEEDS = REGISTRY.register(data.get(1439));
+        BEETROOT_SOUP = REGISTRY.register(data.get(1440));
+        DRAGON_BREATH = REGISTRY.register(data.get(1441));
+        SPLASH_POTION = REGISTRY.register(data.get(1442));
+        SPECTRAL_ARROW = REGISTRY.register(data.get(1443));
+        TIPPED_ARROW = REGISTRY.register(data.get(1444));
+        LINGERING_POTION = REGISTRY.register(data.get(1445));
+        SHIELD = REGISTRY.register(data.get(1446));
+        WOODEN_SPEAR = REGISTRY.register(data.get(1447));
+        STONE_SPEAR = REGISTRY.register(data.get(1448));
+        COPPER_SPEAR = REGISTRY.register(data.get(1449));
+        IRON_SPEAR = REGISTRY.register(data.get(1450));
+        GOLDEN_SPEAR = REGISTRY.register(data.get(1451));
+        DIAMOND_SPEAR = REGISTRY.register(data.get(1452));
+        NETHERITE_SPEAR = REGISTRY.register(data.get(1453));
+        TOTEM_OF_UNDYING = REGISTRY.register(data.get(1454));
+        SHULKER_SHELL = REGISTRY.register(data.get(1455));
+        IRON_NUGGET = REGISTRY.register(data.get(1456));
+        COPPER_NUGGET = REGISTRY.register(data.get(1457));
+        KNOWLEDGE_BOOK = REGISTRY.register(data.get(1458));
+        DEBUG_STICK = REGISTRY.register(data.get(1459));
+        MUSIC_DISC_13 = REGISTRY.register(data.get(1460));
+        MUSIC_DISC_CAT = REGISTRY.register(data.get(1461));
+        MUSIC_DISC_BLOCKS = REGISTRY.register(data.get(1462));
+        MUSIC_DISC_BOUNCE = REGISTRY.register(data.get(1463));
+        MUSIC_DISC_CHIRP = REGISTRY.register(data.get(1464));
+        MUSIC_DISC_CREATOR = REGISTRY.register(data.get(1465));
+        MUSIC_DISC_CREATOR_MUSIC_BOX = REGISTRY.register(data.get(1466));
+        MUSIC_DISC_FAR = REGISTRY.register(data.get(1467));
+        MUSIC_DISC_LAVA_CHICKEN = REGISTRY.register(data.get(1468));
+        MUSIC_DISC_MALL = REGISTRY.register(data.get(1469));
+        MUSIC_DISC_MELLOHI = REGISTRY.register(data.get(1470));
+        MUSIC_DISC_STAL = REGISTRY.register(data.get(1471));
+        MUSIC_DISC_STRAD = REGISTRY.register(data.get(1472));
+        MUSIC_DISC_WARD = REGISTRY.register(data.get(1473));
+        MUSIC_DISC_11 = REGISTRY.register(data.get(1474));
+        MUSIC_DISC_WAIT = REGISTRY.register(data.get(1475));
+        MUSIC_DISC_OTHERSIDE = REGISTRY.register(data.get(1476));
+        MUSIC_DISC_RELIC = REGISTRY.register(data.get(1477));
+        MUSIC_DISC_5 = REGISTRY.register(data.get(1478));
+        MUSIC_DISC_PIGSTEP = REGISTRY.register(data.get(1479));
+        MUSIC_DISC_PRECIPICE = REGISTRY.register(data.get(1480));
+        MUSIC_DISC_TEARS = REGISTRY.register(data.get(1481));
+        DISC_FRAGMENT_5 = REGISTRY.register(data.get(1482));
+        TRIDENT = REGISTRY.register(data.get(1483));
+        NAUTILUS_SHELL = REGISTRY.register(data.get(1484));
+        IRON_NAUTILUS_ARMOR = REGISTRY.register(data.get(1485));
+        GOLDEN_NAUTILUS_ARMOR = REGISTRY.register(data.get(1486));
+        DIAMOND_NAUTILUS_ARMOR = REGISTRY.register(data.get(1487));
+        NETHERITE_NAUTILUS_ARMOR = REGISTRY.register(data.get(1488));
+        COPPER_NAUTILUS_ARMOR = REGISTRY.register(data.get(1489));
+        HEART_OF_THE_SEA = REGISTRY.register(data.get(1490));
+        CROSSBOW = REGISTRY.register(data.get(1491));
+        SUSPICIOUS_STEW = REGISTRY.register(data.get(1492));
+        LOOM = REGISTRY.register(data.get(1493));
+        FLOWER_BANNER_PATTERN = REGISTRY.register(data.get(1494));
+        CREEPER_BANNER_PATTERN = REGISTRY.register(data.get(1495));
+        SKULL_BANNER_PATTERN = REGISTRY.register(data.get(1496));
+        MOJANG_BANNER_PATTERN = REGISTRY.register(data.get(1497));
+        GLOBE_BANNER_PATTERN = REGISTRY.register(data.get(1498));
+        PIGLIN_BANNER_PATTERN = REGISTRY.register(data.get(1499));
+        FLOW_BANNER_PATTERN = REGISTRY.register(data.get(1500));
+        GUSTER_BANNER_PATTERN = REGISTRY.register(data.get(1501));
+        FIELD_MASONED_BANNER_PATTERN = REGISTRY.register(data.get(1502));
+        BORDURE_INDENTED_BANNER_PATTERN = REGISTRY.register(data.get(1503));
+        GOAT_HORN = REGISTRY.register(data.get(1504));
+        COMPOSTER = REGISTRY.register(data.get(1505));
+        BARREL = REGISTRY.register(data.get(1506));
+        SMOKER = REGISTRY.register(data.get(1507));
+        BLAST_FURNACE = REGISTRY.register(data.get(1508));
+        CARTOGRAPHY_TABLE = REGISTRY.register(data.get(1509));
+        FLETCHING_TABLE = REGISTRY.register(data.get(1510));
+        GRINDSTONE = REGISTRY.register(data.get(1511));
+        SMITHING_TABLE = REGISTRY.register(data.get(1512));
+        STONECUTTER = REGISTRY.register(data.get(1513));
+        BELL = REGISTRY.register(data.get(1514));
+        LANTERN = REGISTRY.register(data.get(1515));
+        SOUL_LANTERN = REGISTRY.register(data.get(1516));
+        COPPER_LANTERN = REGISTRY.register(data.get(1517));
+        EXPOSED_COPPER_LANTERN = REGISTRY.register(data.get(1518));
+        WEATHERED_COPPER_LANTERN = REGISTRY.register(data.get(1519));
+        OXIDIZED_COPPER_LANTERN = REGISTRY.register(data.get(1520));
+        WAXED_COPPER_LANTERN = REGISTRY.register(data.get(1521));
+        WAXED_EXPOSED_COPPER_LANTERN = REGISTRY.register(data.get(1522));
+        WAXED_WEATHERED_COPPER_LANTERN = REGISTRY.register(data.get(1523));
+        WAXED_OXIDIZED_COPPER_LANTERN = REGISTRY.register(data.get(1524));
+        SWEET_BERRIES = REGISTRY.register(data.get(1525));
+        GLOW_BERRIES = REGISTRY.register(data.get(1526));
+        CAMPFIRE = REGISTRY.register(data.get(1527));
+        SOUL_CAMPFIRE = REGISTRY.register(data.get(1528));
+        SHROOMLIGHT = REGISTRY.register(data.get(1529));
+        HONEYCOMB = REGISTRY.register(data.get(1530));
+        BEE_NEST = REGISTRY.register(data.get(1531));
+        BEEHIVE = REGISTRY.register(data.get(1532));
+        HONEY_BOTTLE = REGISTRY.register(data.get(1533));
+        HONEYCOMB_BLOCK = REGISTRY.register(data.get(1534));
+        LODESTONE = REGISTRY.register(data.get(1535));
+        CRYING_OBSIDIAN = REGISTRY.register(data.get(1536));
+        BLACKSTONE = REGISTRY.register(data.get(1537));
+        BLACKSTONE_SLAB = REGISTRY.register(data.get(1538));
+        BLACKSTONE_STAIRS = REGISTRY.register(data.get(1539));
+        GILDED_BLACKSTONE = REGISTRY.register(data.get(1540));
+        POLISHED_BLACKSTONE = REGISTRY.register(data.get(1541));
+        POLISHED_BLACKSTONE_SLAB = REGISTRY.register(data.get(1542));
+        POLISHED_BLACKSTONE_STAIRS = REGISTRY.register(data.get(1543));
+        CHISELED_POLISHED_BLACKSTONE = REGISTRY.register(data.get(1544));
+        POLISHED_BLACKSTONE_BRICKS = REGISTRY.register(data.get(1545));
+        POLISHED_BLACKSTONE_BRICK_SLAB = REGISTRY.register(data.get(1546));
+        POLISHED_BLACKSTONE_BRICK_STAIRS = REGISTRY.register(data.get(1547));
+        CRACKED_POLISHED_BLACKSTONE_BRICKS = REGISTRY.register(data.get(1548));
+        RESPAWN_ANCHOR = REGISTRY.register(data.get(1549));
+        CANDLE = REGISTRY.register(data.get(1550));
+        WHITE_CANDLE = REGISTRY.register(data.get(1551));
+        ORANGE_CANDLE = REGISTRY.register(data.get(1552));
+        MAGENTA_CANDLE = REGISTRY.register(data.get(1553));
+        LIGHT_BLUE_CANDLE = REGISTRY.register(data.get(1554));
+        YELLOW_CANDLE = REGISTRY.register(data.get(1555));
+        LIME_CANDLE = REGISTRY.register(data.get(1556));
+        PINK_CANDLE = REGISTRY.register(data.get(1557));
+        GRAY_CANDLE = REGISTRY.register(data.get(1558));
+        LIGHT_GRAY_CANDLE = REGISTRY.register(data.get(1559));
+        CYAN_CANDLE = REGISTRY.register(data.get(1560));
+        PURPLE_CANDLE = REGISTRY.register(data.get(1561));
+        BLUE_CANDLE = REGISTRY.register(data.get(1562));
+        BROWN_CANDLE = REGISTRY.register(data.get(1563));
+        GREEN_CANDLE = REGISTRY.register(data.get(1564));
+        RED_CANDLE = REGISTRY.register(data.get(1565));
+        BLACK_CANDLE = REGISTRY.register(data.get(1566));
+        SMALL_AMETHYST_BUD = REGISTRY.register(data.get(1567));
+        MEDIUM_AMETHYST_BUD = REGISTRY.register(data.get(1568));
+        LARGE_AMETHYST_BUD = REGISTRY.register(data.get(1569));
+        AMETHYST_CLUSTER = REGISTRY.register(data.get(1570));
+        POINTED_DRIPSTONE = REGISTRY.register(data.get(1571));
+        SULFUR_SPIKE = REGISTRY.register(data.get(1572));
+        OCHRE_FROGLIGHT = REGISTRY.register(data.get(1573));
+        VERDANT_FROGLIGHT = REGISTRY.register(data.get(1574));
+        PEARLESCENT_FROGLIGHT = REGISTRY.register(data.get(1575));
+        FROGSPAWN = REGISTRY.register(data.get(1576));
+        ECHO_SHARD = REGISTRY.register(data.get(1577));
+        BRUSH = REGISTRY.register(data.get(1578));
+        NETHERITE_UPGRADE_SMITHING_TEMPLATE = REGISTRY.register(data.get(1579));
+        SENTRY_ARMOR_TRIM_SMITHING_TEMPLATE = REGISTRY.register(data.get(1580));
+        DUNE_ARMOR_TRIM_SMITHING_TEMPLATE = REGISTRY.register(data.get(1581));
+        COAST_ARMOR_TRIM_SMITHING_TEMPLATE = REGISTRY.register(data.get(1582));
+        WILD_ARMOR_TRIM_SMITHING_TEMPLATE = REGISTRY.register(data.get(1583));
+        WARD_ARMOR_TRIM_SMITHING_TEMPLATE = REGISTRY.register(data.get(1584));
+        EYE_ARMOR_TRIM_SMITHING_TEMPLATE = REGISTRY.register(data.get(1585));
+        VEX_ARMOR_TRIM_SMITHING_TEMPLATE = REGISTRY.register(data.get(1586));
+        TIDE_ARMOR_TRIM_SMITHING_TEMPLATE = REGISTRY.register(data.get(1587));
+        SNOUT_ARMOR_TRIM_SMITHING_TEMPLATE = REGISTRY.register(data.get(1588));
+        RIB_ARMOR_TRIM_SMITHING_TEMPLATE = REGISTRY.register(data.get(1589));
+        SPIRE_ARMOR_TRIM_SMITHING_TEMPLATE = REGISTRY.register(data.get(1590));
+        WAYFINDER_ARMOR_TRIM_SMITHING_TEMPLATE = REGISTRY.register(data.get(1591));
+        SHAPER_ARMOR_TRIM_SMITHING_TEMPLATE = REGISTRY.register(data.get(1592));
+        SILENCE_ARMOR_TRIM_SMITHING_TEMPLATE = REGISTRY.register(data.get(1593));
+        RAISER_ARMOR_TRIM_SMITHING_TEMPLATE = REGISTRY.register(data.get(1594));
+        HOST_ARMOR_TRIM_SMITHING_TEMPLATE = REGISTRY.register(data.get(1595));
+        FLOW_ARMOR_TRIM_SMITHING_TEMPLATE = REGISTRY.register(data.get(1596));
+        BOLT_ARMOR_TRIM_SMITHING_TEMPLATE = REGISTRY.register(data.get(1597));
+        ANGLER_POTTERY_SHERD = REGISTRY.register(data.get(1598));
+        ARCHER_POTTERY_SHERD = REGISTRY.register(data.get(1599));
+        ARMS_UP_POTTERY_SHERD = REGISTRY.register(data.get(1600));
+        BLADE_POTTERY_SHERD = REGISTRY.register(data.get(1601));
+        BREWER_POTTERY_SHERD = REGISTRY.register(data.get(1602));
+        BURN_POTTERY_SHERD = REGISTRY.register(data.get(1603));
+        DANGER_POTTERY_SHERD = REGISTRY.register(data.get(1604));
+        EXPLORER_POTTERY_SHERD = REGISTRY.register(data.get(1605));
+        FLOW_POTTERY_SHERD = REGISTRY.register(data.get(1606));
+        FRIEND_POTTERY_SHERD = REGISTRY.register(data.get(1607));
+        GUSTER_POTTERY_SHERD = REGISTRY.register(data.get(1608));
+        HEART_POTTERY_SHERD = REGISTRY.register(data.get(1609));
+        HEARTBREAK_POTTERY_SHERD = REGISTRY.register(data.get(1610));
+        HOWL_POTTERY_SHERD = REGISTRY.register(data.get(1611));
+        MINER_POTTERY_SHERD = REGISTRY.register(data.get(1612));
+        MOURNER_POTTERY_SHERD = REGISTRY.register(data.get(1613));
+        PLENTY_POTTERY_SHERD = REGISTRY.register(data.get(1614));
+        PRIZE_POTTERY_SHERD = REGISTRY.register(data.get(1615));
+        SCRAPE_POTTERY_SHERD = REGISTRY.register(data.get(1616));
+        SHEAF_POTTERY_SHERD = REGISTRY.register(data.get(1617));
+        SHELTER_POTTERY_SHERD = REGISTRY.register(data.get(1618));
+        SKULL_POTTERY_SHERD = REGISTRY.register(data.get(1619));
+        SNORT_POTTERY_SHERD = REGISTRY.register(data.get(1620));
+        COPPER_GRATE = REGISTRY.register(data.get(1621));
+        EXPOSED_COPPER_GRATE = REGISTRY.register(data.get(1622));
+        WEATHERED_COPPER_GRATE = REGISTRY.register(data.get(1623));
+        OXIDIZED_COPPER_GRATE = REGISTRY.register(data.get(1624));
+        WAXED_COPPER_GRATE = REGISTRY.register(data.get(1625));
+        WAXED_EXPOSED_COPPER_GRATE = REGISTRY.register(data.get(1626));
+        WAXED_WEATHERED_COPPER_GRATE = REGISTRY.register(data.get(1627));
+        WAXED_OXIDIZED_COPPER_GRATE = REGISTRY.register(data.get(1628));
+        COPPER_BULB = REGISTRY.register(data.get(1629));
+        EXPOSED_COPPER_BULB = REGISTRY.register(data.get(1630));
+        WEATHERED_COPPER_BULB = REGISTRY.register(data.get(1631));
+        OXIDIZED_COPPER_BULB = REGISTRY.register(data.get(1632));
+        WAXED_COPPER_BULB = REGISTRY.register(data.get(1633));
+        WAXED_EXPOSED_COPPER_BULB = REGISTRY.register(data.get(1634));
+        WAXED_WEATHERED_COPPER_BULB = REGISTRY.register(data.get(1635));
+        WAXED_OXIDIZED_COPPER_BULB = REGISTRY.register(data.get(1636));
+        COPPER_CHEST = REGISTRY.register(data.get(1637));
+        EXPOSED_COPPER_CHEST = REGISTRY.register(data.get(1638));
+        WEATHERED_COPPER_CHEST = REGISTRY.register(data.get(1639));
+        OXIDIZED_COPPER_CHEST = REGISTRY.register(data.get(1640));
+        WAXED_COPPER_CHEST = REGISTRY.register(data.get(1641));
+        WAXED_EXPOSED_COPPER_CHEST = REGISTRY.register(data.get(1642));
+        WAXED_WEATHERED_COPPER_CHEST = REGISTRY.register(data.get(1643));
+        WAXED_OXIDIZED_COPPER_CHEST = REGISTRY.register(data.get(1644));
+        COPPER_GOLEM_STATUE = REGISTRY.register(data.get(1645));
+        EXPOSED_COPPER_GOLEM_STATUE = REGISTRY.register(data.get(1646));
+        WEATHERED_COPPER_GOLEM_STATUE = REGISTRY.register(data.get(1647));
+        OXIDIZED_COPPER_GOLEM_STATUE = REGISTRY.register(data.get(1648));
+        WAXED_COPPER_GOLEM_STATUE = REGISTRY.register(data.get(1649));
+        WAXED_EXPOSED_COPPER_GOLEM_STATUE = REGISTRY.register(data.get(1650));
+        WAXED_WEATHERED_COPPER_GOLEM_STATUE = REGISTRY.register(data.get(1651));
+        WAXED_OXIDIZED_COPPER_GOLEM_STATUE = REGISTRY.register(data.get(1652));
+        TRIAL_SPAWNER = REGISTRY.register(data.get(1653));
+        TRIAL_KEY = REGISTRY.register(data.get(1654));
+        OMINOUS_TRIAL_KEY = REGISTRY.register(data.get(1655));
+        VAULT = REGISTRY.register(data.get(1656));
+        OMINOUS_BOTTLE = REGISTRY.register(data.get(1657));
     }
 }

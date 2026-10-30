@@ -35,10 +35,15 @@ public class MCPing {
     private MCPing() {}
 
     public int getProtocolVersion(String hostname, int port, int timeout, boolean resolveDns) throws IOException {
+        return getProtocolVersion(hostname, port, timeout, resolveDns, PROTOCOL_VERSION_DISCOVERY);
+    }
+
+    /** The protocol version the server answers a ping sent with {@code clientProtocol}. */
+    public int getProtocolVersion(String hostname, int port, int timeout, boolean resolveDns, int clientProtocol) throws IOException {
         final InetSocketAddress address;
         if (resolveDns) address = resolveAddress(hostname, port);
         else address = new InetSocketAddress(hostname, port);
-        var json = Pinger.fetchData(address, timeout, PROTOCOL_VERSION_DISCOVERY);
+        var json = Pinger.fetchData(address, timeout, clientProtocol);
         var jsonTree = OBJECT_MAPPER.readTree(json);
         var versionNode = jsonTree.get("version");
         return versionNode.get("protocol").asInt();

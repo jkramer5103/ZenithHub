@@ -2,14 +2,13 @@ package com.zenith.network.client;
 
 import com.google.gson.JsonObject;
 import com.zenith.control.ManagedMode;
+import com.zenith.control.OutboundProxy;
 import com.zenith.event.client.MsaDeviceCodeLoginEvent;
 import com.zenith.util.WebBrowserHelper;
 import lombok.Getter;
 import lombok.Locked;
 import lombok.SneakyThrows;
 import net.lenni0451.commons.httpclient.HttpClient;
-import net.lenni0451.commons.httpclient.proxy.ProxyHandler;
-import net.lenni0451.commons.httpclient.proxy.ProxyType;
 import net.raphimc.minecraftauth.MinecraftAuth;
 import net.raphimc.minecraftauth.java.JavaAuthManager;
 import net.raphimc.minecraftauth.java.model.MinecraftPlayerCertificates;
@@ -278,23 +277,7 @@ public class Authenticator {
     }
 
     public HttpClient createHttpClient() {
-        var client = MinecraftAuth.createHttpClient();
-        if (CONFIG.authentication.useClientConnectionProxy) {
-            var type = switch (CONFIG.client.connectionProxy.type) {
-                case SOCKS5 -> ProxyType.SOCKS5;
-                case SOCKS4 -> ProxyType.SOCKS4;
-                case HTTP -> ProxyType.HTTP;
-            };
-            var user = CONFIG.client.connectionProxy.user.isEmpty() ? null : CONFIG.client.connectionProxy.user;
-            var pass = CONFIG.client.connectionProxy.password.isEmpty() ? null : CONFIG.client.connectionProxy.password;
-            client.setProxyHandler(new ProxyHandler(
-                type,
-                CONFIG.client.connectionProxy.host,
-                CONFIG.client.connectionProxy.port,
-                user,
-                pass
-            ));
-        }
-        return client;
+        // ZenithHub: through the connection proxy whenever it's on
+        return OutboundProxy.apply(MinecraftAuth.createHttpClient());
     }
 }

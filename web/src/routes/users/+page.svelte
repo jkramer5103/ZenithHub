@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { api } from '#lib/api.js';
+	import { api, errorMessage } from '#lib/api.js';
 	import { app } from '#lib/app.svelte.js';
 	import UserModal from '#lib/components/UserModal.svelte';
 	import { attempt } from '#lib/toast.svelte.js';
@@ -8,9 +8,15 @@
 
 	let users = $state<ManagedUser[] | null>(null);
 	let editing = $state<ManagedUser | null | undefined>(undefined);
+	let loadError = $state('');
 
 	async function load() {
-		users = await api.get<ManagedUser[]>('/users');
+		try {
+			users = await api.get<ManagedUser[]>('/users');
+			loadError = '';
+		} catch (e) {
+			loadError = errorMessage(e);
+		}
 	}
 	load();
 
@@ -33,7 +39,12 @@
 	<button class="btn-primary" onclick={() => (editing = null)}><Plus size={16} /> Add user</button>
 </div>
 
-{#if !users}
+{#if !users && loadError}
+	<div class="flex flex-col items-center gap-3 py-16 text-sm text-red-300">
+		Couldn't load the users: {loadError}
+		<button class="btn-secondary" onclick={load}>Try again</button>
+	</div>
+{:else if !users}
 	<div class="flex items-center justify-center gap-2 py-16 text-sm text-zinc-400"><LoaderCircle size={18} class="animate-spin" /> Loading…</div>
 {:else}
 	<div class="card divide-y divide-zinc-800">

@@ -7,15 +7,22 @@ import com.zenith.command.api.CommandCategory;
 import com.zenith.command.api.CommandContext;
 import com.zenith.command.api.CommandSources;
 import com.zenith.command.api.CommandUsage;
+import com.zenith.network.server.ServerSession;
 import net.kyori.adventure.key.Key;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import org.geysermc.mcprotocollib.protocol.data.game.command.CommandNode;
+import org.geysermc.mcprotocollib.protocol.data.game.command.CommandType;
 import org.geysermc.mcprotocollib.protocol.packet.common.clientbound.ClientboundStoreCookiePacket;
+import org.jspecify.annotations.Nullable;
 
 import java.nio.charset.StandardCharsets;
+import java.util.OptionalInt;
 
 import static com.zenith.Globals.CONFIG;
 
 /**
- * Managed mode only: sends the player back to the ZenithProxy manager's lobby.
+ * Managed mode only: sends the player or spectator back to the ZenithHub lobby.
  */
 public class LobbyCommand extends Command {
     /** Read by the manager's router to decide where a transferred player goes. */
@@ -35,24 +42,49 @@ public class LobbyCommand extends Command {
     public LiteralArgumentBuilder<CommandContext> register() {
         return command("lobby").executes(c -> {
             var info = c.getSource().getInGamePlayerInfo();
-            if (c.getSource().getSource() != CommandSources.PLAYER || info == null) {
+            var source = c.getSource().getSource();
+            if ((source != CommandSources.PLAYER && source != CommandSources.SPECTATOR) || info == null) {
                 c.getSource().getEmbed()
                     .title("Only players in-game can use this command")
                     .errorColor();
                 return ERROR;
             }
-            var session = info.session();
-            if (session.getProtocolVersion().olderThan(ProtocolVersion.v1_20_5)) {
+            var error = sendToLobby(info.session());
+            if (error != null) {
                 c.getSource().getEmbed()
                     .title("Unsupported Client MC Version")
-                    .description("The lobby needs Minecraft 1.20.5 or newer")
+                    .description(error)
                     .errorColor();
                 return ERROR;
             }
             c.getSource().setNoOutput(true);
-            session.send(new ClientboundStoreCookiePacket(TARGET_COOKIE, "lobby".getBytes(StandardCharsets.UTF_8)));
-            session.transfer(CONFIG.server.getProxyAddressForTransfer(), CONFIG.server.getProxyPortForTransfer());
             return OK;
         });
+    }
+
+    public static boolean isLobbyCommand(final String command) {
+        return command.trim().equalsIgnoreCase("lobby");
+    }
+
+    /** Sends a player or spectator back to the lobby. Returns why it can't, or null. */
+    public static @Nullable String sendToLobby(final ServerSession session) {
+        if (session.getProtocolVersion().olderThan(ProtocolVersion.v1_20_5)) return "The lobby needs Minecraft 1.20.5 or newer";
+        session.send(new ClientboundStoreCookiePacket(TARGET_COOKIE, "lobby".getBytes(StandardCharsets.UTF_8)));
+        session.transfer(CONFIG.server.getProxyAddressForTransfer(), CONFIG.server.getProxyPortForTransfer());
+        return null;
+    }
+
+    /** For spectators, who can always go back to the lobby, even without Zenith's spectator commands. */
+    public static void sendSpectatorToLobby(final ServerSession session) {
+        var error = sendToLobby(session);
+        if (error != null) session.sendAsyncMessage(Component.text(error, NamedTextColor.RED));
+    }
+
+    /** A command tree with only /lobby in it, so a spectator's client suggests it. */
+    public static CommandNode[] commandTree() {
+        return new CommandNode[] {
+            new CommandNode(CommandType.ROOT, false, false, new int[] {1}, OptionalInt.empty(), null, null, null, null),
+            new CommandNode(CommandType.LITERAL, true, false, new int[0], OptionalInt.empty(), "lobby", null, null, null)
+        };
     }
 }

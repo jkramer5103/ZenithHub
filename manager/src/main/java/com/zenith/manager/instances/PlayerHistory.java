@@ -74,6 +74,19 @@ public final class PlayerHistory {
         while (queue.size() > 20) queue.removeFirst();
     }
 
+    /** Drops the newest matching noted action, when the kick or swap it was for failed. */
+    public synchronized void cancelAction(String instanceId, String kind, String name, String actor) {
+        var queue = pending.get(instanceId);
+        if (queue == null) return;
+        for (var it = queue.descendingIterator(); it.hasNext(); ) {
+            var p = it.next();
+            if (p.kind().equals(kind) && java.util.Objects.equals(p.name(), name) && p.actor().equals(actor)) {
+                it.remove();
+                return;
+            }
+        }
+    }
+
     /** A "player" event from Zenith's control API. */
     public synchronized void record(String instanceId, JsonObject event) {
         var name = str(event, "name");
@@ -84,7 +97,8 @@ public final class PlayerHistory {
         var list = load(instanceId);
         if (kind.equals("joined")) {
             var left = recentLeave(list, name, ts);
-            if (left != null) {
+            // only a change of role is a switch; a relog or a trip through the lobby stays a leave and a join
+            if (left != null && left.spectator() != spectator) {
                 list.remove(left);
                 var swap = take(instanceId, "swap", name, ts);
                 add(instanceId, new Entry(ts, "switched", name, str(event, "uuid"), spectator, null, swap != null ? swap.actor() : null));

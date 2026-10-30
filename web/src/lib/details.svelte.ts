@@ -27,15 +27,23 @@ export class DetailsPoller {
 
 	/** Fetches now, e.g. right after an action, instead of waiting for the next tick. */
 	async refresh() {
-		clearTimeout(this.timer);
 		await this.tick();
 	}
 
+	// polls overlap when refresh() runs during a scheduled one; only the newest answer counts, and only the
+	// newest schedules the next poll, so overlapping calls don't multiply into parallel loops
+	private latest = 0;
+
 	private async tick() {
+		const request = ++this.latest;
+		clearTimeout(this.timer);
 		try {
-			this.details = await api.get<InstanceDetails>(`/instances/${this.instanceId}/details`);
+			const details = await api.get<InstanceDetails>(`/instances/${this.instanceId}/details`);
+			if (request !== this.latest) return;
+			this.details = details;
 			this.error = null;
 		} catch (e) {
+			if (request !== this.latest) return;
 			this.error = e instanceof Error ? e.message : String(e);
 		}
 		// pause while the tab is hidden: no point hammering the bot

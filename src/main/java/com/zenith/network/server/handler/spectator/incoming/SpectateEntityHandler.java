@@ -4,21 +4,22 @@ import com.zenith.Proxy;
 import com.zenith.cache.data.entity.Entity;
 import com.zenith.network.codec.PacketHandler;
 import com.zenith.network.server.ServerSession;
-import org.geysermc.mcprotocollib.protocol.data.game.entity.player.InteractAction;
 import org.geysermc.mcprotocollib.protocol.packet.ingame.clientbound.ClientboundSetCameraPacket;
 import org.geysermc.mcprotocollib.protocol.packet.ingame.clientbound.entity.ClientboundRemoveEntitiesPacket;
-import org.geysermc.mcprotocollib.protocol.packet.ingame.serverbound.player.ServerboundInteractPacket;
+import org.geysermc.mcprotocollib.protocol.packet.ingame.serverbound.player.ServerboundSpectatorActionPacket;
 
 import static com.zenith.Globals.CACHE;
 
-public class InteractEntitySpectatorHandler implements PacketHandler<ServerboundInteractPacket, ServerSession> {
+public class SpectateEntityHandler implements PacketHandler<ServerboundSpectatorActionPacket, ServerSession> {
     @Override
-    public ServerboundInteractPacket apply(final ServerboundInteractPacket packet, final ServerSession session) {
-        if (packet.getAction() == InteractAction.ATTACK) {
-            final Entity entity = CACHE.getEntityCache().get(packet.getEntityId());
+    public ServerboundSpectatorActionPacket apply(final ServerboundSpectatorActionPacket packet, final ServerSession session) {
+        var entityIdOptional = packet.getEntityId();
+        if (entityIdOptional.isPresent()) {
+            var entityId = entityIdOptional.getAsInt();
+            final Entity entity = CACHE.getEntityCache().get(entityId);
             if (entity != null) {
                 session.setCameraTarget(entity);
-                session.send(new ClientboundSetCameraPacket(packet.getEntityId()));
+                session.send(new ClientboundSetCameraPacket(entityId));
                 var connections = Proxy.getInstance().getActiveConnections().getArray();
                 for (int i = 0; i < connections.length; i++) {
                     var connection = connections[i];

@@ -1,6 +1,5 @@
 <script lang="ts">
 	import '../app.css';
-	import favicon from '#lib/assets/favicon.svg';
 	import { app } from '#lib/app.svelte.js';
 	import AuthScreen from '#lib/components/AuthScreen.svelte';
 	import Logo from '#lib/components/Logo.svelte';
@@ -9,14 +8,23 @@
 	import McLinkModal from '#lib/components/McLinkModal.svelte';
 	import Toasts from '#lib/components/Toasts.svelte';
 	import Switch from '#lib/components/settings/Switch.svelte';
+	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
-	import { ChevronDown, Code, Gamepad2, KeyRound, LayoutGrid, LogOut, MessageSquare, Server, Settings, UserRound, Users, WifiOff } from '@lucide/svelte';
+	import { ChevronDown, Code, Gamepad2, KeyRound, LayoutGrid, LogOut, MessageSquare, RotateCw, Server, Settings, UserRound, Users, WifiOff } from '@lucide/svelte';
 	import type { LayoutProps } from './$types';
 
 	let { children }: LayoutProps = $props();
 
 	let loadError = $state('');
-	app.loadSession().catch((e) => (loadError = e instanceof Error ? e.message : String(e)));
+	function load() {
+		loadError = '';
+		app.loadSession().catch((e) => (loadError = e instanceof Error ? e.message : String(e)));
+	}
+	load();
+
+	// app.html's skeleton covers the page until there is something to show
+	const loading = $derived(!loadError && (!app.session || (!!app.user && !app.overview)));
+	$effect(() => globalThis.zenithBoot?.loading(loading));
 
 	const nav = $derived([
 		{ href: '/', label: 'Instances', icon: LayoutGrid, show: true },
@@ -25,6 +33,12 @@
 		{ href: '/users', label: 'Users', icon: Users, show: app.isAdmin },
 		{ href: '/settings', label: 'Settings', icon: Settings, show: app.isAdmin }
 	].filter((n) => n.show));
+
+	// the nav hides these from members; a typed URL or old bookmark goes home instead of failing to load
+	const adminOnly = $derived(!!app.user && !app.isAdmin && /^\/(users|settings)(\/|$)/.test(page.url.pathname));
+	$effect(() => {
+		if (adminOnly) void goto('/', { replaceState: true });
+	});
 
 	let menuOpen = $state(false);
 	let changingPassword = $state(false);
@@ -41,18 +55,19 @@
 	}
 </script>
 
-<svelte:head>
-	<link rel="icon" href={favicon} />
-</svelte:head>
-
 <svelte:window onclick={closeMenuOutside} onkeydown={(e) => e.key === 'Escape' && (menuOpen = false)} />
 
 {#if loadError}
-	<div class="flex min-h-dvh items-center justify-center p-6 text-center text-sm text-zinc-400">
-		Can't reach ZenithHub: {loadError}
+	<div class="flex min-h-dvh items-center justify-center p-6">
+		<div class="card w-full max-w-sm p-6 text-center" role="alert">
+			<div class="flex justify-center"><Logo /></div>
+			<h1 class="mt-3 font-semibold">Can't reach ZenithHub</h1>
+			<p class="mt-1 text-sm text-zinc-400">{loadError}</p>
+			<button class="btn-primary mt-4" onclick={load}><RotateCw size={16} /> Try again</button>
+		</div>
 	</div>
 {:else if !app.session}
-	<div class="min-h-dvh"></div>
+	<!-- still loading: the skeleton covers this -->
 {:else if !app.user}
 	<AuthScreen />
 {:else if app.overview}
@@ -153,7 +168,7 @@
 		{/if}
 
 		<main class="mx-auto flex w-full max-w-6xl flex-1 flex-col px-4 py-6">
-			{@render children()}
+			{#if !adminOnly}{@render children()}{/if}
 		</main>
 
 		{#if nav.length > 1}

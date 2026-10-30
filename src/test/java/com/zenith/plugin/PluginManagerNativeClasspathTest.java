@@ -49,7 +49,7 @@ class PluginManagerNativeClasspathTest {
               "description": "External test plugin",
               "url": "",
               "authors": [],
-              "mcVersions": ["1.21.4"]
+              "mcVersions": ["26.3.0"]
             }
             """;
         try (var output = new JarOutputStream(Files.newOutputStream(path))) {

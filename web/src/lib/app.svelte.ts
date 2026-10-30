@@ -46,7 +46,7 @@ class AppState {
 	}
 
 	async loadSession() {
-		this.session = await api.get<Session>('/session');
+		this.session = await api.prefetched<Session>('/session');
 		if (this.session.user) await this.#loggedIn();
 	}
 
@@ -60,8 +60,18 @@ class AppState {
 		this.#loggedOut();
 	}
 
+	#refreshes = 0;
+	#newest: Promise<void> = Promise.resolve();
+
 	async refresh() {
-		this.overview = await api.get<Overview>('/overview');
+		// overlapping refreshes (WebSocket and a dialog) can finish out of order; keep the newest,
+		// and only resolve once the newest has landed so callers act on fresh data
+		const request = ++this.#refreshes;
+		let pending = (this.#newest = api.get<Overview>('/overview').then((overview) => {
+			if (request === this.#refreshes) this.overview = overview;
+		}));
+		await pending;
+		while (pending !== this.#newest) await (pending = this.#newest);
 	}
 
 	instance(id: string) {
@@ -93,7 +103,7 @@ class AppState {
 	}
 
 	async #loggedIn() {
-		await this.refresh();
+		this.overview = await api.prefetched<Overview>('/overview');
 		this.#connect();
 	}
 

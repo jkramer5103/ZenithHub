@@ -1,6 +1,7 @@
 package com.zenith.manager.state;
 
 import com.google.gson.JsonObject;
+import com.google.gson.annotations.SerializedName;
 import com.zenith.manager.auth.Capability;
 import com.zenith.manager.auth.Role;
 
@@ -26,8 +27,12 @@ public final class State {
     public static final class ManagerSettings {
         /** Address players use to reach the lobby; shown in the UI and passed to instances as proxyIP. */
         public String publicAddress = "localhost";
-        /** Admin switch for per-instance outbound proxies. Off forces every instance to the host IP. */
-        public boolean outboundProxiesEnabled = false;
+        /**
+         * Lets users set their own outbound proxy. Off, every instance uses the global proxy (the global settings
+         * layer's connection proxy) or none. On, they can change it, but not turn it off while the global one is on.
+         */
+        @SerializedName(value = "userProxiesAllowed", alternate = "outboundProxiesEnabled")
+        public boolean userProxiesAllowed = false;
         /** Runs the central Discord bot; its token is kept in a separate secret file. */
         public boolean discordEnabled = false;
     }
@@ -54,6 +59,8 @@ public final class State {
         public String ownerId;
         /** Last background refresh failure; cleared on success. */
         public String authError;
+        /** When a login without a refresh token (a pasted access token) stops working; 0 when it renews itself. */
+        public long tokenExpiresAt;
         /** The account's category in the Discord server. */
         public String discordCategoryId;
     }
@@ -85,7 +92,8 @@ public final class State {
         public boolean lastConnected;
         public int mcPort;
         public int controlPort;
-        public List<Grant> grants = new ArrayList<>();
+        /** Copy-on-write: permission checks and log routing read it without the store's lock. */
+        public List<Grant> grants = new java.util.concurrent.CopyOnWriteArrayList<>();
         public long createdAt;
         /** The instance's channel in the Discord server. */
         public String discordChannelId;

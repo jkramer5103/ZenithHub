@@ -1,6 +1,7 @@
 package com.zenith.network.client;
 
 import com.google.common.hash.Hashing;
+import com.zenith.control.OutboundProxy;
 import org.geysermc.mcprotocollib.protocol.codec.MinecraftCodec;
 import org.geysermc.mcprotocollib.protocol.data.game.ResourcePackStatus;
 import org.geysermc.mcprotocollib.protocol.packet.common.clientbound.ClientboundResourcePackPushPacket;
@@ -120,7 +121,7 @@ public final class ResourcePackDownloader {
                 CLIENT_LOG.info("Blocked a resource pack redirect into a private network: {}", url);
                 return null;
             }
-            var connection = (HttpURLConnection) url.openConnection();
+            var connection = (HttpURLConnection) url.openConnection(OutboundProxy.javaProxy());
             connection.setInstanceFollowRedirects(false);
             connection.setConnectTimeout(15_000);
             connection.setReadTimeout(30_000);

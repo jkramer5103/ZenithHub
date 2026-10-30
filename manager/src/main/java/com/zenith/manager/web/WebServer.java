@@ -51,6 +51,16 @@ public final class WebServer {
     private static final Logger LOG = LoggerFactory.getLogger("Web");
     private static final String SESSION_COOKIE = "zsid";
     private static final Pattern HOST = Pattern.compile("^[A-Za-z0-9.-]{1,253}$");
+    /** A host or IPv4 address, or a bracketed IPv6 one, with an optional port of 1 to 5 digits. */
+    /** The lobby sends the port in a transfer packet, so it has to be a real one. */
+    private static boolean validPort(String address) {
+        int colon = address.lastIndexOf(':');
+        if (colon < 0 || address.endsWith("]")) return true;
+        int port = Integer.parseInt(address.substring(colon + 1));
+        return port >= 1 && port <= 65535;
+    }
+
+    private static final Pattern PUBLIC_ADDRESS = Pattern.compile("^(?:[A-Za-z0-9.-]{1,253}|\\[[0-9A-Fa-f:.]+])(?::\\d{1,5})?$");
 
     private final ManagerConfig config;
     private final StateStore store;
@@ -86,9 +96,22 @@ public final class WebServer {
             cfg.showJavalinBanner = false;
             cfg.http.maxRequestSize = 1_000_000L;
             if (Files.isDirectory(config.webDir())) {
+                // file names under _app/immutable change with their content, so browsers can keep them for good;
+                // everything else (index.html, version.json, the favicon) is checked with the server on every load
+                var immutable = config.webDir().resolve("_app").resolve("immutable");
+                if (Files.isDirectory(immutable)) {
+                    cfg.staticFiles.add(sf -> {
+                        sf.hostedPath = "/_app/immutable";
+                        sf.directory = immutable.toString();
+                        sf.location = Location.EXTERNAL;
+                        sf.headers = Map.of("Cache-Control", "public, max-age=31536000, immutable");
+                    });
+                }
                 cfg.staticFiles.add(sf -> {
                     sf.directory = config.webDir().toString();
                     sf.location = Location.EXTERNAL;
+                    sf.headers = Map.of("Cache-Control", "no-cache");
+                    sf.skipFileFunction = req -> req.getRequestURI().startsWith("/_app/immutable/");
                 });
             } else {
                 LOG.warn("Web UI directory {} not found, serving the API only", config.webDir());
@@ -105,6 +128,8 @@ public final class WebServer {
 
         // mutations must be JSON: blocks cross-site form posts on top of the SameSite cookie
         app.before("/api/*", ctx -> {
+            // API answers depend on who is signed in: never cache them
+            ctx.header("Cache-Control", "no-store");
             var method = ctx.method().name();
             if (!method.equals("GET") && !method.equals("HEAD") && !method.equals("OPTIONS")) {
                 var type = ctx.contentType();
@@ -123,8 +148,9 @@ public final class WebServer {
         // single page app: unknown non-API paths get index.html, the client-side router takes over
         var index = config.webDir().resolve("index.html");
         app.error(404, ctx -> {
-            if (ctx.path().startsWith("/api") || ctx.method() != HandlerType.GET || !Files.exists(index)) return;
-            ctx.status(200).contentType("text/html").result(Files.readString(index));
+            // a missing script from an older build must fail as one, not load the page as JavaScript
+            if (ctx.path().startsWith("/api") || ctx.path().startsWith("/_app/") || ctx.method() != HandlerType.GET || !Files.exists(index)) return;
+            ctx.status(200).contentType("text/html").header("Cache-Control", "no-cache").result(Files.readString(index));
         });
         // unknown API paths are errors
         for (var method : List.of(HandlerType.GET, HandlerType.POST, HandlerType.PUT, HandlerType.PATCH, HandlerType.DELETE)) {
@@ -223,9 +249,13 @@ public final class WebServer {
     private void registerAccountRoutes() {
         app.post("/api/accounts/login", ctx -> {
             var user = requireUser(ctx);
-            var relogin = optString(body(ctx), "accountId");
+            var request = body(ctx);
+            var relogin = optString(request, "accountId");
             if (relogin != null) requireAccount(user, relogin);
-            send(ctx, accounts.startDeviceCodeLogin(relogin, user.id).toJson());
+            var method = optString(request, "method");
+            send(ctx, method == null || method.equals("microsoft")
+                ? accounts.startDeviceCodeLogin(relogin, user.id).toJson()
+                : accounts.startCredentialLogin(method, requireString(request, "credential"), optString(request, "clientId"), relogin, user.id).toJson());
         });
         app.get("/api/accounts/login/{id}", ctx -> send(ctx, requireLogin(ctx).toJson()));
         app.delete("/api/accounts/login/{id}", ctx -> {
@@ -263,8 +293,10 @@ public final class WebServer {
             send(ctx, ok());
         });
         app.delete("/api/accounts/{id}", ctx -> {
-            requireAccount(requireUser(ctx), ctx.pathParam("id"));
+            var account = requireAccount(requireUser(ctx), ctx.pathParam("id"));
+            var categoryId = account.discordCategoryId;
             accounts.delete(ctx.pathParam("id"));
+            discord.deleteCategory(categoryId);
             changed();
             send(ctx, ok());
         });
@@ -330,19 +362,17 @@ public final class WebServer {
         throw server.ownerId == null ? ApiException.forbidden() : ApiException.notFound();
     }
 
+    /** Checks every field before changing any, so a rejected edit leaves the server as it was. */
     private static void applyServerFields(State.ServerProfile server, JsonObject body, boolean create) {
-        if (create || body.has("name")) server.name = requireString(body, "name").trim();
-        if (create || body.has("address")) {
-            var address = requireString(body, "address").trim();
-            if (!HOST.matcher(address).matches()) throw ApiException.badRequest("Invalid server address");
-            server.address = address;
-        }
-        if (body.has("port")) {
-            int port = body.get("port").getAsInt();
-            if (port < 1 || port > 65535) throw ApiException.badRequest("Invalid port");
-            server.port = port;
-        }
-        if (server.name.isEmpty()) throw ApiException.badRequest("Name is required");
+        var name = create || body.has("name") ? requireString(body, "name").trim() : server.name;
+        if (name == null || name.isEmpty()) throw ApiException.badRequest("Name is required");
+        var address = create || body.has("address") ? requireString(body, "address").trim() : server.address;
+        if (!HOST.matcher(address).matches()) throw ApiException.badRequest("Invalid server address");
+        int port = body.has("port") ? body.get("port").getAsInt() : server.port;
+        if (port < 1 || port > 65535) throw ApiException.badRequest("Invalid port");
+        server.name = name;
+        server.address = address;
+        server.port = port;
     }
 
     // --- instances ---
@@ -385,14 +415,18 @@ public final class WebServer {
         app.patch("/api/instances/{id}", ctx -> {
             var id = requireOwner(ctx).id;
             var body = body(ctx);
+            var name = body.has("name") ? body.get("name").getAsString().trim() : null;
+            if (name != null && name.isEmpty()) throw ApiException.badRequest("Name is required");
+            State.Autostart autostart;
+            try {
+                autostart = body.has("autostart") ? State.Autostart.valueOf(body.get("autostart").getAsString()) : null;
+            } catch (IllegalArgumentException e) {
+                throw ApiException.badRequest("Unknown autostart mode");
+            }
             store.update(s -> {
                 var i = findInstance(s, id);
-                if (body.has("name")) {
-                    var name = body.get("name").getAsString().trim();
-                    if (name.isEmpty()) throw ApiException.badRequest("Name is required");
-                    i.name = name;
-                }
-                if (body.has("autostart")) i.autostart = State.Autostart.valueOf(body.get("autostart").getAsString());
+                if (name != null) i.name = name;
+                if (autostart != null) i.autostart = autostart;
             });
             changed();
             send(ctx, ok());
@@ -498,13 +532,21 @@ public final class WebServer {
             }
             if (!supervisor.isRunning(instance.id)) throw ApiException.badRequest("Connect the instance first");
             var who = requireUser(ctx).username;
-            switch (body.get("action").getAsString()) {
-                case "kick" -> history.noteAction(instance.id, "kick", optString(body, "player"), who);
+            // noted before the command runs, since the leave it causes can arrive before the reply
+            String noted = switch (body.get("action").getAsString()) {
+                case "kick" -> "kick";
                 // the swap reconnects players; whoever ends up switching was swapped by this person
-                case "makePlayer", "makeSpectator" -> history.noteAction(instance.id, "swap", null, who);
-                default -> {}
+                case "makePlayer", "makeSpectator" -> "swap";
+                default -> null;
+            };
+            var notedName = noted != null && noted.equals("kick") ? optString(body, "player") : null;
+            if (noted != null) history.noteAction(instance.id, noted, notedName, who);
+            try {
+                send(ctx, supervisor.command(instance.id, action.command(), actor(ctx)));
+            } catch (Exception e) {
+                if (noted != null) history.cancelAction(instance.id, noted, notedName, who);
+                throw e;
             }
-            send(ctx, supervisor.command(instance.id, action.command(), actor(ctx)));
         });
         app.get("/api/instances/{id}/history", ctx -> {
             var instance = requireCapability(ctx, Capability.CONTROL);
@@ -684,14 +726,15 @@ public final class WebServer {
         app.put("/api/settings/manager", ctx -> {
             requireAdmin(ctx);
             var body = body(ctx);
-            store.update(s -> {
-                if (body.has("publicAddress")) {
-                    var address = body.get("publicAddress").getAsString().trim();
-                    if (address.isEmpty()) throw ApiException.badRequest("Public address is required");
-                    s.settings.publicAddress = address;
-                }
-                if (body.has("outboundProxiesEnabled")) s.settings.outboundProxiesEnabled = body.get("outboundProxiesEnabled").getAsBoolean();
-            });
+            var address = body.has("publicAddress") ? body.get("publicAddress").getAsString().trim() : null;
+            if (address != null && address.isEmpty()) throw ApiException.badRequest("Public address is required");
+            // the lobby parses the port out of it for every transfer, so a bad one would break every join
+            if (address != null && (!PUBLIC_ADDRESS.matcher(address).matches() || !validPort(address))) {
+                throw ApiException.badRequest("Use a host name or IP, optionally with a port, like mc.example.com:25565");
+            }
+            Boolean ownProxies = body.has("userProxiesAllowed") ? body.get("userProxiesAllowed").getAsBoolean() : null;
+            if (address != null) store.update(s -> s.settings.publicAddress = address);
+            if (ownProxies != null) settings.setUserProxiesAllowed(ownProxies);
             changed();
             send(ctx, ok());
         });
@@ -787,7 +830,18 @@ public final class WebServer {
         // linking your own Minecraft accounts: the lobby shows a code, you enter it here
         app.post("/api/me/minecraft", ctx -> {
             var user = requireUser(ctx);
-            var name = access.claimMcLink(user.id, requireString(body(ctx), "code"));
+            // codes are short, so guessing one has to be slow
+            var key = "mclink:" + user.id;
+            long wait = throttle.retryAfterMs(key);
+            if (wait > 0) throw new ApiException(429, "Too many wrong codes, try again in " + (wait / 1000 + 1) + "s");
+            String name;
+            try {
+                name = access.claimMcLink(user.id, requireString(body(ctx), "code"));
+            } catch (ApiException e) {
+                throttle.failure(key);
+                throw e;
+            }
+            throttle.success(key);
             changed();
             var json = new JsonObject();
             json.addProperty("name", name);
@@ -802,8 +856,17 @@ public final class WebServer {
         app.post("/api/me/password", ctx -> {
             var user = requireUser(ctx);
             var body = body(ctx);
-            if (!Passwords.verify(requireString(body, "currentPassword"), user.passwordHash)) throw ApiException.badRequest("Current password is wrong");
+            var key = "password:" + user.id;
+            long wait = throttle.retryAfterMs(key);
+            if (wait > 0) throw new ApiException(429, "Too many attempts, try again in " + (wait / 1000 + 1) + "s");
+            if (!Passwords.verify(requireString(body, "currentPassword"), user.passwordHash)) {
+                throttle.failure(key);
+                throw ApiException.badRequest("Current password is wrong");
+            }
+            throttle.success(key);
             access.updateUser(user.id, requireString(body, "password"), null, false);
+            // whoever had the old password is signed out; this browser stays signed in
+            sessions.invalidateUserExcept(user.id, ctx.cookie(SESSION_COOKIE));
             send(ctx, ok());
         });
 
@@ -997,6 +1060,7 @@ public final class WebServer {
                 v.addProperty("username", a.username);
                 v.addProperty("uuid", a.uuid);
                 v.addProperty("authError", a.authError);
+                if (a.tokenExpiresAt > 0) v.addProperty("tokenExpiresAt", a.tokenExpiresAt);
                 v.addProperty("addedAt", a.addedAt);
                 v.addProperty("ownerId", a.ownerId);
                 v.addProperty("ownerName", userName(s, a.ownerId));
@@ -1007,7 +1071,7 @@ public final class WebServer {
             if (who.admin()) {
                 var settings = new JsonObject();
                 settings.addProperty("publicAddress", s.settings.publicAddress);
-                settings.addProperty("outboundProxiesEnabled", s.settings.outboundProxiesEnabled);
+                settings.addProperty("userProxiesAllowed", s.settings.userProxiesAllowed);
                 json.add("settings", settings);
             }
             return json;

@@ -1,6 +1,11 @@
+<script lang="ts" module>
+	// open dialogs, newest last: Escape closes only the one on top (Add account opens over New instance)
+	const open: symbol[] = [];
+</script>
+
 <script lang="ts">
 	import { X } from '@lucide/svelte';
-	import type { Snippet } from 'svelte';
+	import { onMount, type Snippet } from 'svelte';
 
 	let {
 		title,
@@ -8,9 +13,15 @@
 		children,
 		wide = false
 	}: { title: string; onclose: () => void; children: Snippet; wide?: boolean } = $props();
+
+	const me = Symbol();
+	onMount(() => {
+		open.push(me);
+		return () => open.splice(open.indexOf(me), 1);
+	});
 </script>
 
-<svelte:window onkeydown={(e) => e.key === 'Escape' && onclose()} />
+<svelte:window onkeydown={(e) => e.key === 'Escape' && open.at(-1) === me && onclose()} />
 
 <div class="fixed inset-0 z-40 flex items-end justify-center bg-black/60 backdrop-blur-sm sm:items-center sm:p-4">
 	<button class="absolute inset-0 cursor-default" aria-label="Close" onclick={onclose}></button>

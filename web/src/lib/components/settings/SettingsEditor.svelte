@@ -108,6 +108,13 @@
 		return f.advanced && tagAdvanced ? s * 0.85 : s;
 	}
 
+	const PROXY_TOGGLE = 'client.connectionProxy.enabled';
+	function proxyLock(v: SettingsView, enabled: boolean) {
+		// the admin's global proxy, or the switch alone while users may pick their own
+		if (v.sources['client.connectionProxy.host'] !== 'forced') return 'The admin requires a proxy. You can change which one, but not turn it off.';
+		return enabled ? 'Everything goes through the admin’s global proxy.' : 'The admin hasn’t allowed your own proxy.';
+	}
+
 	function shownByCondition(f: Field) {
 		// a search shows every match, even settings that only apply once something else is on
 		if (searching || !f.showIf || !view) return true;
@@ -129,6 +136,7 @@
 			const results: SectionResult[] = [];
 			for (const section of group.sections) {
 				if (section.advanced && !includeAdvanced) continue;
+				if (section.scopes && !section.scopes.includes(scope)) continue;
 				let scored = section.fields.map((f) => ({ f, s: fieldScore(f, section, group) })).filter((x) => x.s > 0);
 				if (searching) {
 					// when the section's name matches, keep only its settings whose own wording (not their config path) matches a word, if any do
@@ -222,6 +230,7 @@
 	{@const toggleForced = hasToggle && v.sources[section.toggle!] === 'forced'}
 	{@const toggleChanged = hasToggle && v.sources[section.toggle!] === scope}
 	{@const fields = matched.filter(shownByCondition)}
+	{@const adminProxy = section.toggle === PROXY_TOGGLE && v.sources['client.connectionProxy.host'] === 'forced'}
 	<section class="card" id="settings-{section.id}">
 		<div class="flex items-start gap-4 p-4">
 			<div class="min-w-0 flex-1">
@@ -245,7 +254,7 @@
 				{#if toggleForced}
 					<p class="mt-1 flex items-center gap-1 text-xs text-zinc-500">
 						<Lock size={11} />
-						{section.toggle === 'client.connectionProxy.enabled' ? 'Outbound proxies are turned off in the manager settings.' : 'Managed by ZenithHub'}
+						{section.toggle === PROXY_TOGGLE ? proxyLock(v, enabled) : 'Managed by ZenithHub'}
 					</p>
 				{/if}
 			</div>
@@ -260,7 +269,7 @@
 				</div>
 			{/if}
 		</div>
-		{#if (enabled || searching) && fields.length}
+		{#if (enabled || searching) && fields.length && !adminProxy}
 			<div class="divide-y divide-zinc-800/80 border-t border-zinc-800 px-4">
 				{#each fields as field (field.path)}
 					<SettingRow
@@ -343,7 +352,8 @@
 							>
 						{/if}
 					</div>
-					{#if changedCount}
+					<!-- stays while the filter is on, or resetting the last change would trap you on an empty page -->
+					{#if changedCount || onlyChanged}
 						<button
 							class="btn border px-3 py-2 text-sm {onlyChanged
 								? 'border-emerald-700 bg-emerald-950/60 text-emerald-200'
@@ -439,6 +449,7 @@
 				<div class="py-12 text-center text-sm text-zinc-400">
 					{#if onlyChanged && !searching}
 						Nothing changed here yet.
+						<button class="ml-1 text-emerald-400 underline" onclick={() => (onlyChanged = false)}>Show all settings</button>
 					{:else}
 						No settings match “{query.trim()}”.
 						{#if onlyChanged}<button class="ml-1 text-emerald-400 underline" onclick={() => (onlyChanged = false)}>Search all settings</button>{/if}

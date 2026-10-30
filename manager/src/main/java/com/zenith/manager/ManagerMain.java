@@ -6,6 +6,7 @@ import com.zenith.manager.discord.DiscordBot;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.zenith.manager.instances.ConfigComposer;
+import com.zenith.manager.instances.OutboundProxies;
 import com.zenith.manager.instances.PearlService;
 import com.zenith.manager.instances.PlayerHistory;
 import com.zenith.manager.instances.SettingsService;
@@ -13,6 +14,7 @@ import com.zenith.manager.lobby.LobbyServer;
 import com.zenith.manager.lobby.PlayerDirectory;
 import com.zenith.manager.lobby.Router;
 import com.zenith.manager.util.Json;
+import com.zenith.manager.util.MojangProfiles;
 import com.zenith.manager.instances.Supervisor;
 import com.zenith.manager.state.StateStore;
 import com.zenith.manager.web.WebServer;
@@ -35,11 +37,16 @@ public final class ManagerMain {
         var accounts = new AccountService(config, store, events);
         var supervisor = new Supervisor(config, store, accounts, events);
         var settings = new SettingsService(config, store, supervisor);
+        var proxies = new OutboundProxies(config, store, supervisor);
+        accounts.setProxies(proxies);
+        MojangProfiles.setProxy(proxies::global);
         var access = new AccessService(store);
         var players = new PlayerDirectory(config.dataDir().resolve("manager").resolve("players.json"));
         supervisor.setJoinLists(id -> joinLists(access.joinNames(id), players));
         // grants decide who may join; running instances get the new lists right away
         access.onChange(id -> Thread.ofVirtual().start(() -> pushJoinLists(store, supervisor, id)));
+        // access can change between composing a new process's config and the process answering
+        supervisor.setOnRunning(id -> Thread.ofVirtual().start(() -> pushJoinLists(store, supervisor, id)));
         players.onLearned(name -> Thread.ofVirtual().start(() -> pushJoinLists(store, supervisor, null)));
         var pearls = new PearlService(config, supervisor, settings);
         var history = new PlayerHistory(config);

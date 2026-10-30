@@ -58,7 +58,7 @@
 		<p class="text-sm text-zinc-500">Nobody is connected. Players join through the lobby.</p>
 	{:else}
 		<ul class="divide-y divide-zinc-800/70">
-			{#each players as p (p.name)}
+			{#each players as p, i (`${i}:${p.name}`)}
 				{@const blocked = swapBlocked(p)}
 				<li class="flex flex-wrap items-center gap-x-3 gap-y-2 py-2.5">
 					<div class="flex min-w-0 flex-1 basis-40 items-center gap-3">

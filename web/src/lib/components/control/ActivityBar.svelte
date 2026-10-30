@@ -56,7 +56,8 @@
 		</div>
 		{#if position}
 			<div class="truncate text-xs text-zinc-500 tabular-nums">
-				{Math.floor(position.x)}, {Math.floor(position.y)}, {Math.floor(position.z)} · {position.dimension.replace('minecraft:', '').replace('the_', '')}
+				{Math.floor(position.x)}, {Math.floor(position.y)}, {Math.floor(position.z)}{#if position.dimension}
+					· {position.dimension.replace('minecraft:', '').replace('the_', '')}{/if}
 			</div>
 		{/if}
 	</div>

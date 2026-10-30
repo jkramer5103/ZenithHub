@@ -3,6 +3,8 @@ package com.zenith.network.server.handler.spectator.incoming;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.zenith.Proxy;
 import com.zenith.cache.data.entity.Entity;
+import com.zenith.command.impl.LobbyCommand;
+import com.zenith.control.ManagedMode;
 import com.zenith.event.message.PrivateMessageSendEvent;
 import com.zenith.feature.spectator.SpectatorEntityRegistry;
 import com.zenith.feature.spectator.SpectatorSync;
@@ -50,6 +52,10 @@ public class ServerChatSpectatorHandler implements PacketHandler<ServerboundChat
         final String fullCommandAndArgs = message.substring(CONFIG.inGameCommands.prefix.length()).trim(); // cut off the prefix
         final String command = fullCommandAndArgs.split(" ")[0]; // first word is the command
         switch (command) {
+            case "lobby" -> {
+                if (ManagedMode.isManaged()) LobbyCommand.sendSpectatorToLobby(session);
+                else handleCommandInput("help", session);
+            }
             case "help" -> {
                 session.sendAsyncMessage(minimessage("<blue><bold>Spectator commands:"));
                 session.sendAsyncMessage(minimessage("<green>Prefix : \"" + CONFIG.inGameCommands.prefix + "\""));
@@ -57,6 +63,8 @@ public class ServerChatSpectatorHandler implements PacketHandler<ServerboundChat
                 session.sendAsyncMessage(minimessage("<red>help <gray>- <dark_gray>Display help menu"));
                 if (CONFIG.server.spectator.spectatorPublicChatEnabled)
                     session.sendAsyncMessage(minimessage("<red>m <gray>- <dark_gray>Send public chats"));
+                if (ManagedMode.isManaged())
+                    session.sendAsyncMessage(minimessage("<red>lobby <gray>- <dark_gray>Back to the lobby"));
                 session.sendAsyncMessage(minimessage("<red>playercam <gray>- <dark_gray>Set camera to the player"));
                 session.sendAsyncMessage(minimessage("<red>etoggle <gray>- <dark_gray>Hide your entity from yourself"));
                 session.sendAsyncMessage(minimessage("<red>e <gray>- <dark_gray>List spectator entities. Change with \"!e <entity>\""));

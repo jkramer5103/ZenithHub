@@ -1,5 +1,6 @@
 package com.zenith.plugin;
 
+import com.zenith.control.ManagedMode;
 import com.zenith.Globals;
 import com.zenith.discord.Embed;
 import com.zenith.event.plugin.PluginLoadFailureEvent;
@@ -114,6 +115,7 @@ public class PluginManager {
     }
 
     private void linuxChannelIncompatibilityWarning() {
+        if (ManagedMode.isManaged()) return; // ZenithHub doesn't run plugins
         int potentialPluginCount = countPotentialPluginJars();
         if (potentialPluginCount > 0) {
             DISCORD.sendEmbedMessage(Embed.builder()

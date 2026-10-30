@@ -2,7 +2,7 @@
 	import type { Fingerprint } from '#lib/types.js';
 	import { Eye } from '@lucide/svelte';
 
-	let { fingerprint }: { fingerprint: Fingerprint } = $props();
+	let { fingerprint, canEditSettings }: { fingerprint: Fingerprint; canEditSettings: boolean } = $props();
 
 	const translated = $derived(fingerprint.serverVersion !== fingerprint.clientVersion);
 	const rows = $derived([
@@ -45,5 +45,7 @@
 			</div>
 		{/each}
 	</dl>
-	<a class="mt-3 inline-block text-xs text-emerald-400 hover:text-emerald-300" href="?tab=settings#settings-privacy">Privacy settings</a>
+	{#if canEditSettings}
+		<a class="mt-3 inline-block text-xs text-emerald-400 hover:text-emerald-300" href="?tab=settings#settings-privacy">Privacy settings</a>
+	{/if}
 </section>

@@ -1,4 +1,5 @@
 import type { Component } from 'svelte';
+import type { SettingScope } from './types';
 import {
 	Bell,
 	Bot,
@@ -65,6 +66,8 @@ export interface Section {
 	toggle?: string;
 	/** the whole section, switch included, is only shown with "Show advanced settings" on */
 	advanced?: boolean;
+	/** only shown on these settings pages */
+	scopes?: SettingScope[];
 	fields: Field[];
 }
 
@@ -199,8 +202,11 @@ export const catalog: Group[] = [
 			{
 				id: 'proxy',
 				title: 'Outbound proxy',
-				description: 'Connect to the server through a SOCKS or HTTP proxy instead of this machine’s IP.',
+				description:
+					'Send everything through a SOCKS or HTTP proxy instead of this machine’s IP: the server connection, Microsoft and Xbox sign-in, the session server, skins and every other request.',
 				toggle: 'client.connectionProxy.enabled',
+				// the global layer's proxy is the global proxy, set up under Settings → General
+				scopes: ['server', 'instance'],
 				fields: [
 					{ path: 'client.connectionProxy.type', label: 'Type' },
 					{ path: 'client.connectionProxy.host', label: 'Host', placeholder: 'proxy.example.com' },
@@ -1838,11 +1844,6 @@ export const catalog: Group[] = [
 						path: 'server.healthCheck',
 						label: 'Restart the proxy’s server if it stops',
 						help: 'Checks that players can still connect.'
-					},
-					{
-						path: 'server.connectionTestOnStart',
-						label: 'Test that the proxy is reachable on start',
-						help: 'Warns when the proxy’s address doesn’t answer.'
 					}
 				]
 			}

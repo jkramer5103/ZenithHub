@@ -21,7 +21,8 @@ export interface InstanceStatus {
 	inQueue: boolean;
 	online: boolean;
 	queuePosition: number;
-	queueEtaSeconds: number;
+	/** only while in a queue with a known position */
+	queueEtaSeconds?: number;
 	prio: boolean;
 	username: string;
 	server: string;
@@ -29,9 +30,11 @@ export interface InstanceStatus {
 	onlineSeconds: number;
 	ping: number;
 	tps: number;
-	health: number;
-	food: number;
-	position: { x: number; y: number; z: number; dimension: string } | null;
+	/** health, food and position only while online, i.e. in the game */
+	health?: number;
+	food?: number;
+	// dimension can still be null right after joining, before the world loads
+	position?: { x: number; y: number; z: number; dimension: string | null } | null;
 	controller: string | null;
 	spectators: string[];
 	lastDisconnectReason?: string;
@@ -86,6 +89,8 @@ export interface Account {
 	username: string;
 	uuid: string | null;
 	authError: string | null;
+	/** Set for a pasted access token, which can't be renewed: when it stops working. */
+	tokenExpiresAt?: number;
 	addedAt: number;
 	ownerId: string | null;
 	ownerName: string | null;
@@ -94,7 +99,8 @@ export interface Account {
 
 export interface ManagerSettings {
 	publicAddress: string;
-	outboundProxiesEnabled: boolean;
+	/** users may set their own proxy; see ProxyCard */
+	userProxiesAllowed: boolean;
 }
 
 export interface Overview {
@@ -261,7 +267,8 @@ export interface ScheduledTask {
 	next?: number;
 	event?: string;
 	repeat?: boolean;
-	command: string;
+	/** missing for tasks whose action isn't a command */
+	command?: string;
 }
 
 /** Live details for the Control and Tasks tabs, polled while they're open. */

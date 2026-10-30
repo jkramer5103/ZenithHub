@@ -2,6 +2,8 @@ package com.zenith.network.server.handler.spectator.incoming;
 
 import com.zenith.Proxy;
 import com.zenith.command.api.CommandContext;
+import com.zenith.command.impl.LobbyCommand;
+import com.zenith.control.ManagedMode;
 import com.zenith.network.codec.PacketHandler;
 import com.zenith.network.server.ServerSession;
 import org.geysermc.mcprotocollib.protocol.packet.ingame.serverbound.ServerboundChatCommandPacket;
@@ -14,6 +16,10 @@ public class ChatCommandSpectatorHandler implements PacketHandler<ServerboundCha
     public ServerboundChatCommandPacket apply(final ServerboundChatCommandPacket packet, final ServerSession session) {
         final String command = packet.getCommand();
         if (command.isBlank()) return packet;
+        if (ManagedMode.isManaged() && LobbyCommand.isLobbyCommand(command)) {
+            EXECUTOR.execute(() -> LobbyCommand.sendSpectatorToLobby(session));
+            return null;
+        }
         if (CONFIG.inGameCommands.slashCommands
             && CONFIG.inGameCommands.enable
             && CONFIG.server.spectator.fullCommandsEnabled

@@ -19,6 +19,7 @@ import com.zenith.event.player.PlayerDisconnectedEvent;
 import com.zenith.event.player.SpectatorConnectedEvent;
 import com.zenith.event.player.SpectatorDisconnectedEvent;
 import com.zenith.cache.data.entity.Entity;
+import com.zenith.cache.data.entity.EntityPlayer;
 import com.zenith.cache.data.inventory.Container;
 import com.zenith.feature.queue.Queue;
 import com.zenith.feature.tasks.CommandAction;
@@ -134,6 +135,12 @@ public final class ControlServer {
             try {
                 send(ex, 400, error(e.getMessage()));
             } catch (IOException ignored) { }
+        } catch (final com.google.gson.JsonParseException | ClassCastException | UnsupportedOperationException e) {
+            // malformed JSON, or a field of the wrong type (Gson's getAsString on null throws the last one)
+            DEFAULT_LOG.debug("Control API bad request", e);
+            try {
+                send(ex, 400, error("bad request: " + e.getMessage()));
+            } catch (IOException ignored) { }
         } catch (final Exception e) {
             DEFAULT_LOG.debug("Control API error", e);
             try {
@@ -163,9 +170,10 @@ public final class ControlServer {
         var proxy = Proxy.getInstance();
         var json = new JsonObject();
         boolean connected = proxy.isConnected();
+        boolean joined = inGame(proxy);
         json.addProperty("connected", connected);
         json.addProperty("inQueue", proxy.isInQueue());
-        json.addProperty("online", connected && !proxy.isInQueue());
+        json.addProperty("online", joined);
         json.addProperty("queuePosition", proxy.getQueuePosition());
         if (connected && proxy.isInQueue() && proxy.getQueuePosition() > 0) {
             json.addProperty("queueEtaSeconds", Queue.getQueueWait(proxy.getQueuePosition()));
@@ -182,7 +190,8 @@ public final class ControlServer {
             json.addProperty("lastDisconnectReason", reason);
             json.addProperty("lastDisconnectAt", lastDisconnectAt);
         }
-        if (connected) {
+        // health and position are cache defaults until the server has sent the login
+        if (joined) {
             var player = CACHE.getPlayerCache().getThePlayer();
             json.addProperty("health", player.getHealth());
             json.addProperty("food", player.getFood());
@@ -205,7 +214,7 @@ public final class ControlServer {
     private JsonObject details(HttpExchange ex) {
         var proxy = Proxy.getInstance();
         var json = new JsonObject();
-        boolean online = proxy.isConnected() && !proxy.isInQueue();
+        boolean online = inGame(proxy);
         json.addProperty("online", online);
         json.addProperty("alive", online && CACHE.getPlayerCache().isAlive());
         json.addProperty("controlled", proxy.hasActivePlayer());
@@ -253,6 +262,12 @@ public final class ControlServer {
         return json;
     }
 
+    /** In the game itself: the TCP connection alone is up long before login, and the queue isn't the game. */
+    private static boolean inGame(final Proxy proxy) {
+        var client = proxy.getClient();
+        return proxy.isConnected() && client != null && client.isOnline() && !proxy.isInQueue();
+    }
+
     /** What the server can see of the client the bot pretends to be, for the web UI's privacy card. */
     private JsonObject fingerprint(final ClientSession client) {
         var privacy = CONFIG.client.privacy;
@@ -280,19 +295,23 @@ public final class ControlServer {
     /** Other players the bot can see, closest first. */
     private JsonArray nearby() {
         var self = CACHE.getPlayerCache().getThePlayer();
+        // distances are worked out once: the netty thread moves players mid-sort, which breaks the sort's contract
+        record Seen(EntityPlayer player, double distanceSq) {}
         var players = CACHE.getEntityCache().getPlayers().values().stream()
             .filter(p -> !p.isSelfPlayer() && !p.getUuid().equals(self.getUuid()))
-            .sorted(java.util.Comparator.comparingDouble(p -> distanceSq(self, p)))
+            .map(p -> new Seen(p, distanceSq(self, p)))
+            .sorted(java.util.Comparator.comparingDouble(Seen::distanceSq))
             .toList();
         var nearby = new JsonArray();
-        for (var p : players) {
+        for (var seen : players) {
+            var p = seen.player();
             var json = new JsonObject();
             json.addProperty("name", CACHE.getTabListCache().get(p.getUuid()).map(PlayerListEntry::getName).orElse(null));
             json.addProperty("uuid", p.getUuid().toString());
             json.addProperty("x", p.getX());
             json.addProperty("y", p.getY());
             json.addProperty("z", p.getZ());
-            json.addProperty("distance", Math.sqrt(distanceSq(self, p)));
+            json.addProperty("distance", Math.sqrt(seen.distanceSq()));
             json.addProperty("friend", PLAYER_LISTS.getFriendsList().contains(p.getUuid()));
             nearby.add(json);
         }
@@ -337,7 +356,8 @@ public final class ControlServer {
         json.addProperty("title", playerInventory ? null : ComponentSerializer.serializePlain(container.getTitle()));
         int size = container.getSize();
         json.addProperty("size", size);
-        int hotbarStart = playerInventory ? 36 : size - 9;
+        // a container's slots arrive after it opens, and some (lecterns) have fewer than a hotbar's worth
+        int hotbarStart = playerInventory ? 36 : Math.max(0, size - 9);
         json.addProperty("hotbarStart", hotbarStart);
         json.addProperty("heldSlot", hotbarStart + CACHE.getPlayerCache().getHeldItemSlot());
         var slots = new JsonArray();

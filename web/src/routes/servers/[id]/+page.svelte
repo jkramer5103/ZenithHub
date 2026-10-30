@@ -14,11 +14,14 @@
 
 {#if !server}
 	<div class="py-16 text-center text-sm text-zinc-400">This server doesn't exist.</div>
+{:else if !server.editable}
+	<div class="py-16 text-center text-sm text-zinc-400">Only the admin can change settings for {server.name}.</div>
 {:else}
 	<h1 class="text-2xl font-semibold">{server.name}</h1>
 	<p class="mt-1 mb-6 max-w-2xl text-sm text-zinc-400">
 		Settings for every instance on {server.address}{server.port !== 25565 ? `:${server.port}` : ''}. They replace the
-		<a href="/settings?tab=defaults" class="text-emerald-400 hover:underline">defaults for all instances</a>, and each instance can still change
+		{#if app.isAdmin}<a href="/settings?tab=defaults" class="text-emerald-400 hover:underline">defaults for all instances</a>{:else}defaults for all
+			instances{/if}, and each instance can still change
 		them for itself.
 	</p>
 	{#key id}

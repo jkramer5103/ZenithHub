@@ -48,7 +48,7 @@
 			}
 			const { id } = await api.post<{ id: string }>('/instances', { name: name.trim(), accountId, serverId: sid, start });
 			await app.refresh();
-			toasts.success(start ? 'Instance created and starting' : 'Instance created');
+			toasts.success(start ? 'Instance created and connecting' : 'Instance created');
 			onclose();
 			goto(`/instances/${id}`);
 		} catch (e) {
@@ -103,7 +103,7 @@
 			<input id="instance-name" class="input" bind:value={name} oninput={() => (nameTouched = true)} />
 		</div>
 		<label class="flex items-center gap-2 text-sm text-zinc-300">
-			<input type="checkbox" class="size-4 accent-emerald-600" bind:checked={start} /> Start right away
+			<input type="checkbox" class="size-4 accent-emerald-600" bind:checked={start} /> Connect right away
 		</label>
 		{#if error}<p class="text-sm text-red-400">{error}</p>{/if}
 		<button

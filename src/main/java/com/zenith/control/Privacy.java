@@ -2,7 +2,6 @@ package com.zenith.control;
 
 import com.viaversion.nbt.io.MNBTIO;
 import com.viaversion.nbt.tag.CompoundTag;
-import com.viaversion.nbt.tag.StringTag;
 import com.zenith.network.codec.PacketHandler;
 import com.zenith.network.server.ServerSession;
 import net.kyori.adventure.text.Component;
@@ -20,6 +19,7 @@ import org.jspecify.annotations.Nullable;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import static com.zenith.Globals.CACHE;
 import static com.zenith.Globals.CONFIG;
@@ -50,7 +50,7 @@ public final class Privacy {
         if (!CONFIG.client.privacy.translationProbeProtection) return packet;
         var original = signLines(packet.getX(), packet.getY(), packet.getZ(), packet.isFrontText());
         if (original == null) return packet;
-        var lines = Arrays.copyOf(packet.getLines(), packet.getLines().length);
+        var lines = packet.getLines().toArray(String[]::new);
         boolean changed = false;
         for (int i = 0; i < lines.length && i < original.length; i++) {
             if (original[i] == null || !VanillaText.hasProbe(original[i])) continue;
@@ -62,7 +62,7 @@ public final class Privacy {
         }
         if (!changed) return packet;
         SERVER_LOG.info("Answered a sign translation probe like a vanilla client");
-        return packet.withLines(lines);
+        return packet.withLines(List.of(lines));
     };
 
     /** Skins and capes from other hosts can log the IP of players connected through Zenith. */
@@ -98,14 +98,6 @@ public final class Privacy {
         }
     }
 
-    private static Component parseJsonLine(final String json) {
-        try {
-            return GsonComponentSerializer.gson().deserialize(json);
-        } catch (final Exception e) {
-            return Component.text(json);
-        }
-    }
-
     private static Component @Nullable [] signLines(final int x, final int y, final int z, final boolean front) {
         var chunk = CACHE.getChunkCache().get(x >> 4, z >> 4);
         if (chunk == null) return null;
@@ -119,10 +111,7 @@ public final class Privacy {
                 if (messages == null) return null;
                 var lines = new Component[messages.size()];
                 for (int i = 0; i < lines.length; i++) {
-                    // 1.21.4 stores sign lines as JSON strings, newer versions as NBT components
-                    lines[i] = messages.get(i) instanceof StringTag s
-                        ? parseJsonLine(s.getValue())
-                        : GsonComponentSerializer.gson().deserializeFromTree(NbtComponentSerializer.tagComponentToJson(messages.get(i)));
+                    lines[i] = GsonComponentSerializer.gson().deserializeFromTree(NbtComponentSerializer.tagComponentToJson(messages.get(i)));
                 }
                 return lines;
             } catch (final Exception e) {

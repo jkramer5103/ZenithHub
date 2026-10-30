@@ -161,6 +161,7 @@ public abstract class Entity {
         return new LocalizedCollisionBox(minX, maxX, minY, maxY, minZ, maxZ, x, y, z);
     }
 
+    // todo: update lerp for 26.3
     public void lerpTo(double x, double y, double z, float yaw, float pitch, int steps) {
         setX(x);
         setY(y);

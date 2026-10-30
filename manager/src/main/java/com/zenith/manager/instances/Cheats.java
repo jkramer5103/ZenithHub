@@ -1,7 +1,9 @@
 package com.zenith.manager.instances;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import com.zenith.manager.util.Json;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -31,6 +33,16 @@ public final class Cheats {
         MODULES.forEach(m -> forced.put("client.extra." + m + ".enabled", new JsonPrimitive(false)));
         forced.put("client.tickRate", new JsonPrimitive(1.0));
         return forced;
+    }
+
+    /**
+     * ZenithHub's defaults on top of Zenith's: every cheat module starts off, so an account only plays
+     * like a client once its owner turns that on. Any layer can still enable them.
+     */
+    public static JsonObject offByDefault(JsonObject zenithDefaults) {
+        var defaults = zenithDefaults.deepCopy();
+        MODULES.forEach(m -> Json.set(defaults, "client.extra." + m + ".enabled", new JsonPrimitive(false)));
+        return defaults;
     }
 
     public static boolean isTruthy(String value) {

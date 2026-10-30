@@ -1,5 +1,6 @@
 package com.zenith.feature.api;
 
+import com.zenith.control.OutboundProxy;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -17,7 +18,7 @@ public abstract class Api {
     }
 
     protected HttpClient buildHttpClient() {
-        return HttpClient.newBuilder()
+        return OutboundProxy.apply(HttpClient.newBuilder())
             .followRedirects(HttpClient.Redirect.ALWAYS)
             .connectTimeout(Duration.ofSeconds(3))
             .build();

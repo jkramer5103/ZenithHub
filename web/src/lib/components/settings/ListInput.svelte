@@ -80,7 +80,7 @@
 <div>
 	{#if items.length}
 		<ul class="mb-2 flex flex-wrap gap-1.5">
-			{#each items as item, i (key(item))}
+			{#each items as item, i (`${i}:${key(item)}`)}
 				<li class="flex max-w-full items-center gap-1.5 rounded-md border border-zinc-700 bg-zinc-800/70 py-0.5 pr-0.5 pl-2 text-sm">
 					{#if isPlayer}
 						<img

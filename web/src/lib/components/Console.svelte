@@ -26,6 +26,8 @@
 
 	let entries = $state<Entry[]>([]);
 	let lastSeq = -1;
+	// keys are our own: after a manager restart the sequence numbers repeat, and repeated keys crash the page
+	let nextKey = 0;
 	let commandCounter = 0;
 
 	let scroller: HTMLDivElement | undefined = $state();
@@ -48,11 +50,11 @@
 	}
 
 	function onLine(line: LogLine) {
-		// the manager restarted: sequence numbers start over
-		if (line.seq <= lastSeq && line.seq < 5) lastSeq = -1;
+		// the manager restarted: sequence numbers start over (a late duplicate only steps back by a little)
+		if (line.seq < 5 && line.seq + 10 < lastSeq) lastSeq = -1;
 		if (line.seq <= lastSeq) return;
 		lastSeq = line.seq;
-		push([{ kind: 'log', key: `l${line.seq}`, line }]);
+		push([{ kind: 'log', key: `l${nextKey++}`, line }]);
 	}
 
 	async function loadHistory() {
@@ -62,7 +64,7 @@
 			entries = [];
 			lastSeq = -1;
 			// keep our own command results; they aren't part of the server-side log
-			push([...lines.map((line) => ({ kind: 'log' as const, key: `l${line.seq}`, line })), ...commands]);
+			push([...lines.map((line) => ({ kind: 'log' as const, key: `l${nextKey++}`, line })), ...commands]);
 			lastSeq = lines.at(-1)?.seq ?? -1;
 			await scrollToBottom();
 		} catch (e) {

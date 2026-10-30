@@ -185,7 +185,7 @@ public class KillAura extends AbstractInventoryModule {
     }
 
     private static boolean hasCustomName(final EntityLiving entity) {
-        var customName = entity.getMetadataValue(2, MetadataTypes.OPTIONAL_CHAT);
+        var customName = entity.getMetadataValue(2, MetadataTypes.OPTIONAL_COMPONENT);
         return customName != null && customName.isPresent();
     }
 

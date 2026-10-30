@@ -38,6 +38,11 @@
 	);
 
 	$effect(() => {
+		// someone who may share but not play can't hand out Player; start from a role they can give
+		if (grantableRoles.length && !grantableRoles.some((r) => r.id === role)) role = grantableRoles[0].id;
+	});
+
+	$effect(() => {
 		// pick the first person when switching to users
 		if (kind === 'user' && !availableUsers.some((u) => u.id === who)) who = availableUsers[0]?.id ?? '';
 	});
@@ -124,13 +129,13 @@
 					Access works the same on the web, in the in-game lobby and on Discord.
 				</p>
 			</div>
-			<div class="inline-flex rounded-lg border border-zinc-800 bg-zinc-950 p-0.5 text-sm" role="tablist">
+			<div class="flex rounded-lg border border-zinc-800 bg-zinc-950 p-0.5 text-sm sm:inline-flex" role="tablist">
 				{#each ['user', 'mc', 'discord'] as const as k}
 					<button
 						type="button"
 						role="tab"
 						aria-selected={kind === k}
-						class="flex items-center gap-1.5 rounded-md px-3 py-1.5 {kind === k ? 'bg-zinc-800 text-zinc-100' : 'text-zinc-400 hover:text-zinc-200'}"
+						class="flex flex-1 items-center justify-center gap-1.5 rounded-md px-2 py-1.5 sm:flex-none sm:px-3 {kind === k ? 'bg-zinc-800 text-zinc-100' : 'text-zinc-400 hover:text-zinc-200'}"
 						onclick={() => switchKind(k)}
 					>
 						{#if k === 'user'}<UserRound size={14} />{:else if k === 'mc'}<Gamepad2 size={14} />{:else}{@render discordIcon(14)}{/if}

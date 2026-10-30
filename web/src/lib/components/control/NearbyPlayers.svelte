@@ -57,7 +57,7 @@
 		<p class="text-sm text-zinc-500">No other players in sight.</p>
 	{:else}
 		<ul class="divide-y divide-zinc-800/70">
-			{#each nearby as p (p.uuid)}
+			{#each nearby as p, i (`${i}:${p.uuid}`)}
 				{@const angle = bearing(p)}
 				<li class="flex flex-wrap items-center gap-x-3 gap-y-2 py-2.5">
 					<div class="flex min-w-0 flex-1 basis-40 items-center gap-3">

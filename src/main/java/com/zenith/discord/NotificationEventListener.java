@@ -1,5 +1,7 @@
 package com.zenith.discord;
 
+import com.zenith.control.Cheats;
+import com.zenith.control.ManagedMode;
 import com.zenith.Proxy;
 import com.zenith.event.chat.DeathMessageChatEvent;
 import com.zenith.event.client.*;
@@ -216,8 +218,10 @@ public class NotificationEventListener {
                             30L)
                         ) {
                             String msg = "You have possibly been kicked by 2b2t's AntiAFK plugin";
-                            if (!MODULE.get(AntiAFK.class).isEnabled()) {
-                                msg += "\n\nConsider enabling ZenithProxy's AntiAFK module: `antiAFK on`";
+                            if (!MODULE.get(AntiAFK.class).isEnabled() && !Cheats.blocks(MODULE.get(AntiAFK.class))) {
+                                msg += ManagedMode.isManaged()
+                                    ? "\n\nConsider turning on Anti-AFK: Settings → AFK"
+                                    : "\n\nConsider enabling ZenithProxy's AntiAFK module: `antiAFK on`";
                             }
                             embed.description(msg);
                         }
@@ -342,14 +346,21 @@ public class NotificationEventListener {
 
                  Otherwise you may experience issues with 2b2t's anti-cheat, which changes its checks based on client MC version.
 
-                 Or configure ZenithProxy's client ViaVersion (reconnect after changing):
-                 `via zenithToServer version %s`
-                 """.formatted(playerProtocolVersion.getName(), clientProtocolVersion.getName(), playerProtocolVersion.getName());
-            if (CONFIG.client.viaversion.disableOn2b2t) {
-                desc += "`via zenithToServer disableOn2b2t off`\n";
-            }
-            if (!CONFIG.client.viaversion.enabled) {
-                desc += "`via zenithToServer on`\n";
+                 """.formatted(playerProtocolVersion.getName(), clientProtocolVersion.getName());
+            if (ManagedMode.isManaged()) {
+                desc += "Or set the account's version to %s under Settings → Connection → Version translation, then reconnect."
+                    .formatted(playerProtocolVersion.getName());
+            } else {
+                desc += """
+                    Or configure ZenithProxy's client ViaVersion (reconnect after changing):
+                    `via zenithToServer version %s`
+                    """.formatted(playerProtocolVersion.getName());
+                if (CONFIG.client.viaversion.disableOn2b2t) {
+                    desc += "`via zenithToServer disableOn2b2t off`\n";
+                }
+                if (!CONFIG.client.viaversion.enabled) {
+                    desc += "`via zenithToServer on`\n";
+                }
             }
             var embed = Embed.builder()
                 .title("MC Version Mismatch")

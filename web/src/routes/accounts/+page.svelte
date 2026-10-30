@@ -6,11 +6,24 @@
 	import { relative } from '#lib/format.js';
 	import { attempt } from '#lib/toast.svelte.js';
 	import type { Account } from '#lib/types.js';
-	import { CircleAlert, KeyRound, Plus, RefreshCw, Trash2 } from '@lucide/svelte';
+	import { CircleAlert, Clock, KeyRound, Plus, RefreshCw, Trash2 } from '@lucide/svelte';
 
 	let showAdd = $state(false);
 	let relogin = $state<{ id: string; username: string } | null>(null);
 	let refreshing = $state<string | null>(null);
+
+	let now = $state(Date.now());
+	$effect(() => {
+		const timer = setInterval(() => (now = Date.now()), 60_000);
+		return () => clearInterval(timer);
+	});
+
+	function expiresIn(ts: number) {
+		const minutes = Math.round((ts - now) / 60_000);
+		if (minutes < 60) return `${Math.max(minutes, 1)}m`;
+		const hours = Math.floor(minutes / 60);
+		return hours < 48 ? `${hours}h ${minutes % 60}m` : `${Math.floor(hours / 24)}d`;
+	}
 
 	const accounts = $derived(app.overview?.accounts ?? []);
 	const groups = $derived(
@@ -45,7 +58,7 @@
 	<div>
 		<h1 class="text-2xl font-semibold">Accounts</h1>
 		<p class="mt-1 text-sm text-zinc-400">
-			Your Minecraft accounts. You have full control over them and decide who else may use them. Logins are refreshed automatically.
+			Your Minecraft accounts. You have full control over them and decide who else may use them. Microsoft logins renew themselves; a pasted access token works until it expires.
 		</p>
 	</div>
 	<button class="btn-primary" onclick={() => (showAdd = true)}><Plus size={16} /> Add account</button>
@@ -71,16 +84,22 @@
 					loading="lazy"
 				/>
 				<div class="min-w-0 flex-1">
-					<div class="flex items-center gap-2">
-						<span class="truncate font-medium">{account.username}</span>
+					<div class="flex flex-wrap items-center gap-x-2 gap-y-1">
+						<span class="max-w-full truncate font-medium">{account.username}</span>
 						<span class="rounded bg-zinc-800 px-1.5 py-0.5 text-[11px] text-zinc-400">
-							{account.type === 'MSA' ? 'Microsoft' : 'Offline'}
+							{account.type === 'OFFLINE' ? 'Offline' : account.tokenExpiresAt ? 'Access token' : 'Microsoft'}
 						</span>
 						<OwnerBadge mine={account.mine} ownerName={account.ownerName} />
 					</div>
 					<div class="text-xs text-zinc-500">
 						{count} instance{count === 1 ? '' : 's'} · added {relative(account.addedAt)}
 					</div>
+					{#if account.tokenExpiresAt && !account.authError}
+						<div class="mt-1 flex items-center gap-1 text-xs {account.tokenExpiresAt - now < 3 * 3_600_000 ? 'text-amber-400' : 'text-zinc-500'}">
+							<Clock size={13} class="shrink-0" />
+							{account.tokenExpiresAt > now ? `Stops working in ${expiresIn(account.tokenExpiresAt)}. A token can't be renewed.` : 'Expired. Log in again.'}
+						</div>
+					{/if}
 					{#if account.authError}
 						<div class="mt-1 flex items-center gap-1 text-xs text-red-400">
 							<CircleAlert size={13} class="shrink-0" />
@@ -90,11 +109,11 @@
 				</div>
 				<div class="flex items-center gap-1">
 					{#if account.type === 'MSA'}
-						{#if account.authError}
+						{#if account.authError || (account.tokenExpiresAt && account.tokenExpiresAt <= now)}
 							<button class="btn-primary" onclick={() => (relogin = { id: account.id, username: account.username })}>
 								<KeyRound size={16} /> Log in again
 							</button>
-						{:else}
+						{:else if !account.tokenExpiresAt}
 							<button class="btn-ghost p-2" title="Refresh login" onclick={() => refresh(account)} disabled={refreshing === account.id}>
 								<RefreshCw size={16} class={refreshing === account.id ? 'animate-spin' : ''} />
 							</button>

@@ -3,11 +3,12 @@ package com.zenith.cache.data.entity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.cloudburstmc.math.vector.Vector3d;
 import org.geysermc.mcprotocollib.network.packet.Packet;
 import org.geysermc.mcprotocollib.protocol.data.game.entity.metadata.Equipment;
+import org.geysermc.mcprotocollib.protocol.packet.ingame.clientbound.entity.ClientboundAddEntityPacket;
 import org.geysermc.mcprotocollib.protocol.packet.ingame.clientbound.entity.ClientboundRotateHeadPacket;
 import org.geysermc.mcprotocollib.protocol.packet.ingame.clientbound.entity.ClientboundSetEquipmentPacket;
-import org.geysermc.mcprotocollib.protocol.packet.ingame.clientbound.entity.spawn.ClientboundAddEntityPacket;
 import org.jspecify.annotations.NonNull;
 
 import java.util.function.Consumer;
@@ -27,12 +28,11 @@ public class EntityStandard extends EntityLiving {
             this.lerpTargetX(),
             this.lerpTargetY(),
             this.lerpTargetZ(),
+            Vector3d.from(this.velX, this.velY, this.velZ),
             this.lerpTargetYaw(),
             this.lerpTargetHeadYaw(),
-            this.lerpTargetPitch(),
-            this.velX,
-            this.velY,
-            this.velZ));
+            this.lerpTargetPitch()
+        ));
         if (!equipment.isEmpty()) {
             consumer.accept(new ClientboundSetEquipmentPacket(this.entityId, this.equipment.entrySet().stream()
                 .map(entry -> new Equipment(entry.getKey(), entry.getValue()))
