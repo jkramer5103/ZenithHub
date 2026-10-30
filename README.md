@@ -15,22 +15,39 @@ settings all happen in the browser.
 
 ## What ZenithHub adds
 
-- **Web UI** to add accounts (Microsoft device-code login with one click, auth-cache import, or
-  offline), add servers, and connect, disconnect or watch every bot. Works on phones.
+- **Web UI** to add accounts, add servers, and connect, disconnect or watch every bot. Works on phones.
+- **Accounts without a terminal:** Microsoft device-code login with one click, auth-cache import or
+  offline. Under **More**: a login.live.com cookie export, a Microsoft refresh token or a Minecraft
+  access token. Tokens are refreshed in the background.
 - **Instances:** each instance is an account on a server. One account can be on several servers at once.
-- **Clean settings:** curated pages instead of commands, layered Global → Server → Instance, with
-  search, a "changed" filter and reset to inherited. Settings apply live.
+- **Control without commands:** a Control tab for movement (go to, follow, mine, fly and more),
+  waypoints, clicking and looking, the inventory and open containers, connected players (kick, make
+  player, make spectator, connection history), nearby players, requeue, transfers and replay
+  recording. A Pearls tab loads stasis pearls, and a Tasks tab runs any action later, on a schedule
+  or on an event.
+- **Clean settings:** curated pages instead of commands for every Zenith setting, layered
+  Global → Server → Instance, with search, a "changed" filter, reset to inherited and an
+  "advanced" toggle for the rarely used ones. Settings apply live.
 - **One Minecraft port with a lobby:** players join a single address and get a chest menu of the bots
   they may use. Click to play, right-click to spectate, `/lobby` to go back. Clients from 1.20.5 to
   the newest version ViaVersion supports can join.
+- **Any server version:** Zenith runs natively on Minecraft 26.3 and uses ViaVersion to join each
+  server at the newest version it supports, so menus and dialogs reach new clients untranslated.
+- **Looks like a vanilla client:** fresh-install client settings, vanilla chat signing and
+  acknowledgements, real resource-pack downloads, cookies and transfers. Extra privacy switches
+  (block cookies, refuse local resource packs, answer translation-key probes like vanilla and more)
+  are under Settings → Privacy.
 - **Users and sharing:** one admin, users with their own accounts and private servers, and sharing
   by Minecraft name or Discord user with role presets. One permission system covers the web, the
   lobby and Discord.
 - **Optional central Discord bot:** a single bot token for everything. It creates a category per
   account and a channel per instance, posts Zenith's notification embeds and pings the owner. It
-  has `/status`, `/connect` and `/command`, and every notification can be switched off. There is no
-  chat relay.
-- **Outbound proxy** (SOCKS/HTTP) for all traffic: the server connection, Microsoft and Xbox sign-in, skins and every other request. One global proxy, optionally with per-user proxies.
+  has `/status`, `/connect`, `/disconnect`, `/pearl` and `/command`, and every notification can be
+  switched off. There is no chat relay.
+- **Outbound proxy** (SOCKS/HTTP) for all traffic: the server connection, Microsoft and Xbox sign-in,
+  skins and every other request. One global proxy, optionally with per-user proxies.
+- **Optional cheat lock:** `ZENITH_DISABLE_CHEATS=true` removes combat and automation modules for
+  servers that don't allow them.
 - Instances return to their previous state after a restart and are restarted with backoff if they crash.
 
 Deleted compared to upstream: Zenith's own per-instance Discord bot and its Discord commands, the
@@ -83,6 +100,10 @@ own reverse proxy.
 Each instance shows its status, chat and how to join:
 
 ![Instance overview](docs/images/instance.png)
+
+The Control tab replaces Zenith's commands: movement, players, inventory and more, each one tap away:
+
+![Control tab](docs/images/control.png)
 
 Settings are curated pages with search, instead of commands:
 
