@@ -14,6 +14,7 @@
 	import TasksPanel from '#lib/components/TasksPanel.svelte';
 	import CopyField from '#lib/components/CopyField.svelte';
 	import { duration } from '#lib/format.js';
+	import { banIssue } from '#lib/issues.js';
 	import { page } from '$app/state';
 	import { Activity, ArrowLeft, CalendarClock, Gamepad2, Joystick, Settings2, Share2, SlidersHorizontal, Orbit, Terminal, MapPinned } from '@lucide/svelte';
 
@@ -22,6 +23,7 @@
 	const server = $derived(app.overview?.servers.find((s) => s.id === instance?.serverId));
 	const runtime = $derived(instance?.runtime);
 	const status = $derived(runtime?.phase === 'RUNNING' ? runtime.status : null);
+	const ban = $derived(instance ? banIssue(instance) : null);
 	let showSettings = $state(false);
 	const can = (c: Capability) => !!instance?.capabilities.includes(c);
 
@@ -104,7 +106,12 @@
 		</div>
 	</div>
 
-	{#if runtime.phase === 'BACKOFF' && runtime.lastError}
+	{#if ban}
+		<div class="mb-4 rounded-lg border border-red-900 bg-red-950/40 px-4 py-3 text-sm text-red-200">
+			<span class="font-medium">{ban.title}.</span>
+			{ban.detail}
+		</div>
+	{:else if runtime.phase === 'BACKOFF' && runtime.lastError}
 		<div class="mb-4 rounded-lg border border-red-900 bg-red-950/40 px-4 py-3 text-sm text-red-200">{runtime.lastError}</div>
 	{:else if runtime.phase === 'STOPPED' && runtime.lastError}
 		<div class="mb-4 rounded-lg border border-zinc-800 bg-zinc-900 px-4 py-3 text-sm text-zinc-300">{runtime.lastError}</div>

@@ -113,6 +113,7 @@ public final class ControlServer {
                 lastDisconnectAt = System.currentTimeMillis();
                 onDisconnect(e);
             }));
+        ServerBan.onBan(this::onBan);
         server.start();
         DEFAULT_LOG.info("Control API listening on 127.0.0.1:{}", port);
     }
@@ -186,6 +187,8 @@ public final class ControlServer {
         json.addProperty("onlineSeconds", connected ? proxy.getOnlineTimeSeconds() : 0);
         json.addProperty("ping", connected && proxy.getClient() != null ? proxy.getClient().getPing() : 0);
         json.addProperty("tps", TPS.getTPSValue());
+        var ban = ServerBan.current();
+        if (ban != null) json.add("ban", banJson(ban));
         var reason = lastDisconnectReason;
         if (!connected && reason != null) {
             json.addProperty("lastDisconnectReason", reason);
@@ -523,6 +526,28 @@ public final class ControlServer {
     }
 
     /** Someone joined or left through the proxy, for the manager's connection history. */
+    /** The manager disconnects a banned account and shows why. */
+    private void onBan(ServerBan.Ban ban) {
+        if (eventSubscribers.isEmpty()) return;
+        var json = banJson(ban);
+        json.addProperty("type", "ban");
+        json.addProperty("ts", System.currentTimeMillis());
+        var msg = COMPACT_GSON.toJson(json);
+        for (var queue : eventSubscribers) {
+            queue.offer(msg);
+        }
+    }
+
+    private static JsonObject banJson(ServerBan.Ban ban) {
+        var json = new JsonObject();
+        json.addProperty("reason", ban.reason());
+        if (ban.duration() != null) json.addProperty("duration", ban.duration());
+        if (ban.until() != null) json.addProperty("until", ban.until());
+        if (ban.untilMs() > 0) json.addProperty("untilMs", ban.untilMs());
+        json.addProperty("seenAt", ban.seenAt());
+        return json;
+    }
+
     /** The manager gives the account another proxy when the connection keeps dropping. */
     private void onDisconnect(ClientDisconnectEvent e) {
         if (eventSubscribers.isEmpty() || e.manualDisconnect()) return;

@@ -20,6 +20,8 @@ export function instanceIssues(instance: Instance, account: Account | undefined,
 			detail: 'Sign in again under Settings → Accounts.'
 		});
 	}
+	const ban = banIssue(instance, now);
+	if (ban) issues.push(ban);
 	const runtime = instance.runtime;
 	if (runtime.phase === 'BACKOFF') issues.push({ level: 'error', title: 'Crashed', detail: runtime.lastError ?? undefined });
 	const status = runtime.phase === 'RUNNING' ? runtime.status : null;
@@ -38,4 +40,16 @@ export function instanceIssues(instance: Instance, account: Account | undefined,
 		});
 	}
 	return issues;
+}
+
+/** The server banned the account and the ban hasn't run out. */
+export function banIssue(instance: Instance, now = Date.now()): Issue | null {
+	const ban = instance.ban;
+	if (!ban || (ban.untilMs && ban.untilMs <= now)) return null;
+	const until = ban.untilMs ? new Date(ban.untilMs).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' }) : ban.until;
+	return {
+		level: 'error',
+		title: until ? `Banned until ${until}` : `Banned for ${ban.duration}`,
+		detail: `ZenithHub disconnected it. The server says: “${ban.reason}”`
+	};
 }

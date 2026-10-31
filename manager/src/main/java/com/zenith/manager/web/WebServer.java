@@ -1186,6 +1186,7 @@ public final class WebServer {
                 v.addProperty("sharedWithMe", Permissions.sharedWith(who, i));
                 v.addProperty("autostart", i.autostart.name());
                 v.addProperty("desiredRunning", i.desiredRunning);
+                if (i.ban != null) v.add("ban", Json.COMPACT.toJsonTree(i.ban));
                 var capArray = new JsonArray();
                 caps.forEach(c -> capArray.add(c.name()));
                 v.add("capabilities", capArray);

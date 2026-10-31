@@ -28,7 +28,7 @@ settings all happen in the browser.
   pops, the bot leaves the AFK zone or stops earning, arrives somewhere, or nobody has played for a
   while. "Notify me" sends you an alert in the browser and on Discord.
 - **Dashboard:** every account at a glance, with its status, AFK-zone reward now, a day at the
-  current rate, over the last week and in total, and what needs attention (not verified, not earning, crashed, sign-in failed).
+  current rate, over the last week and in total, and what needs attention (not verified, not earning, banned, crashed, sign-in failed).
 - **Clean settings:** curated pages instead of commands for every Zenith setting, layered
   Global → Server → Instance, with search, a "changed" filter, reset to inherited and an
   "advanced" toggle for the rarely used ones. Settings apply live.

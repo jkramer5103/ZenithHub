@@ -68,6 +68,18 @@ export interface Instance {
 	mine: boolean;
 	/** someone gave the viewer access through sharing */
 	sharedWithMe: boolean;
+	/** the server banned the account; cleared by the next Connect */
+	ban?: Ban;
+}
+
+export interface Ban {
+	reason: string;
+	duration: string | null;
+	/** as the server wrote it */
+	until: string | null;
+	/** 0 if the server didn't say */
+	untilMs: number;
+	seenAt: number;
 }
 
 export interface Server {

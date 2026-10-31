@@ -1,5 +1,6 @@
 package com.zenith.network.client;
 
+import com.zenith.control.ServerBan;
 import net.kyori.adventure.key.Key;
 import org.geysermc.mcprotocollib.protocol.data.handshake.HandshakeIntent;
 import org.jspecify.annotations.Nullable;
@@ -20,6 +21,7 @@ public final class ClientCookies {
     private ClientCookies() {}
 
     public static void store(final Key key, final byte[] payload) {
+        ServerBan.onCookie(key, payload);
         if (CONFIG.client.privacy.blockCookies) return;
         COOKIES.put(key, payload);
     }

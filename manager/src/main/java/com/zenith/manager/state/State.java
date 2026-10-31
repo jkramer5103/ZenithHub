@@ -110,6 +110,19 @@ public final class State {
         public long createdAt;
         /** The instance's channel in the Discord server. */
         public String discordChannelId;
+        /** What the server said when it banned the account; cleared by the next Connect. */
+        public Ban ban;
+    }
+
+    /** A ban the server told the bot about (see the bot's {@code ServerBan}). */
+    public static final class Ban {
+        public String reason;
+        public String duration;
+        /** as the server wrote it */
+        public String until;
+        /** 0 if the server didn't say */
+        public long untilMs;
+        public long seenAt;
     }
 
     /**

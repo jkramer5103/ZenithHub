@@ -125,6 +125,10 @@ public final class Supervisor {
      * A fresh process connects by itself because client.autoConnect is forced from lastConnected.
      */
     public void connect(String instanceId, String actor) throws IOException, InterruptedException {
+        if (store.read(s -> s.instances.stream().anyMatch(i -> i.id.equals(instanceId) && i.ban != null))) {
+            store.update(s -> s.instances.stream().filter(i -> i.id.equals(instanceId)).forEach(i -> i.ban = null));
+            events.publish("changed", null, new JsonObject());
+        }
         setLastConnected(instanceId, true);
         var rt = runtime(instanceId);
         boolean alive = rt.process != null && rt.process.isAlive();
@@ -464,6 +468,7 @@ public final class Supervisor {
                             case "player" -> playerEvents.accept(rt.instanceId, json);
                             case "afk" -> afkEvents.accept(rt.instanceId, json);
                             case "disconnect" -> disconnectEvents.accept(rt.instanceId, json);
+                            case "ban" -> banned(rt.instanceId, json);
                             default -> {}
                         }
                     });
@@ -624,6 +629,26 @@ public final class Supervisor {
 
     public void setDisconnectEvents(java.util.function.BiConsumer<String, JsonObject> listener) {
         this.disconnectEvents = listener;
+    }
+
+    /** The server banned the account: keep what it said for the UI and stop trying. */
+    private void banned(String instanceId, JsonObject event) {
+        var ban = new State.Ban();
+        ban.reason = str(event, "reason");
+        ban.duration = str(event, "duration");
+        ban.until = str(event, "until");
+        ban.untilMs = event.has("untilMs") ? event.get("untilMs").getAsLong() : 0;
+        ban.seenAt = event.has("seenAt") ? event.get("seenAt").getAsLong() : System.currentTimeMillis();
+        store.update(s -> s.instances.stream().filter(i -> i.id.equals(instanceId)).forEach(i -> i.ban = ban));
+        events.publish("changed", null, new JsonObject());
+        LOG.warn("Instance {} was banned: {} (until {})", instanceId, ban.reason, ban.until != null ? ban.until : ban.duration);
+        Thread.ofVirtual().name("banned").start(() -> {
+            try {
+                disconnect(instanceId, "ZenithHub (banned)");
+            } catch (Exception e) {
+                LOG.warn("Couldn't disconnect banned instance {}: {}", instanceId, e.getMessage());
+            }
+        });
     }
 
     private void setDesiredRunning(String instanceId, boolean running) {
