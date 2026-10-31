@@ -412,7 +412,9 @@ public final class Supervisor {
     }
 
     public JsonObject zenithDefaults(Path instanceDir) {
-        for (var candidate : new Path[] { instanceDir.resolve("config.defaults.json"), config.zenithDefaultsFile() }) {
+        // the manager's copy is dumped from the current binary at startup; the instance's own is from whatever
+        // binary ran it last, so after an image update its old defaults would turn into instance overrides
+        for (var candidate : new Path[] { config.zenithDefaultsFile(), instanceDir.resolve("config.defaults.json") }) {
             try {
                 if (Files.exists(candidate)) return Cheats.offByDefault(Json.readObject(candidate));
             } catch (Exception e) {
