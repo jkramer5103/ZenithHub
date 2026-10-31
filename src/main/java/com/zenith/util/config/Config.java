@@ -100,7 +100,8 @@ public final class Config {
             // the sidebar line that counts what the zone pays
             public String rewardLabel = "Stars";
             // the server shows this while the account can't earn (HugoSMP: "you must be verified on Discord")
-            public String notEarningText = "verifiziert";
+            // any of these, split by |: servers translate the message by the IP's country, the link stays the same
+            public String notEarningText = "discord|verif|vérif";
             // wait a random time in this range after joining or leaving the zone, like a person would
             public int enterDelayMinSeconds = 8;
             public int enterDelayMaxSeconds = 30;

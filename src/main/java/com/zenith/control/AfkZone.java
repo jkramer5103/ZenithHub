@@ -137,9 +137,18 @@ public class AfkZone extends Module {
         if (!isInZone()) return;
         serverMessage = text;
         serverMessageAt = System.currentTimeMillis();
-        if (!c.notEarningText.isBlank() && lower.contains(c.notEarningText.toLowerCase(Locale.ROOT))) {
+        if (containsAny(lower, c.notEarningText)) {
             notEarningMessageAt = serverMessageAt;
         }
+    }
+
+    /** Whether the lower-case text contains one of the |-separated alternatives. */
+    static boolean containsAny(final String lower, final String alternatives) {
+        for (var alternative : alternatives.split("\\|")) {
+            var a = alternative.strip().toLowerCase(Locale.ROOT);
+            if (!a.isEmpty() && lower.contains(a)) return true;
+        }
+        return false;
     }
 
     private void entered() {

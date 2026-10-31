@@ -604,7 +604,7 @@ export const catalog: Group[] = [
 					{
 						path: 'client.afkZone.notEarningText',
 						label: 'Not earning when it says',
-						help: 'Text in the server’s zone message that means the account earns nothing, e.g. a Discord verification hint.',
+						help: 'Text in the server’s zone message that means the account earns nothing, e.g. a Discord verification hint. Separate alternatives with |, since servers translate it by the country of the IP.',
 						advanced: true
 					},
 					{ path: 'client.afkZone.enterDelayMinSeconds', label: 'Wait at least', unit: 'seconds before going in', min: 0, advanced: true },
