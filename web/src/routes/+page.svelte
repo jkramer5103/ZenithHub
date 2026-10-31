@@ -10,7 +10,7 @@
 	const overview = $derived(app.overview!);
 	const instances = $derived(overview.instances);
 
-	// what each one earned over the last day and week; the counters themselves come live with the status
+	// what each one earned over the last week and ever; the counters themselves come live with the status
 	let summary = $state<AfkSummary>({});
 	async function loadSummary() {
 		try {
@@ -67,7 +67,14 @@
 	// a total only makes sense when they all count the same thing
 	const labels = $derived([...new Set(rows.map((r) => r.afk?.rewardLabel).filter(Boolean))]);
 	const label = $derived(labels.length === 1 ? labels[0]! : 'Reward');
-	const today = $derived(afkRows.reduce((sum, r) => sum + (summary[r.instance.id]?.day ?? 0), 0));
+	// HugoSMP pays one a minute while an account earns, so that's what a day comes to
+	const PER_DAY = 24 * 60;
+	const perDay = $derived(earning * PER_DAY);
+	const current = $derived(rows.reduce((sum, r) => sum + (r.afk?.reward ?? 0), 0));
+	const lifetime = $derived(afkRows.reduce((sum, r) => sum + (summary[r.instance.id]?.lifetime ?? 0), 0));
+	function earningNow(r: Row) {
+		return r.afk?.state === 'IN_ZONE' && r.afk.earning === true;
+	}
 
 	function amount(n: number | null | undefined) {
 		if (n == null) return '-';
@@ -116,7 +123,7 @@
 		<a href="/instances" class="btn-primary mt-4"><LayoutGrid size={16} /> Set up an instance</a>
 	</div>
 {:else}
-	<div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
+	<div class="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-6">
 		<div class="card px-4 py-3">
 			<div class="text-2xl font-semibold tabular-nums">{online}<span class="text-base text-zinc-500">/{rows.length}</span></div>
 			<div class="text-xs text-zinc-500">online</div>
@@ -129,8 +136,16 @@
 				<div class="text-xs text-zinc-500">earning {label}</div>
 			</div>
 			<div class="card px-4 py-3">
-				<div class="text-2xl font-semibold tabular-nums">+{amount(today)}</div>
-				<div class="text-xs text-zinc-500">{label} in 24 hours</div>
+				<div class="text-2xl font-semibold tabular-nums">{amount(current)}</div>
+				<div class="text-xs text-zinc-500">{label} now</div>
+			</div>
+			<div class="card px-4 py-3">
+				<div class="text-2xl font-semibold tabular-nums {perDay ? 'text-emerald-300' : ''}">+{amount(perDay)}</div>
+				<div class="text-xs text-zinc-500">{label} a day at this rate</div>
+			</div>
+			<div class="card px-4 py-3">
+				<div class="text-2xl font-semibold tabular-nums">{amount(lifetime)}</div>
+				<div class="text-xs text-zinc-500">{label} earned in total</div>
 			</div>
 		{/if}
 		<div class="card px-4 py-3">
@@ -212,9 +227,9 @@
 								<PhaseBadge runtime={r.instance.runtime} />
 							</div>
 							{#if r.afk || earned}
-								<div class="grid grid-cols-3 gap-2 text-center md:w-96 md:shrink-0 md:grid-cols-4">
+								<div class="grid grid-cols-4 gap-2 text-center md:w-[32rem] md:shrink-0 md:grid-cols-5">
 									<!-- phones: a line of its own above the numbers -->
-									<div class="col-span-3 min-w-0 text-left md:col-span-1 md:text-center">
+									<div class="col-span-4 min-w-0 text-left md:col-span-1 md:text-center">
 										<div class="truncate text-sm font-medium {afk?.cls ?? 'text-zinc-500'}">{afk?.text ?? 'Not in game'}</div>
 										<div class="hidden text-[11px] text-zinc-500 md:block">AFK zone</div>
 									</div>
@@ -223,14 +238,18 @@
 										<div class="truncate text-[11px] text-zinc-500">{r.afk?.rewardLabel || label} now</div>
 									</div>
 									<div>
-										<div class="text-sm font-semibold tabular-nums {earned?.day ? 'text-emerald-300' : ''}">
-											{earned ? `+${amount(earned.day)}` : '-'}
+										<div class="text-sm font-semibold tabular-nums {earningNow(r) ? 'text-emerald-300' : ''}">
+											{r.afk ? `+${amount(earningNow(r) ? PER_DAY : 0)}` : '-'}
 										</div>
-										<div class="text-[11px] text-zinc-500">24 hours</div>
+										<div class="text-[11px] text-zinc-500">a day</div>
 									</div>
 									<div>
 										<div class="text-sm font-semibold tabular-nums">{earned ? `+${amount(earned.week)}` : '-'}</div>
 										<div class="text-[11px] text-zinc-500">7 days</div>
+									</div>
+									<div>
+										<div class="text-sm font-semibold tabular-nums">{earned ? amount(earned.lifetime) : '-'}</div>
+										<div class="text-[11px] text-zinc-500">in total</div>
 									</div>
 								</div>
 							{/if}

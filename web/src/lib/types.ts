@@ -376,7 +376,8 @@ export interface AfkZoneStatus {
 }
 
 /** What each instance earned in the AFK zone, by instance id; only instances with a history. */
-export type AfkSummary = Record<string, { day: number; week: number }>;
+/** what each instance's counter rose by: the last day and week, and ever since ZenithHub first saw it */
+export type AfkSummary = Record<string, { day: number | null; week: number | null; lifetime: number }>;
 
 export interface AfkHistory {
 	/** [timestamp, reward], oldest first */

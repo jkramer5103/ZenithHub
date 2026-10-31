@@ -565,7 +565,7 @@ public final class WebServer {
             var instance = requireCapability(ctx, Capability.CONTROL);
             send(ctx, history.list(instance.id));
         });
-        // what each visible instance earned in the AFK zone over the last day and week, for the dashboard
+        // what each visible instance earned in the AFK zone over the last day, week and ever, for the dashboard
         app.get("/api/afk/summary", ctx -> {
             var who = Permissions.Identity.of(requireUser(ctx));
             var ids = store.read(s -> s.instances.stream()
@@ -578,6 +578,7 @@ public final class WebServer {
                 var entry = new JsonObject();
                 entry.addProperty("day", day);
                 entry.addProperty("week", afkHistory.gainedSince(id, now - 7 * 86_400_000L));
+                entry.addProperty("lifetime", afkHistory.lifetime(id));
                 json.add(id, entry);
             }
             send(ctx, json);

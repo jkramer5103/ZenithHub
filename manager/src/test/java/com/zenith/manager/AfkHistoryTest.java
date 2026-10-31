@@ -72,4 +72,20 @@ class AfkHistoryTest {
         assertEquals(0.0, history.gainedSince("i", t + 60 * min));
         assertNull(history.gainedSince("other", t));
     }
+
+    @Test
+    void lifetimeOutlivesTheSamplesAndSurvivesARestart() {
+        long t = 1_000_000_000L;
+        long day = 86_400_000L;
+        var history = new AfkHistory(dir);
+        history.record("i", event("IN_ZONE", t, 10.0, t));
+        history.record("i", event("IN_ZONE", t + day, 30.0, t));
+        history.record("i", event("IN_ZONE", t + 2 * day, 20.0, t));
+        // the first samples drop out after two weeks, what they earned stays
+        history.record("i", event("IN_ZONE", t + 20 * day, 25.0, t));
+        assertEquals(0.0, history.gainedSince("i", 0));
+        assertEquals(25.0, history.lifetime("i"));
+        assertEquals(25.0, new AfkHistory(dir).lifetime("i"));
+        assertEquals(0.0, history.lifetime("other"));
+    }
 }

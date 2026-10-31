@@ -54,6 +54,8 @@ public final class AfkHistory {
     private static final class Data {
         final Deque<Sample> samples = new ArrayDeque<>();
         final Deque<Session> sessions = new ArrayDeque<>();
+        /** every rise of the counter ever seen; samples only go back {@value #KEEP_DAYS} days */
+        double lifetime;
         long savedAt;
     }
 
@@ -78,6 +80,7 @@ public final class AfkHistory {
 
         if (reward != null) {
             var last = d.samples.peekLast();
+            if (last != null && reward > last.value()) d.lifetime += reward - last.value();
             if (last == null || last.value() != reward) {
                 // points at least a sample window apart, plus a last one that follows the counter
                 var all = d.samples.toArray(Sample[]::new);
@@ -130,9 +133,18 @@ public final class AfkHistory {
     public synchronized @Nullable Double gainedSince(String instanceId, long from) {
         var d = load(instanceId);
         if (d.samples.isEmpty()) return null;
+        return rises(d.samples, from);
+    }
+
+    /** Everything the counter earned since it was first seen, including what's older than the samples. */
+    public synchronized double lifetime(String instanceId) {
+        return load(instanceId).lifetime;
+    }
+
+    private static double rises(Iterable<Sample> samples, long from) {
         double gained = 0;
         Sample previous = null;
-        for (var sample : d.samples) {
+        for (var sample : samples) {
             if (sample.ts() < from) {
                 previous = sample;
                 continue;
@@ -158,6 +170,7 @@ public final class AfkHistory {
         var sessions = new JsonArray();
         d.sessions.descendingIterator().forEachRemaining(s -> sessions.add(s.toJson()));
         json.add("sessions", sessions);
+        json.addProperty("lifetime", d.lifetime);
         return json;
     }
 
@@ -191,6 +204,8 @@ public final class AfkHistory {
                     s.endReason = str(o, "endReason");
                     d.sessions.add(s);
                 }
+                if (json.has("lifetime")) d.lifetime = json.get("lifetime").getAsDouble();
+                else d.lifetime = rises(d.samples, Long.MIN_VALUE);
                 // the manager went away mid-stay: we don't know when it ended
                 var open = d.sessions.peekLast();
                 if (open != null && open.end == 0) {
