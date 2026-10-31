@@ -27,6 +27,8 @@ settings all happen in the browser.
   at a time of day, or when something happens: a stranger comes into view, health drops, a totem
   pops, the bot leaves the AFK zone or stops earning, arrives somewhere, or nobody has played for a
   while. "Notify me" sends you an alert in the browser and on Discord.
+- **Dashboard:** every account at a glance, with its status, AFK-zone reward now and over the last
+  day and week, and what needs attention (not verified, not earning, crashed, sign-in failed).
 - **Clean settings:** curated pages instead of commands for every Zenith setting, layered
   Global → Server → Instance, with search, a "changed" filter, reset to inherited and an
   "advanced" toggle for the rarely used ones. Settings apply live.
@@ -80,12 +82,12 @@ password.
 **3. Set the public address.** Under Settings → General, enter the address players type in
 Minecraft, for example `mc.example.net` or your server's IP.
 
-**4. Add a Minecraft account.** Accounts → Add account → Get login code. Enter the code on
+**4. Add a Minecraft account.** Settings → Accounts → Add account → Get login code. Enter the code on
 Microsoft's page from any device. Nothing is typed into a terminal.
 
 ![Add account dialog](docs/images/add-account.png)
 
-**5. Add a server and connect.** Servers → Add server with `2b2t.org` (or any server), then Instances → New
+**5. Add a server and connect.** Settings → Servers → Add server with `2b2t.org` (or any server), then Instances → New
 instance, pick the account and the server, and press Connect.
 
 **6. Join in Minecraft.** Connect to the public address on port 25565. The lobby shows a chest menu

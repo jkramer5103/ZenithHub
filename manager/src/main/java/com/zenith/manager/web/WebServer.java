@@ -565,6 +565,23 @@ public final class WebServer {
             var instance = requireCapability(ctx, Capability.CONTROL);
             send(ctx, history.list(instance.id));
         });
+        // what each visible instance earned in the AFK zone over the last day and week, for the dashboard
+        app.get("/api/afk/summary", ctx -> {
+            var who = Permissions.Identity.of(requireUser(ctx));
+            var ids = store.read(s -> s.instances.stream()
+                .filter(i -> Permissions.capabilities(who, i).contains(Capability.VIEW)).map(i -> i.id).toList());
+            long now = System.currentTimeMillis();
+            var json = new JsonObject();
+            for (var id : ids) {
+                var day = afkHistory.gainedSince(id, now - 86_400_000L);
+                if (day == null) continue;
+                var entry = new JsonObject();
+                entry.addProperty("day", day);
+                entry.addProperty("week", afkHistory.gainedSince(id, now - 7 * 86_400_000L));
+                json.add(id, entry);
+            }
+            send(ctx, json);
+        });
         app.get("/api/instances/{id}/afk", ctx -> {
             var instance = requireCapability(ctx, Capability.VIEW);
             send(ctx, afkHistory.get(instance.id));

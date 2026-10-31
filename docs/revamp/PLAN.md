@@ -160,3 +160,20 @@ For plugin servers like HugoSMP and DonutSMP that pay for idling in an AFK zone.
 - [x] `client.viaversion.enabled` is forced on: without it a bot speaks only Zenith's native version and reconnects forever with "Outdated server" anywhere else. The switch is gone from Settings.
 - [x] LAN servers connect directly: `ConfigComposer.isLanAddress` (IPv4/IPv6 literals in loopback, private, link-local and `fc00::/7`, `localhost`, names without a dot, `.local`/`.lan`/`.internal`/`.home.arpa`/`.localdomain`; no DNS lookup, so nothing leaks around the proxy) makes `ConfigComposer` force `client.connectionProxy.enabled=false` over the pool, the global proxy, users' own proxies and overrides, and the pool assigns no proxy for it.
 - [x] Admin proxy override per account (Settings → General, proxy pool card, the sliders button on each account): Default, No proxy, or a custom SOCKS5/SOCKS4/HTTP proxy. Kept in the 0600 secret `secrets/proxy-overrides.json` (`ProxyOverrides`); the API returns it without the password (`hasPassword`), and a blank password keeps the saved one. It wins over the pool (which frees the account's pool proxy), the global proxy and the owner's own; owners can't see or change it. `PUT`/`DELETE /api/proxy-overrides/{accountId}`, admin only; deleting the account deletes it.
+
+### Phase 8: Dashboard and Settings menu (done, 2026-10-31)
+- [x] Navigation is Dashboard (`/`), Instances (`/instances`) and Settings. Accounts, Servers, Users, General and Defaults, set up once and rarely changed, are pages under Settings (`/settings/accounts`, `/settings/servers[/<id>]`, `/settings/users`, `/settings/general`, `/settings/defaults`): a sidebar on wide screens, a list on phones with a back link on each page. Members see Accounts and Servers. Old URLs (`/accounts`, `/servers[/<id>]`, `/users`, `/settings?tab=defaults`) redirect.
+- [x] Dashboard: tiles (online, earning, reward in 24 hours, needing attention), a **Needs attention** list and a row per instance, grouped yours / shared / other users', with status, AFK state, the reward now and what it earned in the last 24 hours and 7 days. Rows open the instance (its AFK tab when the zone is in use). Problems come from `web/src/lib/issues.ts`: sign-in failed, login expiring, crashed, disconnected while meant to be online, couldn't get into the AFK zone, and not earning (titled "Not verified" when the server's message mentions verification or Discord).
+- [x] Bot: `/v1/status` includes `afkZone` (same as the details) while the zone is in use (keep on, in the zone, or a reward on the sidebar), so the dashboard updates live. Manager: `GET /api/afk/summary` gives each visible instance's `day` and `week` gain from `AfkHistory.gainedSince` (only the rises, so spending doesn't count against it).
+- [x] The manager composes instances from the Zenith defaults it dumps from the current binary at startup, not the instance's own `config.defaults.json` (written by whichever binary ran it last), which after an image update turned the old defaults into instance overrides.
+
+### Later
+- More browser notifications (queue done, low health, visual range, …) without needing a task.
+
+## Removed in the fork
+Deleted from the code, not just switched off (2026-10-29):
+- Zenith's own Discord bot (JDA login, presence, nickname/avatar, buttons, Discord command input). `com.zenith.discord.DiscordBot` only posts `MainChannelMessageSentEvent`s, which the control API forwards to the manager's bot. The `discord` and `chatRelay` commands and their config are gone.
+- The Discord chat relay (listener, events, config).
+- The interactive JLine terminal and the `terminal` command. `TerminalManager` only prints logs to stdout.
+- The self-updater, its events and the `update`, `autoUpdate`, `channel` and `jvmArgs` commands. `LaunchConfig` keeps only version information.
+- The Python launcher (`src/launcher`), `scripts/` install and run helpers, the launcher/release/prerelease workflows, and the wiki setup guides.

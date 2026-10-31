@@ -57,7 +57,7 @@
 					</div>
 				</div>
 				{#if server.editable}
-					<a class="btn-ghost p-2" title="Settings for instances on this server" href="/servers/{server.id}"><SlidersHorizontal size={16} /></a>
+					<a class="btn-ghost p-2" title="Settings for instances on this server" href="/settings/servers/{server.id}"><SlidersHorizontal size={16} /></a>
 					<button class="btn-ghost p-2" title="Edit" onclick={() => (editing = server)}><Pencil size={16} /></button>
 					<button
 						class="btn-ghost p-2 hover:text-red-400"

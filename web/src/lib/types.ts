@@ -39,6 +39,8 @@ export interface InstanceStatus {
 	spectators: string[];
 	lastDisconnectReason?: string;
 	lastDisconnectAt?: number;
+	/** only while the AFK zone is in use: kept in it, in it, or a reward is on the sidebar */
+	afkZone?: AfkZoneStatus;
 }
 
 export interface Runtime {
@@ -372,6 +374,9 @@ export interface AfkZoneStatus {
 	rewardText?: string;
 	rewardAtEntry?: number;
 }
+
+/** What each instance earned in the AFK zone, by instance id; only instances with a history. */
+export type AfkSummary = Record<string, { day: number; week: number }>;
 
 export interface AfkHistory {
 	/** [timestamp, reward], oldest first */

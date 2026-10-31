@@ -208,6 +208,9 @@ public final class ControlServer {
         var spectators = new JsonArray();
         proxy.getSpectatorConnections().forEach(s -> spectators.add(s.getName()));
         json.add("spectators", spectators);
+        // for the dashboard; the AFK tab reads the same from the details
+        var afk = MODULE.get(AfkZone.class);
+        if (afk.inUse()) json.add("afkZone", afk.json());
         return json;
     }
 

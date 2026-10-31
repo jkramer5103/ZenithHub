@@ -72,10 +72,10 @@
 
 {#if !instance || !runtime}
 	<div class="py-16 text-center text-sm text-zinc-400">
-		This instance doesn't exist or isn't shared with you. <a href="/" class="text-emerald-400 underline">Back to instances</a>
+		This instance doesn't exist or isn't shared with you. <a href="/instances" class="text-emerald-400 underline">Back to instances</a>
 	</div>
 {:else}
-	<a href="/" class="mb-4 inline-flex items-center gap-1 text-sm text-zinc-400 hover:text-zinc-200"><ArrowLeft size={15} /> Instances</a>
+	<a href="/instances" class="mb-4 inline-flex items-center gap-1 text-sm text-zinc-400 hover:text-zinc-200"><ArrowLeft size={15} /> Instances</a>
 
 	<div class="mb-5 flex flex-wrap items-center gap-x-4 gap-y-3">
 		<img

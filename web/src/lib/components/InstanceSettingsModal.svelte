@@ -43,7 +43,7 @@
 			await app.refresh();
 			toasts.success('Instance deleted');
 			onclose();
-			goto('/');
+			goto('/instances');
 		} catch (e) {
 			error = errorMessage(e);
 		} finally {

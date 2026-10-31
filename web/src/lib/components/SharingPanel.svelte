@@ -183,7 +183,7 @@
 				{roleOf(role).label}: {roleOf(role).description.toLowerCase()}.
 				{#if kind === 'mc'}Anyone logged in to Minecraft as this name gets access in the lobby, no web account needed.{/if}
 				{#if kind === 'discord'}Gives access in this instance’s Discord channel. In Discord, enable developer mode and use “Copy User ID”.{/if}
-				{#if kind === 'user' && app.isAdmin && !view.users.length}<a href="/users" class="text-emerald-400 underline">Add users</a> first.{/if}
+				{#if kind === 'user' && app.isAdmin && !view.users.length}<a href="/settings/users" class="text-emerald-400 underline">Add users</a> first.{/if}
 			</p>
 			{#if addError}<p class="text-sm text-red-400">{addError}</p>{/if}
 		</form>

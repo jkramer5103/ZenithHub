@@ -10,7 +10,7 @@
 	import Switch from '#lib/components/settings/Switch.svelte';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
-	import { ChevronDown, Code, Gamepad2, KeyRound, LayoutGrid, LogOut, MessageSquare, RotateCw, Server, Settings, UserRound, Users, WifiOff } from '@lucide/svelte';
+	import { ChevronDown, Code, Gamepad2, Gauge, KeyRound, LayoutGrid, LogOut, MessageSquare, RotateCw, Settings, WifiOff } from '@lucide/svelte';
 	import type { LayoutProps } from './$types';
 
 	let { children }: LayoutProps = $props();
@@ -26,16 +26,15 @@
 	const loading = $derived(!loadError && (!app.session || (!!app.user && !app.overview)));
 	$effect(() => globalThis.zenithBoot?.loading(loading));
 
-	const nav = $derived([
-		{ href: '/', label: 'Instances', icon: LayoutGrid, show: true },
-		{ href: '/accounts', label: 'Accounts', icon: UserRound, show: true },
-		{ href: '/servers', label: 'Servers', icon: Server, show: true },
-		{ href: '/users', label: 'Users', icon: Users, show: app.isAdmin },
-		{ href: '/settings', label: 'Settings', icon: Settings, show: app.isAdmin }
-	].filter((n) => n.show));
+	// accounts, servers and users are set up once, so they live under Settings
+	const nav = [
+		{ href: '/', label: 'Dashboard', icon: Gauge },
+		{ href: '/instances', label: 'Instances', icon: LayoutGrid },
+		{ href: '/settings', label: 'Settings', icon: Settings }
+	];
 
-	// the nav hides these from members; a typed URL or old bookmark goes home instead of failing to load
-	const adminOnly = $derived(!!app.user && !app.isAdmin && /^\/(users|settings)(\/|$)/.test(page.url.pathname));
+	// Settings hides these from members; a typed URL or old bookmark goes home instead of failing to load
+	const adminOnly = $derived(!!app.user && !app.isAdmin && /^\/(users|settings\/(users|general|defaults))(\/|$)/.test(page.url.pathname));
 	$effect(() => {
 		if (adminOnly) void goto('/', { replaceState: true });
 	});
@@ -51,7 +50,7 @@
 
 	function active(href: string) {
 		const path = page.url.pathname;
-		return href === '/' ? path === '/' || path.startsWith('/instances') : path.startsWith(href);
+		return href === '/' ? path === '/' : path.startsWith(href);
 	}
 </script>
 
@@ -76,7 +75,7 @@
 			<div class="mx-auto flex h-14 max-w-6xl items-center gap-6 px-4">
 				<a href="/" class="flex items-center gap-2 font-semibold"><Logo /> ZenithHub</a>
 				<nav class="hidden items-center gap-1 md:flex">
-					{#each nav as item}
+					{#each nav as item (item.href)}
 						<a
 							href={item.href}
 							class="btn px-3 py-1.5 {active(item.href) ? 'bg-zinc-800 text-zinc-100' : 'text-zinc-400 hover:text-zinc-100'}"
@@ -171,21 +170,19 @@
 			{#if !adminOnly}{@render children()}{/if}
 		</main>
 
-		{#if nav.length > 1}
-			<nav
-				class="fixed inset-x-0 bottom-0 z-30 flex border-t border-zinc-800 bg-zinc-950/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden"
-			>
-				{#each nav as item}
-					<a
-						href={item.href}
-						class="flex flex-1 flex-col items-center gap-0.5 py-2 text-[11px] {active(item.href) ? 'text-emerald-400' : 'text-zinc-500'}"
-					>
-						<item.icon size={20} />
-						{item.label}
-					</a>
-				{/each}
-			</nav>
-		{/if}
+		<nav
+			class="fixed inset-x-0 bottom-0 z-30 flex border-t border-zinc-800 bg-zinc-950/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden"
+		>
+			{#each nav as item (item.href)}
+				<a
+					href={item.href}
+					class="flex flex-1 flex-col items-center gap-0.5 py-2 text-[11px] {active(item.href) ? 'text-emerald-400' : 'text-zinc-500'}"
+				>
+					<item.icon size={20} />
+					{item.label}
+				</a>
+			{/each}
+		</nav>
 	</div>
 {/if}
 

@@ -6,6 +6,7 @@ import com.google.gson.JsonParser;
 import com.zenith.manager.ManagerConfig;
 import com.zenith.manager.util.Json;
 import com.zenith.manager.util.SecureFiles;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -120,6 +121,26 @@ public final class AfkHistory {
         }
 
         if (changed || ts - d.savedAt >= SAVE_EVERY_MS) save(instanceId, d, ts);
+    }
+
+    /**
+     * What the counter rose by since {@code from}: only the rises, so spending in between doesn't count against it.
+     * The last sample before {@code from} is the starting point. Null without any samples.
+     */
+    public synchronized @Nullable Double gainedSince(String instanceId, long from) {
+        var d = load(instanceId);
+        if (d.samples.isEmpty()) return null;
+        double gained = 0;
+        Sample previous = null;
+        for (var sample : d.samples) {
+            if (sample.ts() < from) {
+                previous = sample;
+                continue;
+            }
+            if (previous != null && sample.value() > previous.value()) gained += sample.value() - previous.value();
+            previous = sample;
+        }
+        return gained;
     }
 
     /** {@code samples} oldest first, {@code sessions} newest first. */

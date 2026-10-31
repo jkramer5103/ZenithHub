@@ -9,6 +9,7 @@ import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 class AfkHistoryTest {
     @TempDir Path dir;
@@ -54,5 +55,21 @@ class AfkHistoryTest {
         var s = new AfkHistory(dir).get("i").getAsJsonArray("sessions").get(0).getAsJsonObject();
         assertEquals("ZenithHub restarted", s.get("endReason").getAsString());
         assertFalse(s.get("end").getAsLong() < t);
+    }
+
+    @Test
+    void gainedCountsOnlyRisesSinceTheStart() {
+        var history = new AfkHistory(dir);
+        long t = 1_000_000_000L;
+        long min = 60_000;
+        history.record("i", event("IN_ZONE", t, 10.0, t));
+        history.record("i", event("IN_ZONE", t + 6 * min, 20.0, t));
+        // spent 5 in between
+        history.record("i", event("IN_ZONE", t + 12 * min, 15.0, t));
+        history.record("i", event("IN_ZONE", t + 18 * min, 25.0, t));
+        assertEquals(20.0, history.gainedSince("i", t + min));
+        assertEquals(10.0, history.gainedSince("i", t + 13 * min));
+        assertEquals(0.0, history.gainedSince("i", t + 60 * min));
+        assertNull(history.gainedSince("other", t));
     }
 }

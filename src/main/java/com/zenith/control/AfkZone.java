@@ -180,6 +180,11 @@ public class AfkZone extends Module {
         report();
     }
 
+    /** Kept in the zone, in it, or reading a reward: worth showing on the dashboard. */
+    public boolean inUse() {
+        return CONFIG.client.afkZone.keep || isInZone() || reward != null;
+    }
+
     public boolean isInZone() {
         return zoneSince > 0;
     }
