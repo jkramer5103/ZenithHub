@@ -21,8 +21,14 @@ FROM ghcr.io/graalvm/native-image-community:25 AS java
 ARG ZENITH_RUNTIME
 RUN microdnf install -y findutils git-core && microdnf clean all
 WORKDIR /src
-COPY . .
-# build also regenerates the command docs, which runs Zenith in ./run
+# Keep UI, docs and CI changes out of the native compilation cache key.
+COPY gradlew build.gradle.kts settings.gradle.kts gradle.properties ./
+COPY gradle/ ./gradle/
+COPY buildSrc/ ./buildSrc/
+COPY src/ ./src/
+COPY manager/build.gradle.kts ./manager/
+COPY manager/src/ ./manager/src/
+# The native build also generates command docs, which runs Zenith in ./run.
 RUN --mount=type=cache,target=/root/.gradle mkdir -p run && \
     if [ "$ZENITH_RUNTIME" = "native" ]; then \
       ./gradlew --no-daemon -x test nativeCompile :manager:shadowJar \
