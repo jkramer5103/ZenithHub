@@ -252,6 +252,12 @@ public final class ControlServer {
                     t.addProperty("event", c.getEvent().getSimpleName());
                     t.addProperty("repeat", !(task.getContinuation() instanceof OnceContinuation));
                 }
+                case TriggerCondition c -> {
+                    t.addProperty("type", "trigger");
+                    t.addProperty("trigger", c.getSpec());
+                    t.addProperty("repeat", !(task.getContinuation() instanceof OnceContinuation));
+                    if (c.getNextDaily() != null) t.addProperty("next", c.getNextDaily().toEpochMilli());
+                }
                 default -> t.addProperty("type", "other");
             }
             if (task.getAction() instanceof CommandAction action) t.addProperty("command", action.getCommand());

@@ -218,8 +218,7 @@ export const catalog: Group[] = [
 			{
 				id: 'viaversion',
 				title: 'Version translation',
-				description: 'Join servers on any Minecraft version, using the newest one the server supports (ViaVersion).',
-				toggle: 'client.viaversion.enabled',
+				description: 'Join servers on any Minecraft version, using the newest one the server supports (ViaVersion). Always on.',
 				fields: [
 					{ path: 'client.viaversion.autoProtocolVersion', label: 'Detect the server version automatically' },
 					{
@@ -1326,6 +1325,7 @@ export const catalog: Group[] = [
 				description: 'Everything else the bot reports.',
 				fields: [
 					{ path: 'client.extra.tasks.taskCommandExecutedNotification', label: 'Scheduled tasks ran' },
+					{ path: 'discord.notifications.taskAlerts', label: 'Notify me (from tasks)', help: 'The "Notify me" action of scheduled tasks.' },
 					{ path: 'discord.notifications.spawnPatrol', label: 'Spawn patrol targets' },
 					{ path: 'discord.notifications.replays', label: 'Replay recordings' },
 					{ path: 'discord.notifications.plugins', label: 'Plugins' }
@@ -1340,6 +1340,7 @@ export const catalog: Group[] = [
 					{ path: 'discord.mentionRoleOnDisconnect', label: 'Disconnected' },
 					{ path: 'discord.mentionRoleOnStartQueue', label: 'Started queueing' },
 					{ path: 'discord.mentionRoleOnDeath', label: 'Died' },
+					{ path: 'discord.notifications.taskAlertsMention', label: 'Notify me (from tasks)' },
 					{ path: 'client.extra.utility.actions.autoDisconnect.mentionOnDisconnect', label: 'Auto disconnect logged out' },
 					{ path: 'client.extra.autoTotem.totemPopAlertMention', label: 'Totem popped' },
 					{ path: 'client.extra.autoTotem.noTotemsAlertMention', label: 'Out of totems' },

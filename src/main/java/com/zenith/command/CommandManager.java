@@ -124,6 +124,7 @@ public class CommandManager {
             commandsList.add(new com.zenith.command.impl.LobbyCommand());
             commandsList.add(new com.zenith.command.impl.ControllerCommand());
             commandsList.add(new com.zenith.command.impl.AfkZoneCommand());
+            commandsList.add(new com.zenith.command.impl.NotifyCommand());
         }
         commandsList.removeIf(com.zenith.control.Cheats::blocks);
         registerCommands();

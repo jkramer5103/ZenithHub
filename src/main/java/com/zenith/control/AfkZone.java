@@ -361,7 +361,7 @@ public class AfkZone extends Module {
     }
 
     /** Earning: unknown until it has been in the zone a while, unless the server says it can't. */
-    private @Nullable Boolean earning() {
+    @Nullable Boolean earning() {
         if (!isInZone()) return null;
         long now = System.currentTimeMillis();
         if (notEarningMessageAt > 0 && now - notEarningMessageAt < 60_000) return false;

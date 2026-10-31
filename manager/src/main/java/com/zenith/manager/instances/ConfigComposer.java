@@ -68,7 +68,7 @@ public final class ConfigComposer {
         "server.verifyUsers", "server.acceptTransfers", "server.onlyZenithTransfers", "server.enforceMatchingConnectingAddress",
         "server.loginRateLimiter.enabled", "server.extra.whitelist.enable", "server.extra.whitelist.autoAddClient",
         "server.extra.whitelist.whitelist", "server.spectator.whitelistEnabled", "server.spectator.whitelist",
-        "client.server.address", "client.server.port", "client.autoConnect",
+        "client.server.address", "client.server.port", "client.autoConnect", "client.viaversion.enabled",
         "discord.accountOwnerRoleId", "discord.notificationMentionRoleId",
         "authentication.openBrowserOnLogin", "authentication.username", "authentication.accountType"
     );
@@ -102,6 +102,8 @@ public final class ConfigComposer {
         forced.put("client.server.port", new JsonPrimitive(ctx.server().port));
         // restore previous state: reconnect if it was connected when last observed
         forced.put("client.autoConnect", new JsonPrimitive(instance.lastConnected || instance.autostart == State.Autostart.ALWAYS));
+        // without it the bot only speaks Zenith's native version and loops on "Outdated server" everywhere else
+        forced.put("client.viaversion.enabled", new JsonPrimitive(true));
         // Zenith's notifications reach the manager's bot through the control API; any role mention means "ping the account owner"
         forced.put("discord.accountOwnerRoleId", new JsonPrimitive("1"));
         forced.put("discord.notificationMentionRoleId", new JsonPrimitive(""));

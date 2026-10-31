@@ -1014,6 +1014,9 @@ public final class Config {
             public boolean spawnPatrol = true;
             public boolean replays = true;
             public boolean plugins = true;
+            // ZenithHub: "Notify me" task actions
+            public boolean taskAlerts = true;
+            public boolean taskAlertsMention = true;
         }
     }
 

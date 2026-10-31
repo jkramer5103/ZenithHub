@@ -1061,6 +1061,8 @@ public final class WebServer {
             case "login" -> who.admin() || who.user().id.equals(str(event.payload(), "ownerId"));
             // only for the Discord bot
             case "notification" -> false;
+            // the owner asked for it; friends' alerts would be noise
+            case "alert" -> instance != null && who.user().id.equals(instance.ownerId);
             case "log" -> instance != null && client.subscribed.contains(instance.id) && Permissions.has(who, instance, Capability.VIEW);
             default -> instance != null && Permissions.has(who, instance, Capability.VIEW);
         };

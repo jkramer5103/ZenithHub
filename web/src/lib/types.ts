@@ -261,9 +261,11 @@ export type TaskEvent = 'connect' | 'death' | 'disconnect' | 'online' | 'playerC
 
 export interface ScheduledTask {
 	id: string;
-	type: 'timed' | 'interval' | 'event' | 'other';
+	type: 'timed' | 'interval' | 'event' | 'trigger' | 'other';
 	intervalSeconds?: number;
-	/** epoch ms of the next run, for timed and interval tasks */
+	/** the bot's trigger spec, like "player;who=stranger;cooldown=60" */
+	trigger?: string;
+	/** epoch ms of the next run, for timed, interval and daily tasks */
 	next?: number;
 	event?: string;
 	repeat?: boolean;

@@ -7,6 +7,7 @@ import com.zenith.command.api.Command;
 import com.zenith.command.api.CommandCategory;
 import com.zenith.command.api.CommandContext;
 import com.zenith.command.api.CommandUsage;
+import com.zenith.control.TriggerCondition;
 import com.zenith.event.client.ClientConnectEvent;
 import com.zenith.event.client.ClientDeathEvent;
 import com.zenith.event.client.ClientDisconnectEvent;
@@ -59,6 +60,7 @@ public class TasksCommand extends Command {
                 "add timed <id> <delay> <command>",
                 "add interval <id> <startDelay> <repeatDelay> <command>",
                 "add event <id> <" + String.join("/", EVENT_MAP.keySet().stream().sorted().toList()) + "> <repeat/once> <command>",
+                "add trigger <id> <trigger> <repeat/once> <command>",
                 "del <id>",
                 "list",
                 "clear",
@@ -177,6 +179,38 @@ public class TasksCommand extends Command {
                         .addField("Event", EVENT_MAP.inverse().get(eventClass))
                         .addField("Command", command);
                     return OK;
+                }))))))
+                // ZenithHub: triggers with settings, see TriggerCondition
+                .then(literal("trigger").then(argument("id", wordWithChars()).then(argument("trigger", wordWithChars()).then(argument("repeat", enumStrings("repeat", "once")).then(argument("command", greedyString()).executes(c -> {
+                    var taskId = getString(c, "id");
+                    var repeat = getString(c, "repeat").equalsIgnoreCase("repeat");
+                    var command = getString(c, "command");
+                    var parse = COMMAND.parse(CommandContext.create(command, new CommandAction.CommandActionSource()));
+                    if (!parse.getExceptions().isEmpty() || parse.getReader().canRead()) {
+                        c.getSource().getEmbed()
+                            .title("Invalid Command")
+                            .description("Invalid command: `" + command + "`");
+                        return ERROR;
+                    }
+                    String spec;
+                    try {
+                        spec = TriggerCondition.validate(getString(c, "trigger"));
+                    } catch (IllegalArgumentException e) {
+                        c.getSource().getEmbed()
+                            .title("Invalid Trigger")
+                            .description(e.getMessage());
+                        return ERROR;
+                    }
+                    var task = new Task(taskId, new CommandAction(command), new TriggerCondition(spec),
+                        repeat ? new ForeverContinuation() : new OnceContinuation());
+                    MODULE.get(Tasks.class).addTask(task);
+                    c.getSource().getEmbed()
+                        .title("Task Added")
+                        .addField("Task ID", task.getId())
+                        .addField("Type", "Trigger")
+                        .addField("Trigger", spec)
+                        .addField("Command", command);
+                    return OK;
                 })))))))
             .then(literal("del").then(argument("id", wordWithChars()).executes(c -> {
                 var id = getString(c, "id");
@@ -231,6 +265,7 @@ public class TasksCommand extends Command {
                 yield "Interval";
             }
             case EventCondition c -> "Event";
+            case TriggerCondition c -> "Trigger";
             case null, default -> "Unknown";
         };
     }

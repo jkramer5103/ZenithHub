@@ -2,7 +2,8 @@ import { errorMessage } from './api';
 
 export interface Toast {
 	id: number;
-	kind: 'error' | 'success';
+	kind: 'error' | 'success' | 'alert';
+	title?: string;
 	message: string;
 }
 
@@ -11,10 +12,11 @@ let nextId = 1;
 class Toasts {
 	items = $state<Toast[]>([]);
 
-	show(kind: Toast['kind'], message: string) {
+	show(kind: Toast['kind'], message: string, title?: string) {
 		const id = nextId++;
-		this.items.push({ id, kind, message });
-		setTimeout(() => this.dismiss(id), kind === 'error' ? 6000 : 3000);
+		this.items.push({ id, kind, message, title });
+		// alerts are something the user asked to hear about: they stay a while
+		setTimeout(() => this.dismiss(id), kind === 'alert' ? 20000 : kind === 'error' ? 6000 : 3000);
 	}
 
 	error(e: unknown) {

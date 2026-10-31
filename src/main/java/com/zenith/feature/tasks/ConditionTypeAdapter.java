@@ -33,6 +33,13 @@ public class ConditionTypeAdapter extends TypeAdapter<Condition> {
                 writer.value(interval.getInterval().toString());
                 writer.endObject();
             }
+            // ZenithHub
+            case com.zenith.control.TriggerCondition trigger -> {
+                writer.beginObject();
+                writer.name("spec");
+                writer.value(trigger.getSpec());
+                writer.endObject();
+            }
             default -> {
                 writer.nullValue();
             }
@@ -86,6 +93,20 @@ public class ConditionTypeAdapter extends TypeAdapter<Condition> {
                 var interval = Duration.parse(intervalString);
                 reader.endObject();
                 condition = new IntervalCondition(startTime, interval);
+            }
+            // ZenithHub
+            case "TriggerCondition" -> {
+                reader.beginObject();
+                if (!reader.nextName().equals("spec")) {
+                    return null;
+                }
+                var spec = reader.nextString();
+                reader.endObject();
+                try {
+                    condition = new com.zenith.control.TriggerCondition(com.zenith.control.TriggerCondition.validate(spec));
+                } catch (IllegalArgumentException e) {
+                    DEFAULT_LOG.error("Invalid trigger {} in TriggerCondition deserializer", spec);
+                }
             }
             default -> {
                 reader.skipValue();

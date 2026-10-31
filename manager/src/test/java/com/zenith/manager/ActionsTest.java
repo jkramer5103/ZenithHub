@@ -61,6 +61,29 @@ class ActionsTest {
     }
 
     @Test
+    void tasksWithTriggers() {
+        assertEquals("tasks add trigger t1 player;who=stranger;cooldown=120;delay=20;ifIdle=1 repeat notify A stranger is near",
+            command("{\"action\":\"addTask\",\"id\":\"t1\",\"when\":\"trigger\",\"repeat\":true,"
+                + "\"trigger\":{\"kind\":\"player\",\"who\":\"stranger\",\"cooldown\":120,\"delay\":20,\"ifIdle\":true},"
+                + "\"run\":{\"action\":\"notify\",\"text\":\"A stranger\\nis near\"}}"));
+        assertEquals("tasks add trigger t2 daily;at=08:30;days=135;zone=Europe/Berlin;jitter=15 repeat afkZone enter",
+            command("{\"action\":\"addTask\",\"id\":\"t2\",\"when\":\"trigger\",\"repeat\":true,"
+                + "\"trigger\":{\"kind\":\"daily\",\"at\":\"08:30\",\"days\":\"135\",\"zone\":\"Europe/Berlin\",\"jitter\":15},"
+                + "\"run\":{\"action\":\"afkEnter\"}}"));
+        assertEquals("tasks add trigger t3 arrived;x=-10;z=200;radius=5 once pathfinder stop",
+            command("{\"action\":\"addTask\",\"id\":\"t3\",\"when\":\"trigger\",\"repeat\":false,"
+                + "\"trigger\":{\"kind\":\"arrived\",\"x\":-10,\"z\":200,\"radius\":5},\"run\":{\"action\":\"stop\"}}"));
+        // a player name can't smuggle in more settings or a second command
+        assertThrows(IllegalArgumentException.class, () -> command("{\"action\":\"addTask\",\"id\":\"t\",\"when\":\"trigger\","
+            + "\"trigger\":{\"kind\":\"player\",\"who\":\"Steve;cooldown=0\"},\"run\":{\"action\":\"respawn\"}}"));
+        assertThrows(IllegalArgumentException.class, () -> command("{\"action\":\"addTask\",\"id\":\"t\",\"when\":\"trigger\","
+            + "\"trigger\":{\"kind\":\"player\",\"who\":\"anyone\",\"cooldown\":1},\"run\":{\"action\":\"respawn\"}}"));
+        assertThrows(IllegalArgumentException.class, () -> command("{\"action\":\"addTask\",\"id\":\"t\",\"when\":\"trigger\","
+            + "\"trigger\":{\"kind\":\"daily\",\"at\":\"8:30 x\",\"zone\":\"UTC\"},\"run\":{\"action\":\"respawn\"}}"));
+        assertThrows(IllegalArgumentException.class, () -> command("{\"action\":\"notify\",\"text\":\"  \"}"));
+    }
+
+    @Test
     void rejectsInjection() {
         assertThrows(IllegalArgumentException.class, () -> command("{\"action\":\"follow\",\"player\":\"Steve stop\"}"));
         assertThrows(IllegalArgumentException.class, () -> command("{\"action\":\"loadPearl\",\"pearl\":\"a b\"}"));

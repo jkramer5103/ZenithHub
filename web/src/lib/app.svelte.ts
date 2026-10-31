@@ -1,5 +1,6 @@
 import { api, setUnauthorizedHandler } from './api';
 import type { LogLine, Overview, PendingLogin, Runtime, Session } from './types';
+import { toasts } from './toast.svelte';
 
 type LogListener = (line: LogLine) => void;
 type LoginListener = (login: PendingLogin) => void;
@@ -166,6 +167,21 @@ class AppState {
 			case 'login':
 				this.#loginListeners.forEach((l) => l(msg.data as PendingLogin));
 				break;
+			case 'alert': {
+				// a task's "Notify me"; only the instance's owner gets these
+				const text = (msg.data as { text?: string }).text ?? '';
+				const name = (msg.instanceId && this.instance(msg.instanceId)?.name) || 'ZenithHub';
+				toasts.show('alert', text, name);
+				// the system notification needs https or localhost, and permission from the Tasks tab
+				if (typeof Notification !== 'undefined' && Notification.permission === 'granted' && document.hidden) {
+					try {
+						new Notification(name, { body: text, tag: `alert-${msg.instanceId}-${text}` });
+					} catch {
+						// some mobile browsers only allow notifications from a service worker
+					}
+				}
+				break;
+			}
 			case 'changed':
 				// bursts of changes collapse into one refetch
 				if (this.#refetchQueued) break;

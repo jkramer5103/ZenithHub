@@ -25,6 +25,8 @@ public final class Actions {
 
     /** Task triggers, as Zenith's tasks command names them. */
     public static final Set<String> TASK_EVENTS = Set.of("connect", "death", "disconnect", "online", "playerConnect", "playerDisconnect");
+    /** The bot's TriggerCondition kinds. */
+    public static final Set<String> TASK_TRIGGERS = Set.of("afk", "player", "health", "attacked", "totem", "daily", "unattended", "arrived", "onlineFor");
 
     /** {@code alsoNeeds}: a second capability, for tasks that run an action later. */
     public record Command(Capability capability, String command, Capability alsoNeeds) {
@@ -107,6 +109,14 @@ public final class Actions {
             case "addTask" -> addTask(body);
             case "deleteTask" -> new Command(Capability.CONTROL, "tasks del " + id(body, "id"));
 
+            // --- notifications, mostly for tasks ---
+            case "notify" -> {
+                var text = string(body, "text").replaceAll("[\\r\\n\\t]+", " ").strip();
+                if (text.isEmpty()) throw new IllegalArgumentException("Empty message");
+                if (text.length() > 200) throw new IllegalArgumentException("Keep the message under 200 characters");
+                yield new Command(Capability.CONTROL, "notify " + text);
+            }
+
             // --- free text, for developer mode ---
             case "command" -> {
                 var command = string(body, "command").replace('\n', ' ').trim();
@@ -123,16 +133,59 @@ public final class Actions {
         if (!body.has("run") || !body.get("run").isJsonObject()) throw new IllegalArgumentException("Missing run");
         var run = parse(body.getAsJsonObject("run"));
         if (run.command().startsWith("tasks ")) throw new IllegalArgumentException("A task can't change tasks");
-        var when = oneOf(body, "when", Set.of("after", "every", "event"));
+        var when = oneOf(body, "when", Set.of("after", "every", "event", "trigger"));
         var prefix = switch (when) {
             case "after" -> "tasks add timed " + id + " " + integer(body, "delaySeconds", 1, 31_536_000) + "s ";
             case "every" -> "tasks add interval " + id + " "
                 + integer(body, "startSeconds", 0, 31_536_000) + "s "
                 + integer(body, "intervalSeconds", 1, 31_536_000) + "s ";
+            case "trigger" -> "tasks add trigger " + id + " " + trigger(body) + " " + (bool(body, "repeat") ? "repeat" : "once") + " ";
             default -> "tasks add event " + id + " " + oneOf(body, "event", TASK_EVENTS) + " "
                 + (bool(body, "repeat") ? "repeat" : "once") + " ";
         };
         return new Command(Capability.CONTROL, prefix + run.command(), run.capability());
+    }
+
+    /**
+     * The bot's trigger spec, like {@code player;who=stranger;cooldown=60}: the kind and its settings, then how often
+     * the task may run, a random wait before it does and whether it waits for nobody to be playing.
+     */
+    static String trigger(JsonObject body) {
+        if (!body.has("trigger") || !body.get("trigger").isJsonObject()) throw new IllegalArgumentException("Missing trigger");
+        var t = body.getAsJsonObject("trigger");
+        var kind = oneOf(t, "kind", TASK_TRIGGERS);
+        var spec = new StringBuilder(kind);
+        switch (kind) {
+            case "afk" -> spec.append(";on=").append(oneOf(t, "on", Set.of("earningStopped", "earningStarted", "leftZone")));
+            case "player" -> {
+                var who = string(t, "who").trim();
+                spec.append(";who=").append(who.equals("anyone") || who.equals("stranger") ? who : player(t, "who"));
+            }
+            case "health" -> spec.append(";below=").append(integer(t, "below", 1, 19));
+            case "daily" -> {
+                var at = string(t, "at").trim();
+                if (!at.matches("([01]\\d|2[0-3]):[0-5]\\d")) throw new IllegalArgumentException("Invalid time");
+                spec.append(";at=").append(at);
+                if (t.has("days") && !t.get("days").isJsonNull()) {
+                    var days = string(t, "days");
+                    if (!days.matches("[1-7]{1,7}")) throw new IllegalArgumentException("Invalid days");
+                    spec.append(";days=").append(days);
+                }
+                var zone = string(t, "zone").trim();
+                if (!java.time.ZoneId.getAvailableZoneIds().contains(zone)) throw new IllegalArgumentException("Unknown time zone");
+                spec.append(";zone=").append(zone);
+                if (t.has("jitter")) spec.append(";jitter=").append(integer(t, "jitter", 0, 720));
+            }
+            case "unattended", "onlineFor" -> spec.append(";minutes=").append(integer(t, "minutes", 1, 10_080));
+            case "arrived" -> spec.append(";x=").append(integer(t, "x", -30_000_000, 30_000_000))
+                .append(";z=").append(integer(t, "z", -30_000_000, 30_000_000))
+                .append(";radius=").append(integer(t, "radius", 1, 10_000));
+            default -> {}
+        }
+        if (t.has("cooldown")) spec.append(";cooldown=").append(integer(t, "cooldown", 10, 604_800));
+        if (t.has("delay")) spec.append(";delay=").append(integer(t, "delay", 0, 3600));
+        if (t.has("ifIdle") && bool(t, "ifIdle")) spec.append(";ifIdle=1");
+        return spec.toString();
     }
 
     private static String click(JsonObject body) {

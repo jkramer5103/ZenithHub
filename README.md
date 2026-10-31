@@ -23,8 +23,10 @@ settings all happen in the browser.
 - **Control without commands:** a Control tab for movement (go to, follow, mine, fly and more),
   waypoints, clicking and looking, the inventory and open containers, connected players (kick, make
   player, make spectator, connection history), nearby players, requeue, transfers and replay
-  recording. A Pearls tab loads stasis pearls, and a Tasks tab runs any action later, on a schedule
-  or on an event.
+  recording. A Pearls tab loads stasis pearls, and a Tasks tab runs any action later, on a schedule,
+  at a time of day, or when something happens: a stranger comes into view, health drops, a totem
+  pops, the bot leaves the AFK zone or stops earning, arrives somewhere, or nobody has played for a
+  while. "Notify me" sends you an alert in the browser and on Discord.
 - **Clean settings:** curated pages instead of commands for every Zenith setting, layered
   Global → Server → Instance, with search, a "changed" filter, reset to inherited and an
   "advanced" toggle for the rarely used ones. Settings apply live.

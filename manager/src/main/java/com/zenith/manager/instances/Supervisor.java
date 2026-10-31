@@ -457,6 +457,8 @@ public final class Supervisor {
                             case "log" -> appendLog(rt, str(json, "logger"), str(json, "level"), str(json, "text"), str(json, "ansi"), json.get("ts").getAsLong());
                             // what Zenith's own Discord bot would have posted
                             case "notification" -> events.publish(json.get("type").getAsString(), rt.instanceId, json);
+                            // a task's "Notify me", for the owner's browser
+                            case "alert" -> events.publish("alert", rt.instanceId, json);
                             case "player" -> playerEvents.accept(rt.instanceId, json);
                             case "afk" -> afkEvents.accept(rt.instanceId, json);
                             default -> {}
