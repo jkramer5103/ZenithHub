@@ -2205,6 +2205,8 @@ Examples:
 
   ```tasks add event <id> <connect/death/disconnect/online/playerConnect/playerDisconnect> <repeat/once> <command>```
 
+  ```tasks add trigger <id> <trigger> <repeat/once> <command>```
+
   ```tasks del <id>```
 
   ```tasks list```

@@ -158,14 +158,5 @@ For plugin servers like HugoSMP and DonutSMP that pay for idling in an AFK zone.
 - [x] Manager: `addTask` takes `when: trigger` with a `trigger` object and builds the spec from checked values (`Actions.trigger`); the bot checks it again. Action `notify` (CONTROL) with a message of up to 200 characters runs the bot's `notify` command: an `alert` event for the owner's browser (WebSocket; only the instance's owner gets it) and a Discord embed unless `discord.notifications.taskAlerts` is off, with a ping unless `taskAlertsMention` is off (Settings → Discord). The web UI shows alerts as a 20 s toast and, when the tab is hidden and the user allowed it (https or localhost only), as a system notification.
 - [x] Tasks tab: four kinds of When (Once later, Repeat, At a time, When…). When… groups Zenith's events and the triggers, with their settings; At a time has a time, weekdays and a random offset in the browser's time zone. Options: at most once every…, a random wait, and Only if nobody is playing (on by default for actions that move or click). Notify me, Go into the AFK zone and Leave the AFK zone are new task actions.
 - [x] `client.viaversion.enabled` is forced on: without it a bot speaks only Zenith's native version and reconnects forever with "Outdated server" anywhere else. The switch is gone from Settings.
-
-### Later
-- More browser notifications (queue done, low health, visual range, …) without needing a task.
-
-## Removed in the fork
-Deleted from the code, not just switched off (2026-10-29):
-- Zenith's own Discord bot (JDA login, presence, nickname/avatar, buttons, Discord command input). `com.zenith.discord.DiscordBot` only posts `MainChannelMessageSentEvent`s, which the control API forwards to the manager's bot. The `discord` and `chatRelay` commands and their config are gone.
-- The Discord chat relay (listener, events, config).
-- The interactive JLine terminal and the `terminal` command. `TerminalManager` only prints logs to stdout.
-- The self-updater, its events and the `update`, `autoUpdate`, `channel` and `jvmArgs` commands. `LaunchConfig` keeps only version information.
-- The Python launcher (`src/launcher`), `scripts/` install and run helpers, the launcher/release/prerelease workflows, and the wiki setup guides.
+- [x] LAN servers connect directly: `ConfigComposer.isLanAddress` (IPv4/IPv6 literals in loopback, private, link-local and `fc00::/7`, `localhost`, names without a dot, `.local`/`.lan`/`.internal`/`.home.arpa`/`.localdomain`; no DNS lookup, so nothing leaks around the proxy) makes `ConfigComposer` force `client.connectionProxy.enabled=false` over the pool, the global proxy, users' own proxies and overrides, and the pool assigns no proxy for it.
+- [x] Admin proxy override per account (Settings → General, proxy pool card, the sliders button on each account): Default, No proxy, or a custom SOCKS5/SOCKS4/HTTP proxy. Kept in the 0600 secret `secrets/proxy-overrides.json` (`ProxyOverrides`); the API returns it without the password (`hasPassword`), and a blank password keeps the saved one. It wins over the pool (which frees the account's pool proxy), the global proxy and the owner's own; owners can't see or change it. `PUT`/`DELETE /api/proxy-overrides/{accountId}`, admin only; deleting the account deletes it.

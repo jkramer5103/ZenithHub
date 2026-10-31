@@ -422,5 +422,14 @@ export interface ProxyPoolStatus {
 	free: number;
 	refreshedAt?: number;
 	error?: string;
-	accounts: { accountId: string; username: string; proxy?: string; inPool?: boolean }[];
+	accounts: {
+		accountId: string;
+		username: string;
+		proxy?: string;
+		inPool?: boolean;
+		/** the admin's proxy for this account, over the pool; never the password */
+		override?: { type: 'DIRECT' | 'SOCKS5' | 'SOCKS4' | 'HTTP'; host?: string; port?: number; user?: string; hasPassword?: boolean };
+		/** every instance of it joins a server on the local network, so it connects directly */
+		lan?: boolean;
+	}[];
 }

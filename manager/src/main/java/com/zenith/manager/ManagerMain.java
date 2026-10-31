@@ -9,6 +9,7 @@ import com.zenith.manager.instances.ConfigComposer;
 import com.zenith.manager.instances.OutboundProxies;
 import com.zenith.manager.instances.PearlService;
 import com.zenith.manager.instances.AfkHistory;
+import com.zenith.manager.instances.ProxyOverrides;
 import com.zenith.manager.instances.ProxyPool;
 import com.zenith.manager.instances.PlayerHistory;
 import com.zenith.manager.instances.SettingsService;
@@ -43,7 +44,12 @@ public final class ManagerMain {
         accounts.setProxies(proxies);
         MojangProfiles.setProxy(proxies::global);
         var proxyPool = new ProxyPool(config, store, proxies::global);
-        supervisor.setPoolProxy(proxyPool::forAccount);
+        var proxyOverrides = new ProxyOverrides(config);
+        // the admin's override wins over the pool, and an overridden account doesn't take a proxy from it
+        supervisor.setPoolProxy(accountId -> {
+            var override = proxyOverrides.forAccount(accountId);
+            return override != null ? override : proxyPool.forAccount(accountId);
+        });
         var access = new AccessService(store);
         var players = new PlayerDirectory(config.dataDir().resolve("manager").resolve("players.json"));
         supervisor.setJoinLists(id -> joinLists(access.joinNames(id), players));
@@ -58,7 +64,7 @@ public final class ManagerMain {
         var afkHistory = new AfkHistory(config);
         supervisor.setAfkEvents(afkHistory::record);
         var discord = new DiscordBot(config, store, access, supervisor, events, pearls);
-        var web = new WebServer(config, store, accounts, supervisor, events, settings, access, discord, pearls, history, afkHistory, proxyPool);
+        var web = new WebServer(config, store, accounts, supervisor, events, settings, access, discord, pearls, history, afkHistory, proxyPool, proxyOverrides);
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             LOG.info("Stopping instances...");

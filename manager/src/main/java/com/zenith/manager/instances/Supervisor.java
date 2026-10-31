@@ -577,10 +577,12 @@ public final class Supervisor {
             return new ConfigComposer.Context(instance, server, account, s.globalSettings, s.settings, null, config.cheatsDisabled());
         });
         return new ConfigComposer.Context(ctx.instance(), ctx.server(), ctx.account(), ctx.globalSettings(), ctx.managerSettings(),
-            joinLists.apply(instanceId), ctx.cheatsDisabled(), poolProxy.apply(ctx.account().id));
+            joinLists.apply(instanceId), ctx.cheatsDisabled(),
+            // a LAN server connects directly, without taking a proxy from the pool
+            ConfigComposer.isLanAddress(ctx.server().address) ? null : poolProxy.apply(ctx.account().id));
     }
 
-    /** The proxy pool's proxy for an account, or null while the pool is off. */
+    /** The admin's proxy override for an account or its proxy from the pool, or null while neither applies. */
     private volatile java.util.function.Function<String, ConfigComposer.@org.jspecify.annotations.Nullable PoolProxy> poolProxy = accountId -> null;
 
     public void setPoolProxy(java.util.function.Function<String, ConfigComposer.@org.jspecify.annotations.Nullable PoolProxy> provider) {

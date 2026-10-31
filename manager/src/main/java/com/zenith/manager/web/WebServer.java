@@ -16,8 +16,10 @@ import com.zenith.manager.auth.Passwords;
 import com.zenith.manager.auth.Permissions;
 import com.zenith.manager.auth.Sessions;
 import com.zenith.manager.instances.Actions;
+import com.zenith.manager.instances.ConfigComposer;
 import com.zenith.manager.instances.PearlService;
 import com.zenith.manager.instances.AfkHistory;
+import com.zenith.manager.instances.ProxyOverrides;
 import com.zenith.manager.instances.ProxyPool;
 import com.zenith.manager.instances.PlayerHistory;
 import com.zenith.manager.instances.SettingsService;
@@ -78,15 +80,17 @@ public final class WebServer {
     private final PlayerHistory history;
     private final AfkHistory afkHistory;
     private final ProxyPool proxyPool;
+    private final ProxyOverrides proxyOverrides;
     private final Map<WsContext, WsClient> wsClients = new ConcurrentHashMap<>();
     private Javalin app;
 
-    public WebServer(ManagerConfig config, StateStore store, AccountService accounts, Supervisor supervisor, EventHub events, SettingsService settings, AccessService access, DiscordBot discord, PearlService pearls, PlayerHistory history, AfkHistory afkHistory, ProxyPool proxyPool) {
+    public WebServer(ManagerConfig config, StateStore store, AccountService accounts, Supervisor supervisor, EventHub events, SettingsService settings, AccessService access, DiscordBot discord, PearlService pearls, PlayerHistory history, AfkHistory afkHistory, ProxyPool proxyPool, ProxyOverrides proxyOverrides) {
         this.config = config;
         this.pearls = pearls;
         this.history = history;
         this.afkHistory = afkHistory;
         this.proxyPool = proxyPool;
+        this.proxyOverrides = proxyOverrides;
         this.discord = discord;
         this.access = access;
         this.settings = settings;
@@ -303,6 +307,7 @@ public final class WebServer {
             var categoryId = account.discordCategoryId;
             accounts.delete(ctx.pathParam("id"));
             proxyPool.forgetAccount(ctx.pathParam("id"));
+            proxyOverrides.clear(ctx.pathParam("id"));
             discord.deleteCategory(categoryId);
             changed();
             send(ctx, ok());
@@ -738,7 +743,7 @@ public final class WebServer {
         // proxy pool (admin): the list URL goes in, never out
         app.get("/api/proxy-pool", ctx -> {
             requireAdmin(ctx);
-            send(ctx, proxyPool.status());
+            send(ctx, proxyStatus());
         });
         app.put("/api/proxy-pool", ctx -> {
             requireAdmin(ctx);
@@ -758,7 +763,7 @@ public final class WebServer {
             // a new list can drop proxies accounts were using, so they get new ones too
             if (enabled != null || type != null || url != null) settings.changeProxyRules(() -> proxyPool.configure(enabled, type));
             changed();
-            send(ctx, proxyPool.status());
+            send(ctx, proxyStatus());
         });
         app.post("/api/proxy-pool/refresh", ctx -> {
             requireAdmin(ctx);
@@ -768,13 +773,47 @@ public final class WebServer {
                 throw ApiException.badRequest("Couldn't load the list: " + e.getMessage());
             }
             settings.changeProxyRules(() -> {});
-            send(ctx, proxyPool.status());
+            send(ctx, proxyStatus());
         });
         app.post("/api/proxy-pool/reassign/{accountId}", ctx -> {
             requireAdmin(ctx);
             var accountId = ctx.pathParam("accountId");
             settings.changeProxyRules(() -> proxyPool.reassign(accountId));
-            send(ctx, proxyPool.status());
+            send(ctx, proxyStatus());
+        });
+        // the admin's proxy for one account, over the pool, the global proxy and users' own
+        app.put("/api/proxy-overrides/{accountId}", ctx -> {
+            requireAdmin(ctx);
+            var accountId = ctx.pathParam("accountId");
+            if (store.read(s -> s.accounts.stream().noneMatch(a -> a.id.equals(accountId)))) throw ApiException.notFound();
+            ProxyOverrides.Override override;
+            try {
+                override = proxyOverrides.parse(accountId, body(ctx));
+            } catch (IllegalArgumentException e) {
+                throw ApiException.badRequest(e.getMessage());
+            }
+            settings.changeProxyRules(() -> {
+                try {
+                    proxyOverrides.put(accountId, override);
+                } catch (java.io.IOException e) {
+                    throw new java.io.UncheckedIOException(e);
+                }
+                // its pool proxy is free for another account now
+                proxyPool.forgetAccount(accountId);
+            });
+            send(ctx, proxyStatus());
+        });
+        app.delete("/api/proxy-overrides/{accountId}", ctx -> {
+            requireAdmin(ctx);
+            var accountId = ctx.pathParam("accountId");
+            settings.changeProxyRules(() -> {
+                try {
+                    proxyOverrides.clear(accountId);
+                } catch (java.io.IOException e) {
+                    throw new java.io.UncheckedIOException(e);
+                }
+            });
+            send(ctx, proxyStatus());
         });
         // connected instances keep their old connection until they reconnect; this restarts them one by one
         app.post("/api/proxy-pool/reconnect", ctx -> {
@@ -1076,6 +1115,30 @@ public final class WebServer {
             store.read(s -> s.users.stream().filter(u -> u.id.equals(id)).findFirst()).ifPresent(u -> c.identity = Permissions.Identity.of(u));
         });
         events.publish("changed", null, new JsonObject());
+    }
+
+    /** The proxy pool with each account's override, for the admin. */
+    private JsonObject proxyStatus() {
+        var json = proxyPool.status();
+        // accounts whose instances all join servers on the local network connect directly
+        var lan = store.read(s -> {
+            var servers = new java.util.HashMap<String, String>();
+            s.servers.forEach(server -> servers.put(server.id, server.address));
+            var result = new java.util.HashMap<String, Boolean>();
+            for (var i : s.instances) {
+                boolean local = ConfigComposer.isLanAddress(servers.get(i.serverId));
+                result.merge(i.accountId, local, Boolean::logicalAnd);
+            }
+            return result;
+        });
+        for (var a : json.getAsJsonArray("accounts")) {
+            var account = a.getAsJsonObject();
+            var id = account.get("accountId").getAsString();
+            var override = proxyOverrides.view(id);
+            if (override != null) account.add("override", override);
+            if (Boolean.TRUE.equals(lan.get(id))) account.addProperty("lan", true);
+        }
+        return json;
     }
 
     // --- views ---

@@ -48,7 +48,8 @@ settings all happen in the browser.
   switched off. There is no chat relay.
 - **Outbound proxy** (SOCKS/HTTP) for all traffic: the server connection, Microsoft and Xbox sign-in,
   skins and every other request. One global proxy, optionally with per-user proxies, or a proxy pool
-  that gives every account its own IP from a provider's list (Webshare and the like).
+  that gives every account its own IP from a provider's list (Webshare and the like). The admin can
+  give any account its own proxy or none, and servers on your local network are always joined directly.
 - **AFK zones** on plugin servers like HugoSMP: keeps the bot in the zone, and shows whether it's
   actually earning, the reward over time and every stay.
 - **Optional cheat lock:** `ZENITH_DISABLE_CHEATS=true` removes combat and automation modules for

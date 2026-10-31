@@ -14,6 +14,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 /**
  * Settings layering: Zenith defaults → global → server → instance → forced managed values.
@@ -29,7 +30,7 @@ public final class ConfigComposer {
         State.ManagerSettings managerSettings,
         JoinLists joinLists,
         boolean cheatsDisabled,
-        /** null while the proxy pool is off */
+        /** the admin's override for the account, or its proxy from the pool; null while neither applies */
         @Nullable PoolProxy poolProxy
     ) {
         public Context(State.Instance instance, State.ServerProfile server, State.Account account, JsonObject globalSettings,
@@ -38,10 +39,21 @@ public final class ConfigComposer {
         }
     }
 
-    /** The proxy pool's proxy for the instance's account; {@code host} null while the pool has none free for it. */
+    /**
+     * The proxy forced for the instance's account: the admin's override, or else its proxy from the pool.
+     * {@code host} is null while the pool has none free for it; type {@code DIRECT} means no proxy at all.
+     */
     public record PoolProxy(String type, @Nullable String host, int port, String user, String password) {
+        public static PoolProxy direct() {
+            return new PoolProxy("DIRECT", "", 0, "", "");
+        }
+
         public boolean missing() {
             return host == null;
+        }
+
+        public boolean isDirect() {
+            return "DIRECT".equals(type);
         }
     }
 
@@ -117,7 +129,9 @@ public final class ConfigComposer {
             forced.put("authentication.accountType", new JsonPrimitive("device_code"));
         }
         var pool = ctx.poolProxy();
-        if (pool != null && !pool.missing()) forced.putAll(poolForcedValues(pool));
+        // no proxy can reach a server on the local network
+        if (isLanAddress(ctx.server().address) || (pool != null && pool.isDirect())) forced.putAll(directForcedValues());
+        else if (pool != null && !pool.missing()) forced.putAll(poolForcedValues(pool));
         else forced.putAll(proxyForcedValues(ctx.managerSettings(), ctx.globalSettings()));
         if (ctx.cheatsDisabled()) forced.putAll(Cheats.forcedValues());
         return forced;
@@ -169,6 +183,40 @@ public final class ConfigComposer {
         forced.put(PROXY + "user", new JsonPrimitive(pool.user()));
         forced.put(PROXY + "password", new JsonPrimitive(pool.password()));
         return forced;
+    }
+
+    public static Map<String, JsonElement> directForcedValues() {
+        var forced = new LinkedHashMap<String, JsonElement>();
+        forced.put(PROXY + "enabled", new JsonPrimitive(false));
+        return forced;
+    }
+
+    private static final Pattern IPV4 = Pattern.compile("\\d{1,3}(\\.\\d{1,3}){3}");
+    private static final List<String> LAN_SUFFIXES = List.of(".local", ".lan", ".internal", ".home.arpa", ".localdomain");
+
+    /**
+     * A server on the local network: a private, loopback or link-local IP, {@code localhost}, a name without a dot
+     * or a local-only domain. Names are never looked up, so deciding this sends nothing around the proxy.
+     */
+    public static boolean isLanAddress(@Nullable String address) {
+        if (address == null) return false;
+        var host = address.trim().toLowerCase(java.util.Locale.ROOT);
+        if (host.startsWith("[") && host.endsWith("]")) host = host.substring(1, host.length() - 1);
+        if (host.endsWith(".")) host = host.substring(0, host.length() - 1);
+        if (host.isEmpty()) return false;
+        if (IPV4.matcher(host).matches() || host.contains(":")) {
+            try {
+                // a literal, so no DNS lookup
+                var ip = java.net.InetAddress.ofLiteral(host);
+                if (ip.isLoopbackAddress() || ip.isSiteLocalAddress() || ip.isLinkLocalAddress()) return true;
+                // IPv6 unique local addresses, fc00::/7
+                return ip instanceof java.net.Inet6Address && (ip.getAddress()[0] & 0xFE) == 0xFC;
+            } catch (IllegalArgumentException e) {
+                return false;
+            }
+        }
+        if (host.equals("localhost") || !host.contains(".")) return true;
+        return LAN_SUFFIXES.stream().anyMatch(host::endsWith);
     }
 
     private static boolean sameProxyEndpoint(JsonObject config, JsonObject globalSettings) {

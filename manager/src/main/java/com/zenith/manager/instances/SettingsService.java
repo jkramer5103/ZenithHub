@@ -237,8 +237,8 @@ public final class SettingsService {
                 }
             }
         }
-        // so is the proxy pool's
-        if (scope == Scope.INSTANCE && forced.containsKey(ConfigComposer.PROXY + "password") && store.read(s -> s.proxyPool.enabled)) {
+        // so are the proxy pool's and the admin's overrides
+        if (scope == Scope.INSTANCE && forced.containsKey(ConfigComposer.PROXY + "password")) {
             for (var shown : List.of(values, inheritedValues)) {
                 if (shown.has(ConfigComposer.PROXY + "password")) shown.addProperty(ConfigComposer.PROXY + "password", "");
             }
