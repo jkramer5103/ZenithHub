@@ -111,6 +111,7 @@ public final class ControlServer {
             of(ClientDisconnectEvent.class, e -> {
                 lastDisconnectReason = e.manualDisconnect() ? null : friendlyReason(e.reason());
                 lastDisconnectAt = System.currentTimeMillis();
+                onDisconnect(e);
             }));
         server.start();
         DEFAULT_LOG.info("Control API listening on 127.0.0.1:{}", port);
@@ -522,6 +523,27 @@ public final class ControlServer {
     }
 
     /** Someone joined or left through the proxy, for the manager's connection history. */
+    /** The manager gives the account another proxy when the connection keeps dropping. */
+    private void onDisconnect(ClientDisconnectEvent e) {
+        if (eventSubscribers.isEmpty() || e.manualDisconnect()) return;
+        var json = new JsonObject();
+        json.addProperty("type", "disconnect");
+        json.addProperty("ts", System.currentTimeMillis());
+        json.addProperty("reason", e.reason());
+        json.addProperty("network", networkFailure(e.reason()));
+        var msg = COMPACT_GSON.toJson(json);
+        for (var queue : eventSubscribers) {
+            queue.offer(msg);
+        }
+    }
+
+    /** The connection itself broke (reset, timeout, the proxy failing), as opposed to a kick or a restart. */
+    static boolean networkFailure(String reason) {
+        if (reason == null) return false;
+        return reason.contains("Connection reset") || reason.contains("timed out") || reason.contains("ProxyConnectException")
+            || reason.contains("Broken pipe") || reason.contains("No route to host");
+    }
+
     private void onPlayer(String event, boolean spectator, GameProfile profile, String reason) {
         if (eventSubscribers.isEmpty() || profile == null) return;
         var json = new JsonObject();

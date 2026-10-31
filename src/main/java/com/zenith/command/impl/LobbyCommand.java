@@ -70,7 +70,10 @@ public class LobbyCommand extends Command {
     public static @Nullable String sendToLobby(final ServerSession session) {
         if (session.getProtocolVersion().olderThan(ProtocolVersion.v1_20_5)) return "The lobby needs Minecraft 1.20.5 or newer";
         session.send(new ClientboundStoreCookiePacket(TARGET_COOKIE, "lobby".getBytes(StandardCharsets.UTF_8)));
-        session.transfer(CONFIG.server.getProxyAddressForTransfer(), CONFIG.server.getProxyPortForTransfer());
+        // back the way they came, so the LAN IP and a public address both work; proxyIP only without a handshake address
+        var host = session.getConnectingServerAddress();
+        if (host != null && !host.isBlank() && session.getConnectingServerPort() > 0) session.transfer(host, session.getConnectingServerPort());
+        else session.transfer(CONFIG.server.getProxyAddressForTransfer(), CONFIG.server.getProxyPortForTransfer());
         return null;
     }
 

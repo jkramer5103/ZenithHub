@@ -10,6 +10,7 @@ import com.zenith.manager.instances.OutboundProxies;
 import com.zenith.manager.instances.PearlService;
 import com.zenith.manager.instances.AfkHistory;
 import com.zenith.manager.instances.ProxyOverrides;
+import com.zenith.manager.instances.ProxyFailover;
 import com.zenith.manager.instances.ProxyPool;
 import com.zenith.manager.instances.PlayerHistory;
 import com.zenith.manager.instances.SettingsService;
@@ -61,6 +62,24 @@ public final class ManagerMain {
         var pearls = new PearlService(config, supervisor, settings);
         var history = new PlayerHistory(config);
         supervisor.setPlayerEvents(history::record);
+        // two dropped connections through the same pool proxy: the account gets another one, live, before it reconnects
+        var failover = new ProxyFailover();
+        supervisor.setDisconnectEvents((instanceId, event) -> {
+            if (!event.has("network") || !event.get("network").getAsBoolean()) return;
+            var accountId = store.read(s -> s.instances.stream().filter(i -> i.id.equals(instanceId)).findFirst()
+                .filter(i -> s.servers.stream().noneMatch(sv -> sv.id.equals(i.serverId) && ConfigComposer.isLanAddress(sv.address)))
+                .map(i -> i.accountId).orElse(null));
+            if (accountId == null || proxyOverrides.forAccount(accountId) != null) return;
+            long ts = event.has("ts") ? event.get("ts").getAsLong() : System.currentTimeMillis();
+            if (!failover.dropped(accountId, ts)) return;
+            Thread.ofVirtual().name("proxy-failover").start(() -> {
+                try {
+                    settings.changeProxyRules(() -> proxyPool.replaceDropping(accountId));
+                } catch (Exception e) {
+                    LOG.warn("Couldn't give account {} another proxy: {}", accountId, e.getMessage());
+                }
+            });
+        });
         var afkHistory = new AfkHistory(config);
         supervisor.setAfkEvents(afkHistory::record);
         var discord = new DiscordBot(config, store, access, supervisor, events, pearls);

@@ -48,6 +48,8 @@ public final class ProxyPool {
     }
 
     private final StateStore store;
+    /** proxies that kept dropping connections since the manager started */
+    private final Set<String> dropped = new HashSet<>();
     private final Path urlFile;
     private final Path listFile;
     /** the global proxy's relay, which the download goes through while it's on */
@@ -90,6 +92,9 @@ public final class ProxyPool {
             return keys;
         });
         var free = list.stream().filter(p -> !taken.contains(p.key())).toList();
+        // a proxy that kept dropping connections only if nothing else is left
+        var healthy = free.stream().filter(p -> !dropped.contains(p.key())).toList();
+        if (!healthy.isEmpty()) free = healthy;
         if (free.isEmpty()) return new ConfigComposer.PoolProxy(type, null, 0, "", "");
         var pick = free.get(ThreadLocalRandom.current().nextInt(free.size()));
         store.update(s -> s.proxyPool.assignments.put(accountId, pick.key()));
@@ -123,6 +128,19 @@ public final class ProxyPool {
             if (enabled != null) s.proxyPool.enabled = enabled;
             if (type != null) s.proxyPool.type = type;
         });
+    }
+
+    /**
+     * The account's proxy kept dropping its connection: give it another one when it next connects, and don't hand
+     * this one out again while there are others. False when the account has no pool proxy.
+     */
+    public synchronized boolean replaceDropping(String accountId) {
+        var current = store.read(s -> s.proxyPool.enabled ? s.proxyPool.assignments.get(accountId) : null);
+        if (current == null) return false;
+        dropped.add(current);
+        reassign(accountId);
+        LOG.info("Account {} keeps losing its connection through {}, it gets another proxy", accountId, current);
+        return true;
     }
 
     /** Gives the account a different proxy from the pool the next time it connects, e.g. after a ban. */

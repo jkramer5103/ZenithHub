@@ -36,7 +36,8 @@
 		<label class="label" for="public-address">Public address</label>
 		<input id="public-address" class="input font-mono" bind:value={publicAddress} placeholder="mc.example.com" spellcheck="false" />
 		<p class="mt-1 text-xs text-zinc-400">
-			The address players type in Minecraft to reach the lobby. Add <span class="font-mono">:port</span> if it isn’t 25565.
+			The address players type in Minecraft to reach the lobby. Add <span class="font-mono">:port</span> if it isn’t 25565. Players who join
+			another way, like the LAN IP, stay on that address.
 		</p>
 	</div>
 	{#if error}<p class="text-sm text-red-400">{error}</p>{/if}

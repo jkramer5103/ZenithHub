@@ -80,7 +80,8 @@ docker compose up -d
 password.
 
 **3. Set the public address.** Under Settings → General, enter the address players type in
-Minecraft, for example `mc.example.net` or your server's IP.
+Minecraft, for example `mc.example.net` or your server's IP. Players who join another way, like
+the LAN IP, a VPN or a tunnel, are kept on the address they typed, so one setup works for all of them.
 
 **4. Add a Minecraft account.** Settings → Accounts → Add account → Get login code. Enter the code on
 Microsoft's page from any device. Nothing is typed into a terminal.

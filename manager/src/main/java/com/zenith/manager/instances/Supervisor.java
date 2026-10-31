@@ -463,6 +463,7 @@ public final class Supervisor {
                             case "alert" -> events.publish("alert", rt.instanceId, json);
                             case "player" -> playerEvents.accept(rt.instanceId, json);
                             case "afk" -> afkEvents.accept(rt.instanceId, json);
+                            case "disconnect" -> disconnectEvents.accept(rt.instanceId, json);
                             default -> {}
                         }
                     });
@@ -616,6 +617,13 @@ public final class Supervisor {
 
     public void setAfkEvents(java.util.function.BiConsumer<String, JsonObject> listener) {
         this.afkEvents = listener;
+    }
+
+    /** The bot lost its server connection without being told to (instance id, Zenith's event). */
+    private volatile java.util.function.BiConsumer<String, JsonObject> disconnectEvents = (id, event) -> {};
+
+    public void setDisconnectEvents(java.util.function.BiConsumer<String, JsonObject> listener) {
+        this.disconnectEvents = listener;
     }
 
     private void setDesiredRunning(String instanceId, boolean running) {

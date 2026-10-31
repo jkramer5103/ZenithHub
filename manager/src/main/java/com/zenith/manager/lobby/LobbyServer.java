@@ -35,6 +35,7 @@ import org.geysermc.mcprotocollib.protocol.data.status.VersionInfo;
 import org.geysermc.mcprotocollib.protocol.packet.common.clientbound.ClientboundStoreCookiePacket;
 import org.geysermc.mcprotocollib.protocol.packet.configuration.clientbound.ClientboundRegistryDataPacket;
 import org.geysermc.mcprotocollib.protocol.packet.common.clientbound.ClientboundTransferPacket;
+import org.geysermc.mcprotocollib.protocol.packet.handshake.serverbound.ClientIntentionPacket;
 import org.geysermc.mcprotocollib.protocol.packet.ingame.clientbound.ClientboundLoginPacket;
 import org.geysermc.mcprotocollib.protocol.packet.ingame.clientbound.ClientboundSystemChatPacket;
 import org.geysermc.mcprotocollib.protocol.packet.ingame.clientbound.entity.player.ClientboundPlayerAbilitiesPacket;
@@ -46,6 +47,7 @@ import org.geysermc.mcprotocollib.protocol.packet.ingame.clientbound.inventory.C
 import org.geysermc.mcprotocollib.protocol.packet.ingame.clientbound.level.ClientboundGameEventPacket;
 import org.geysermc.mcprotocollib.protocol.packet.ingame.serverbound.inventory.ServerboundContainerClickPacket;
 import org.geysermc.mcprotocollib.protocol.packet.ingame.serverbound.player.ServerboundUseItemPacket;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -117,6 +119,35 @@ public final class LobbyServer {
         }
     };
 
+    /** The address the player typed, from the handshake the router passes on untouched. */
+    private static final class ConnectedTo extends SessionAdapter {
+        volatile String host;
+        volatile int port;
+
+        @Override
+        public void packetReceived(Session session, Packet packet) {
+            if (packet instanceof ClientIntentionPacket intention) {
+                host = intention.getHostname();
+                port = intention.getPort();
+            }
+        }
+    }
+
+    /**
+     * Where to send a player so they come back through the router: the address they joined with, so the LAN IP,
+     * a domain or a tunnel all work at once. Public address only when the handshake has nothing usable.
+     */
+    static String transferTarget(@Nullable String host, int port, String fallback) {
+        if (host != null) {
+            // Forge appends "\0FML…", and a resolved name may end with a dot
+            int nul = host.indexOf('\0');
+            if (nul >= 0) host = host.substring(0, nul);
+            if (host.endsWith(".")) host = host.substring(0, host.length() - 1);
+        }
+        if (host == null || host.isBlank() || port <= 0 || port > 65535) return fallback;
+        return host.contains(":") ? "[" + host + "]:" + port : host + ":" + port;
+    }
+
     private volatile boolean onlineMode;
 
     /** Binds to a free local port; only the router connects to it. */
@@ -131,6 +162,7 @@ public final class LobbyServer {
         }, connections, address -> {
             var session = new TcpServerSession(address.getHostString(), address.getPort(), server.createPacketProtocol(), server);
             session.addListener(REGISTRY_FIX);
+            session.addListener(new ConnectedTo());
             return session;
         });
         server.setGlobalFlag(MinecraftConstants.SERVER_CHANNEL_INITIALIZER, LobbyVia.CHANNELS);
@@ -264,7 +296,9 @@ public final class LobbyServer {
         }
 
         void transfer(Entry entry, boolean spectate) {
-            var hostPort = ConfigComposer.publicHostPort(store.read(s -> s.settings));
+            var connectedTo = session.getListeners().stream().filter(ConnectedTo.class::isInstance).map(ConnectedTo.class::cast).findFirst();
+            var hostPort = transferTarget(connectedTo.map(c -> c.host).orElse(null), connectedTo.map(c -> c.port).orElse(0),
+                ConfigComposer.publicHostPort(store.read(s -> s.settings)));
             int colon = hostPort.lastIndexOf(':');
             var host = hostPort.substring(0, colon).replace("[", "").replace("]", "");
             int port = Integer.parseInt(hostPort.substring(colon + 1));

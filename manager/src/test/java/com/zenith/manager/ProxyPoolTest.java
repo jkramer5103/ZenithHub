@@ -14,6 +14,7 @@ import java.nio.file.Path;
 import java.util.HashSet;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -89,5 +90,17 @@ class ProxyPoolTest {
         assertEquals("1.1.1.1", Json.get(config, ConfigComposer.PROXY + "host").getAsString());
         assertEquals("p", Json.get(config, ConfigComposer.PROXY + "password").getAsString());
         assertTrue(Json.get(config, ConfigComposer.PROXY + "enabled").getAsBoolean());
+    }
+
+    @Test
+    void aDroppingProxyIsReplacedAndNotHandedOutAgain() throws Exception {
+        var pool = pool("1.1.1.1:1:u1:p1\n2.2.2.2:2:u2:p2\n", "a", "b");
+        var first = pool.forAccount("a");
+        assertTrue(pool.replaceDropping("a"));
+        var second = pool.forAccount("a");
+        assertNotEquals(first.host(), second.host());
+        // the other account gets the dropping one only because nothing else is free
+        assertEquals(first.host(), pool.forAccount("b").host());
+        assertFalse(pool.replaceDropping("nobody"));
     }
 }
