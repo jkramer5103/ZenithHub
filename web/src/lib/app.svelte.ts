@@ -1,9 +1,10 @@
 import { api, setUnauthorizedHandler } from './api';
-import type { LogLine, Overview, PendingLogin, Runtime, Session } from './types';
+import type { FlowEvent, LogLine, Overview, PendingLogin, Runtime, Session } from './types';
 import { toasts } from './toast.svelte';
 
 type LogListener = (line: LogLine) => void;
 type LoginListener = (login: PendingLogin) => void;
+type FlowListener = (instanceId: string, event: FlowEvent) => void;
 
 /**
  * Global client state: the session, the overview (instances, accounts, servers),
@@ -23,6 +24,7 @@ class AppState {
 	#logListeners = new Map<string, Set<LogListener>>();
 	#loginListeners = new Set<LoginListener>();
 	#reconnectListeners = new Set<() => void>();
+	#flowListeners = new Set<FlowListener>();
 	#refetchQueued = false;
 
 	constructor() {
@@ -95,6 +97,12 @@ class AppState {
 	onLogin(listener: LoginListener) {
 		this.#loginListeners.add(listener);
 		return () => this.#loginListeners.delete(listener);
+	}
+
+	/** Flow progress (started, step, done, error) and changes to the flow list. */
+	onFlow(listener: FlowListener) {
+		this.#flowListeners.add(listener);
+		return () => this.#flowListeners.delete(listener);
 	}
 
 	/** Called after the WebSocket reconnects, so views can refetch what they may have missed. */
@@ -182,6 +190,9 @@ class AppState {
 				}
 				break;
 			}
+			case 'flow':
+				this.#flowListeners.forEach((l) => l(msg.instanceId ?? '', msg.data as FlowEvent));
+				break;
 			case 'changed':
 				// bursts of changes collapse into one refetch
 				if (this.#refetchQueued) break;

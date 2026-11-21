@@ -451,3 +451,114 @@ export interface ProxyPoolStatus {
 		lan?: boolean;
 	}[];
 }
+
+/** An integration token, as its owner sees it. The token itself is only returned once, when it's made. */
+export interface Integration {
+	id: string;
+	name: string;
+	/** every instance the person can see, including later ones */
+	allInstances: boolean;
+	instances: string[];
+	capabilities: Capability[];
+	created: number;
+	lastUsed?: number;
+	/** only in the reply that made it */
+	token?: string;
+}
+
+// --- flows (manager/.../flows/FlowEngine) ---
+
+export interface FlowTrigger {
+	kind: string;
+	[key: string]: unknown;
+}
+
+export interface FlowCondition {
+	kind: string;
+	not?: boolean;
+	[key: string]: unknown;
+}
+
+export type FlowStepType =
+	| 'action'
+	| 'say'
+	| 'whisper'
+	| 'notify'
+	| 'log'
+	| 'connect'
+	| 'disconnect'
+	| 'wait'
+	| 'waitFor'
+	| 'waitUntil'
+	| 'if'
+	| 'repeat'
+	| 'repeatUntil'
+	| 'forever'
+	| 'broadcast'
+	| 'set'
+	| 'change'
+	| 'stop';
+
+export interface FlowStep {
+	id: string;
+	type: FlowStepType;
+	off?: boolean;
+	run?: { action: string } & Record<string, unknown>;
+	text?: string;
+	/** whisper: a name or {player} */
+	player?: string;
+	seconds?: number;
+	/** wait: a random time between seconds and upTo */
+	upTo?: number;
+	event?: FlowTrigger;
+	timeout?: number;
+	cond?: FlowCondition;
+	then?: FlowStep[];
+	else?: FlowStep[];
+	times?: number;
+	steps?: FlowStep[];
+	/** broadcast: the message; set/change: the variable */
+	name?: string;
+	value?: string;
+	by?: number;
+}
+
+export interface Flow {
+	id: string;
+	name: string;
+	enabled: boolean;
+	cooldown: number;
+	/** what a trigger does while a run is going: nothing, or start over */
+	mode?: 'ignore' | 'restart';
+	trigger: FlowTrigger;
+	steps: FlowStep[];
+	ownerId?: string;
+	ownerName?: string;
+	updated?: number;
+	running?: { startedAt: number; step?: string };
+	last?: { ok: boolean; message?: string; step?: string; startedAt: number; at: number };
+	/** a daily flow's next start */
+	next?: number;
+}
+
+export interface FlowRun {
+	ok: boolean;
+	message?: string;
+	step?: string;
+	startedAt: number;
+	at: number;
+	cause: string;
+	log: string[];
+}
+
+export interface FlowActivity {
+	runs: FlowRun[];
+	variables: Record<string, string>;
+}
+
+export interface FlowEvent {
+	flowId?: string;
+	state: 'started' | 'step' | 'log' | 'done' | 'error' | 'changed';
+	step?: string;
+	message?: string;
+}

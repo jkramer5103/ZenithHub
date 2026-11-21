@@ -12,6 +12,7 @@
 	import PearlsPanel from '#lib/components/PearlsPanel.svelte';
 	import AfkPanel from '#lib/components/AfkPanel.svelte';
 	import TasksPanel from '#lib/components/TasksPanel.svelte';
+	import FlowsPanel from '#lib/components/flows/FlowsPanel.svelte';
 	import CopyField from '#lib/components/CopyField.svelte';
 	import { duration } from '#lib/format.js';
 	import { banIssue } from '#lib/issues.js';
@@ -25,6 +26,8 @@
 	const status = $derived(runtime?.phase === 'RUNNING' ? runtime.status : null);
 	const ban = $derived(instance ? banIssue(instance) : null);
 	let showSettings = $state(false);
+	// the flow editor takes the whole Tasks tab while it's open
+	let editingFlow = $state(false);
 	const can = (c: Capability) => !!instance?.capabilities.includes(c);
 
 	type Tab = 'overview' | 'control' | 'afk' | 'pearls' | 'tasks' | 'settings' | 'sharing' | 'console';
@@ -161,7 +164,8 @@
 		{/key}
 	{:else if tab === 'tasks'}
 		{#key id}
-			<TasksPanel instanceId={id} capabilities={instance.capabilities} running={runtime.phase === 'RUNNING'} />
+			<FlowsPanel instanceId={id} capabilities={instance.capabilities} running={runtime.phase === 'RUNNING'} bind:editing={editingFlow} />
+			{#if !editingFlow}<TasksPanel instanceId={id} capabilities={instance.capabilities} running={runtime.phase === 'RUNNING'} />{/if}
 		{/key}
 	{:else if tab === 'settings'}
 		{#key id}

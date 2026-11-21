@@ -1,7 +1,9 @@
 export class ApiError extends Error {
 	constructor(
 		readonly status: number,
-		message: string
+		message: string,
+		/** the whole error reply, for fields beyond the message */
+		readonly data: Record<string, unknown> | null = null
 	) {
 		super(message);
 	}
@@ -35,7 +37,7 @@ async function read<T>(res: Response, path: string): Promise<T> {
 	if (!res.ok) {
 		if (res.status === 401 && path !== '/login') onUnauthorized();
 		const message = (data as { error?: string } | null)?.error ?? `Request failed (${res.status})`;
-		throw new ApiError(res.status, message);
+		throw new ApiError(res.status, message, data as Record<string, unknown> | null);
 	}
 	return data as T;
 }

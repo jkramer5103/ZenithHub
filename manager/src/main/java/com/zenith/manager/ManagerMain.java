@@ -2,6 +2,9 @@ package com.zenith.manager;
 
 import com.zenith.manager.accounts.AccountService;
 import com.zenith.manager.auth.AccessService;
+import com.zenith.manager.auth.Capability;
+import com.zenith.manager.auth.Permissions;
+import com.zenith.manager.flows.FlowEngine;
 import com.zenith.manager.discord.DiscordBot;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -27,6 +30,7 @@ import org.slf4j.LoggerFactory;
 
 import java.nio.file.Files;
 import java.util.List;
+import java.util.Set;
 
 public final class ManagerMain {
     private static final Logger LOG = LoggerFactory.getLogger("Manager");
@@ -83,7 +87,56 @@ public final class ManagerMain {
         var afkHistory = new AfkHistory(config);
         supervisor.setAfkEvents(afkHistory::record);
         var discord = new DiscordBot(config, store, access, supervisor, events, pearls);
-        var web = new WebServer(config, store, accounts, supervisor, events, settings, access, discord, pearls, history, afkHistory, proxyPool, proxyOverrides);
+        var flows = new FlowEngine(config.dataDir().resolve("manager").resolve("flows"), new FlowEngine.Bot() {
+            @Override
+            public JsonObject command(String instanceId, String command, String actor) throws Exception {
+                return supervisor.command(instanceId, command, actor);
+            }
+
+            @Override
+            public void loadPearl(String instanceId, String pearl, String actor) {
+                var result = pearls.load(instanceId, pearl, actor);
+                if (!result.ok()) throw new IllegalStateException(result.message());
+            }
+
+            @Override
+            public void disconnect(String instanceId, String actor) throws Exception {
+                supervisor.disconnect(instanceId, actor);
+            }
+
+            @Override
+            public void connect(String instanceId, String actor) throws Exception {
+                supervisor.connect(instanceId, actor);
+            }
+
+            @Override
+            public JsonObject details(String instanceId) throws Exception {
+                return supervisor.isRunning(instanceId) ? supervisor.details(instanceId) : null;
+            }
+
+            @Override
+            public String server(String instanceId) {
+                return store.read(s -> s.instances.stream().filter(i -> i.id.equals(instanceId)).findFirst()
+                    .flatMap(i -> s.servers.stream().filter(v -> v.id.equals(i.serverId)).findFirst())
+                    .map(v -> v.name != null && !v.name.isBlank() ? v.name : v.address).orElse(""));
+            }
+
+            @Override
+            public JsonObject status(String instanceId) {
+                return supervisor.isRunning(instanceId) ? supervisor.runtime(instanceId).status() : null;
+            }
+
+            @Override
+            public Set<Capability> capabilities(String instanceId, String userId) {
+                return store.read(s -> {
+                    var user = s.users.stream().filter(u -> u.id.equals(userId)).findFirst().orElse(null);
+                    var instance = s.instances.stream().filter(i -> i.id.equals(instanceId)).findFirst().orElse(null);
+                    return user == null || instance == null ? Set.<Capability>of() : Permissions.capabilities(Permissions.Identity.of(user), instance);
+                });
+            }
+        }, events);
+        flows.start();
+        var web = new WebServer(config, store, accounts, supervisor, events, settings, access, discord, pearls, history, afkHistory, proxyPool, proxyOverrides, flows);
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             LOG.info("Stopping instances...");

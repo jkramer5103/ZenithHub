@@ -114,6 +114,7 @@ public final class ControlServer {
                 onDisconnect(e);
             }));
         ServerBan.onBan(this::onBan);
+        GameEvents.INSTANCE.start();
         server.start();
         DEFAULT_LOG.info("Control API listening on 127.0.0.1:{}", port);
     }

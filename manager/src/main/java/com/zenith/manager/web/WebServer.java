@@ -6,10 +6,13 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.zenith.manager.EventHub;
 import com.zenith.manager.ManagerConfig;
+import com.zenith.manager.flows.FlowEngine;
+import com.zenith.manager.flows.FlowSpec;
 import com.zenith.manager.accounts.AccountService;
 import com.zenith.manager.auth.AccessService;
 import com.zenith.manager.discord.DiscordBot;
 import com.zenith.manager.auth.Capability;
+import com.zenith.manager.auth.IntegrationTokens;
 import com.zenith.manager.auth.Role;
 import com.zenith.manager.auth.LoginThrottle;
 import com.zenith.manager.auth.Passwords;
@@ -64,6 +67,12 @@ public final class WebServer {
         return port >= 1 && port <= 65535;
     }
 
+    /** Request attribute: the integration token a request was made with. */
+    private static final String TOKEN_ATTR = "zh.token";
+    /** All an integration token may reach: its own summary, and controlling the instances it covers. */
+    private static final Pattern TOKEN_GET = Pattern.compile("^/api/integration$|^/api/instances/[^/]+/(details|logs|pearls|afk)$");
+    private static final Pattern TOKEN_POST = Pattern.compile("^/api/instances/[^/]+/(action|chat|command|connect|disconnect)$");
+
     private static final Pattern PUBLIC_ADDRESS = Pattern.compile("^(?:[A-Za-z0-9.-]{1,253}|\\[[0-9A-Fa-f:.]+])(?::\\d{1,5})?$");
 
     private final ManagerConfig config;
@@ -77,16 +86,19 @@ public final class WebServer {
     private final AccessService access;
     private final DiscordBot discord;
     private final PearlService pearls;
+    private final FlowEngine flows;
     private final PlayerHistory history;
     private final AfkHistory afkHistory;
     private final ProxyPool proxyPool;
     private final ProxyOverrides proxyOverrides;
+    private final IntegrationTokens integrations;
     private final Map<WsContext, WsClient> wsClients = new ConcurrentHashMap<>();
     private Javalin app;
 
-    public WebServer(ManagerConfig config, StateStore store, AccountService accounts, Supervisor supervisor, EventHub events, SettingsService settings, AccessService access, DiscordBot discord, PearlService pearls, PlayerHistory history, AfkHistory afkHistory, ProxyPool proxyPool, ProxyOverrides proxyOverrides) {
+    public WebServer(ManagerConfig config, StateStore store, AccountService accounts, Supervisor supervisor, EventHub events, SettingsService settings, AccessService access, DiscordBot discord, PearlService pearls, PlayerHistory history, AfkHistory afkHistory, ProxyPool proxyPool, ProxyOverrides proxyOverrides, FlowEngine flows) {
         this.config = config;
         this.pearls = pearls;
+        this.flows = flows;
         this.history = history;
         this.afkHistory = afkHistory;
         this.proxyPool = proxyPool;
@@ -99,6 +111,7 @@ public final class WebServer {
         this.supervisor = supervisor;
         this.events = events;
         this.sessions = new Sessions(config.dataDir().resolve("manager").resolve("sessions.json"));
+        this.integrations = new IntegrationTokens(config.dataDir().resolve("manager").resolve("secrets").resolve("integration-tokens.json"));
     }
 
     public void start() {
@@ -146,6 +159,20 @@ public final class WebServer {
                 if (type == null || !type.startsWith("application/json")) throw new ApiException(415, "Expected application/json");
             }
         });
+        // integration tokens: instead of the session cookie, and only for the few routes an integration needs
+        app.before("/api/*", ctx -> {
+            var secret = bearer(ctx.header("Authorization"));
+            if (secret == null) return;
+            var token = integrations.resolve(secret);
+            if (token == null) throw new ApiException(401, "Unknown or deleted integration token");
+            var pattern = switch (ctx.method().name()) {
+                case "GET" -> TOKEN_GET;
+                case "POST" -> TOKEN_POST;
+                default -> null;
+            };
+            if (pattern == null || !pattern.matcher(ctx.path()).matches()) throw new ApiException(403, "Integration tokens can't use this");
+            ctx.attribute(TOKEN_ATTR, token);
+        });
 
         registerSessionRoutes();
         registerAccountRoutes();
@@ -154,6 +181,7 @@ public final class WebServer {
         registerSettingsRoutes();
         registerAccessRoutes();
         registerControlRoutes();
+        registerIntegrationRoutes();
         registerWebSocket();
         // single page app: unknown non-API paths get index.html, the client-side router takes over
         var index = config.webDir().resolve("index.html");
@@ -447,8 +475,10 @@ public final class WebServer {
             var id = requireOwner(ctx).id;
             supervisor.forget(id);
             pearls.forget(id, null);
+            integrations.forget(id, null);
             history.forget(id);
             afkHistory.forget(id);
+            flows.forget(id);
             store.update(s -> s.instances.removeIf(i -> i.id.equals(id)));
             SecureFiles.deleteRecursively(config.instanceDir(id));
             changed();
@@ -560,6 +590,43 @@ public final class WebServer {
                 if (noted != null) history.cancelAction(instance.id, noted, notedName, who);
                 throw e;
             }
+        });
+        // flows: block-built automations the manager runs (flows/FlowEngine)
+        app.get("/api/instances/{id}/flows", ctx -> send(ctx, flows.list(requireCapability(ctx, Capability.CONTROL).id)));
+        app.put("/api/instances/{id}/flows/{flowId}", ctx -> {
+            var instance = requireCapability(ctx, Capability.CONTROL);
+            var body = body(ctx);
+            body.addProperty("id", ctx.pathParam("flowId"));
+            var user = requireUser(ctx);
+            try {
+                send(ctx, flows.save(instance.id, body, user.id, user.username));
+            } catch (SecurityException e) {
+                throw new ApiException(403, e.getMessage());
+            } catch (FlowSpec.Invalid e) {
+                // points the editor at the block that's wrong
+                var json = new JsonObject();
+                json.addProperty("error", e.getMessage());
+                if (e.step != null) json.addProperty("step", e.step);
+                ctx.status(400).contentType("application/json").result(json.toString());
+            }
+        });
+        app.get("/api/instances/{id}/flows/{flowId}/activity", ctx -> send(ctx, flows.activity(requireCapability(ctx, Capability.CONTROL).id, ctx.pathParam("flowId"))));
+        app.delete("/api/instances/{id}/flows/{flowId}/variables", ctx -> {
+            flows.clearVariables(requireCapability(ctx, Capability.CONTROL).id, ctx.pathParam("flowId"));
+            send(ctx, ok());
+        });
+        app.delete("/api/instances/{id}/flows/{flowId}", ctx -> {
+            flows.delete(requireCapability(ctx, Capability.CONTROL).id, ctx.pathParam("flowId"));
+            send(ctx, ok());
+        });
+        app.post("/api/instances/{id}/flows/{flowId}/run", ctx -> {
+            var instance = requireCapability(ctx, Capability.CONTROL);
+            flows.runNow(instance.id, ctx.pathParam("flowId"));
+            send(ctx, ok());
+        });
+        app.post("/api/instances/{id}/flows/{flowId}/stop", ctx -> {
+            flows.stop(requireCapability(ctx, Capability.CONTROL).id, ctx.pathParam("flowId"));
+            send(ctx, ok());
         });
         app.get("/api/instances/{id}/history", ctx -> {
             var instance = requireCapability(ctx, Capability.CONTROL);
@@ -915,6 +982,8 @@ public final class WebServer {
             var id = ctx.pathParam("id");
             access.deleteUser(id);
             pearls.forget(null, id);
+            integrations.forget(null, id);
+            closeTokenSockets(t -> t.userId.equals(id));
             sessions.invalidateUser(id);
             changed();
             send(ctx, ok());
@@ -1054,19 +1123,34 @@ public final class WebServer {
 
     private static final class WsClient {
         volatile Permissions.Identity identity;
+        /** set when the socket was opened with an integration token rather than a login */
+        volatile IntegrationTokens.Token token;
         final Set<String> subscribed = ConcurrentHashMap.newKeySet();
     }
 
     private void registerWebSocket() {
         app.ws("/api/ws", ws -> {
             ws.onConnect(ctx -> {
-                var origin = ctx.header("Origin");
-                var host = ctx.header("X-Forwarded-Host") != null ? ctx.header("X-Forwarded-Host") : ctx.header("Host");
-                if (origin != null && host != null && !origin.replaceFirst("^https?://", "").equalsIgnoreCase(host)) {
-                    ctx.closeSession(4003, "Bad origin");
-                    return;
+                var secret = bearer(ctx.header("Authorization"));
+                IntegrationTokens.Token token = null;
+                String userId;
+                if (secret != null) {
+                    // a program, not a browser: no cookie and no origin to check
+                    token = integrations.resolve(secret);
+                    if (token == null) {
+                        ctx.closeSession(4001, "Unknown or deleted integration token");
+                        return;
+                    }
+                    userId = token.userId;
+                } else {
+                    var origin = ctx.header("Origin");
+                    var host = ctx.header("X-Forwarded-Host") != null ? ctx.header("X-Forwarded-Host") : ctx.header("Host");
+                    if (origin != null && host != null && !origin.replaceFirst("^https?://", "").equalsIgnoreCase(host)) {
+                        ctx.closeSession(4003, "Bad origin");
+                        return;
+                    }
+                    userId = sessions.userId(ctx.cookie(SESSION_COOKIE));
                 }
-                var userId = sessions.userId(ctx.cookie(SESSION_COOKIE));
                 var user = userId == null ? null : store.read(s -> s.users.stream().filter(u -> u.id.equals(userId)).findFirst().orElse(null));
                 if (user == null) {
                     ctx.closeSession(4001, "Not logged in");
@@ -1075,6 +1159,7 @@ public final class WebServer {
                 ctx.enableAutomaticPings();
                 var client = new WsClient();
                 client.identity = Permissions.Identity.of(user);
+                client.token = token;
                 wsClients.put(ctx, client);
             });
             ws.onMessage(ctx -> {
@@ -1113,16 +1198,117 @@ public final class WebServer {
 
     private static boolean allowed(WsClient client, EventHub.Event event, State.Instance instance) {
         var who = client.identity;
+        if (client.token != null) {
+            // integrations get their instances' events, nothing about accounts or other people
+            if (event.type().equals("login")) return false;
+            if (instance != null && !IntegrationTokens.scope(client.token, instance.id, Permissions.capabilities(who, instance)).contains(Capability.VIEW)) return false;
+        }
         return switch (event.type()) {
             case "changed" -> true;
             case "login" -> who.admin() || who.user().id.equals(str(event.payload(), "ownerId"));
             // only for the Discord bot
             case "notification" -> false;
+            // in-game events (chat, visual range, totems…) are for integrations; the web UI doesn't use them
+            case "game" -> client.token != null && instance != null && Permissions.has(who, instance, Capability.VIEW);
             // the owner asked for it; friends' alerts would be noise
             case "alert" -> instance != null && who.user().id.equals(instance.ownerId);
+            // flow progress, for whoever can edit the instance's flows
+            case "flow" -> client.token == null && instance != null && Permissions.has(who, instance, Capability.CONTROL);
             case "log" -> instance != null && client.subscribed.contains(instance.id) && Permissions.has(who, instance, Capability.VIEW);
             default -> instance != null && Permissions.has(who, instance, Capability.VIEW);
         };
+    }
+
+    /** Closes WebSockets opened with tokens that were just deleted. */
+    private void closeTokenSockets(java.util.function.Predicate<IntegrationTokens.Token> which) {
+        wsClients.forEach((ctx, client) -> {
+            if (client.token == null || !which.test(client.token)) return;
+            wsClients.remove(ctx);
+            try {
+                ctx.closeSession(4001, "Integration token deleted");
+            } catch (Exception ignored) {
+                // already gone
+            }
+        });
+    }
+
+    // --- integrations: tokens for other programs, like Blockbot ---
+
+    private void registerIntegrationRoutes() {
+        // what the token reaches, so an integration can offer the right instances
+        app.get("/api/integration", ctx -> {
+            IntegrationTokens.Token token = ctx.attribute(TOKEN_ATTR);
+            if (token == null) throw ApiException.badRequest("Call this with an integration token");
+            var user = requireUser(ctx);
+            var who = Permissions.Identity.of(user);
+            send(ctx, store.read(s -> {
+                var json = new JsonObject();
+                json.addProperty("user", user.username);
+                json.addProperty("token", token.name);
+                var instances = new JsonArray();
+                for (var i : s.instances) {
+                    var caps = IntegrationTokens.scope(token, i.id, Permissions.capabilities(who, i));
+                    if (!caps.contains(Capability.VIEW)) continue;
+                    var v = new JsonObject();
+                    v.addProperty("id", i.id);
+                    v.addProperty("name", i.name);
+                    v.addProperty("accountName", s.accounts.stream().filter(a -> a.id.equals(i.accountId)).map(a -> a.username).findFirst().orElse("?"));
+                    v.addProperty("mine", user.id.equals(i.ownerId));
+                    v.addProperty("ownerName", userName(s, i.ownerId));
+                    var capArray = new JsonArray();
+                    caps.forEach(c -> capArray.add(c.name()));
+                    v.add("capabilities", capArray);
+                    v.add("runtime", supervisor.runtime(i.id).toJson());
+                    instances.add(v);
+                }
+                json.add("instances", instances);
+                return json;
+            }));
+        });
+        app.get("/api/me/integrations", ctx -> {
+            var user = requireUser(ctx);
+            var list = new JsonArray();
+            integrations.list(user.id).forEach(t -> list.add(t.toJson()));
+            send(ctx, list);
+        });
+        app.post("/api/me/integrations", ctx -> {
+            var user = requireUser(ctx);
+            var body = body(ctx);
+            boolean all = optBoolean(body, "allInstances");
+            var ids = new java.util.LinkedHashSet<String>();
+            if (!all && body.has("instances") && body.get("instances").isJsonArray()) {
+                body.getAsJsonArray("instances").forEach(e -> ids.add(e.getAsString()));
+            }
+            var who = Permissions.Identity.of(user);
+            store.read(s -> {
+                for (var id : ids) {
+                    if (!Permissions.has(who, findInstance(s, id), Capability.VIEW)) throw ApiException.notFound();
+                }
+                return null;
+            });
+            var caps = java.util.EnumSet.noneOf(Capability.class);
+            if (body.has("capabilities") && body.get("capabilities").isJsonArray()) {
+                for (var e : body.getAsJsonArray("capabilities")) {
+                    try {
+                        caps.add(Capability.valueOf(e.getAsString()));
+                    } catch (IllegalArgumentException ex) {
+                        throw ApiException.badRequest("Unknown permission: " + e.getAsString());
+                    }
+                }
+            }
+            var created = integrations.create(user.id, optString(body, "name"), all, ids, caps);
+            var json = created.token().toJson();
+            json.addProperty("token", created.secret());
+            LOG.info("{} created integration token {}", user.username, created.token().name);
+            send(ctx, json);
+        });
+        app.delete("/api/me/integrations/{tokenId}", ctx -> {
+            var user = requireUser(ctx);
+            var id = ctx.pathParam("tokenId");
+            if (!integrations.revoke(user.id, id)) throw ApiException.notFound();
+            closeTokenSockets(t -> t.id.equals(id));
+            send(ctx, ok());
+        });
     }
 
     /** Tells clients to refetch the overview; cheap and keeps the client logic simple. */
@@ -1263,7 +1449,8 @@ public final class WebServer {
     // --- request helpers ---
 
     private State.User currentUser(Context ctx) {
-        var userId = sessions.userId(ctx.cookie(SESSION_COOKIE));
+        IntegrationTokens.Token token = ctx.attribute(TOKEN_ATTR);
+        var userId = token != null ? token.userId : sessions.userId(ctx.cookie(SESSION_COOKIE));
         if (userId == null) return null;
         return store.read(s -> s.users.stream().filter(u -> u.id.equals(userId)).findFirst().orElse(null));
     }
@@ -1276,7 +1463,7 @@ public final class WebServer {
 
     private State.User requireAdmin(Context ctx) {
         var user = requireUser(ctx);
-        if (!user.admin) throw ApiException.forbidden();
+        if (!user.admin || ctx.attribute(TOKEN_ATTR) != null) throw ApiException.forbidden();
         return user;
     }
 
@@ -1284,6 +1471,8 @@ public final class WebServer {
         var who = Permissions.Identity.of(requireUser(ctx));
         var instance = store.read(s -> findInstance(s, ctx.pathParam("id")));
         var caps = Permissions.capabilities(who, instance);
+        IntegrationTokens.Token token = ctx.attribute(TOKEN_ATTR);
+        if (token != null) caps = IntegrationTokens.scope(token, instance.id, caps);
         // don't reveal instances the user can't see at all
         if (!caps.contains(Capability.VIEW)) throw ApiException.notFound();
         if (!caps.contains(cap)) throw ApiException.forbidden();
@@ -1307,7 +1496,15 @@ public final class WebServer {
     }
 
     private String actor(Context ctx) {
-        return "web:" + requireUser(ctx).username;
+        IntegrationTokens.Token token = ctx.attribute(TOKEN_ATTR);
+        return (token != null ? "integration:" : "web:") + requireUser(ctx).username;
+    }
+
+    /** The token in an {@code Authorization: Bearer zh_…} header, or null. */
+    private static String bearer(String header) {
+        if (header == null || !header.regionMatches(true, 0, "Bearer ", 0, 7)) return null;
+        var value = header.substring(7).trim();
+        return value.startsWith(IntegrationTokens.PREFIX) ? value : null;
     }
 
     private static State.Instance findInstance(State s, String id) {

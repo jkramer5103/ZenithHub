@@ -465,6 +465,8 @@ public final class Supervisor {
                             case "notification" -> events.publish(json.get("type").getAsString(), rt.instanceId, json);
                             // a task's "Notify me", for the owner's browser
                             case "alert" -> events.publish("alert", rt.instanceId, json);
+                            // what happens to the bot in game, for integrations
+                            case "game" -> events.publish("game", rt.instanceId, json);
                             case "player" -> playerEvents.accept(rt.instanceId, json);
                             case "afk" -> afkEvents.accept(rt.instanceId, json);
                             case "disconnect" -> disconnectEvents.accept(rt.instanceId, json);
