@@ -2177,47 +2177,6 @@ Sends alerts when players join or leave
   ```stalk add/del <player>```
 
 
-### tasks
-
-[BETA]
-
-
-
-Schedules commands to be executed after a delay or after specified events.
-
-
-
-Examples:
-
-`tasks add timed loadMyPearl 15m pearlLoader load rfresh`
-
-`tasks add interval mapgen 30s 1h map generate`
-
-`tasks add event continueTraveling online once b goto 0 1500`
-
-**Aliases:** `task`
-
-**Usage**
-
-  ```tasks add timed <id> <delay> <command>```
-
-  ```tasks add interval <id> <startDelay> <repeatDelay> <command>```
-
-  ```tasks add event <id> <connect/death/disconnect/online/playerConnect/playerDisconnect> <repeat/once> <command>```
-
-  ```tasks add trigger <id> <trigger> <repeat/once> <command>```
-
-  ```tasks del <id>```
-
-  ```tasks list```
-
-  ```tasks clear```
-
-  ```tasks logCommandActionOutput on/off```
-
-  ```tasks taskCommandExecutedNotification on/off```
-
-
 ### tickRate
 
 Modifies the client tick rate, as a multiple of the default rate (20 ticks per second)
