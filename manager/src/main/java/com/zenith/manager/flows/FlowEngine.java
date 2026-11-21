@@ -81,6 +81,12 @@ public final class FlowEngine {
         /** The server address, for {server}. */
         String server(String instanceId);
 
+        /** Every instance's id, for broadcasts to every bot. */
+        List<String> instances();
+
+        /** The instance's name, for {fromBot}. */
+        String name(String instanceId);
+
         /** What this user may do on this instance right now; empty if either is gone. */
         Set<Capability> capabilities(String instanceId, String userId);
     }
@@ -306,7 +312,10 @@ public final class FlowEngine {
         }
     }
 
-    /** Turns changes in the bot's status into events: joined, left, crashed, queue, food, controlled, afk. */
+    /**
+     * Turns changes in the bot's status into events: joined, left, crashed, queue, food, controlled, afk, onlineTime,
+     * unattended, moved, proxyJoin and proxyLeave.
+     */
     List<JsonObject> changes(String instanceId, JsonObject runtime) {
         var out = new ArrayList<JsonObject>();
         var statusElement = runtime.get("status");
@@ -323,7 +332,28 @@ public final class FlowEngine {
             now.addProperty("afkState", str(afk.getAsJsonObject(), "state"));
             now.addProperty("earning", bool(afk.getAsJsonObject(), "earning"));
         }
-        var before = lastStatus.put(instanceId, now);
+        boolean online = bool(status, "online");
+        if (online) now.addProperty("onlineSeconds", num(status, "onlineSeconds"));
+        var pos = status.get("position");
+        if (online && pos != null && pos.isJsonObject() && pos.getAsJsonObject().has("x")) {
+            now.addProperty("x", num(pos.getAsJsonObject(), "x"));
+            now.addProperty("z", num(pos.getAsJsonObject(), "z"));
+        }
+        // everyone on the proxy: the one playing and the spectators
+        var players = new java.util.LinkedHashSet<String>();
+        if (!str(status, "controller").isEmpty()) players.add(str(status, "controller"));
+        var spectators = status.get("spectators");
+        if (spectators != null && spectators.isJsonArray()) for (var p : spectators.getAsJsonArray()) if (p.isJsonPrimitive()) players.add(p.getAsString());
+        var list = new JsonArray();
+        players.forEach(list::add);
+        now.add("players", list);
+        var before = lastStatus.get(instanceId);
+        // how long nobody has played, counted from joining or from the last player leaving
+        if (online && !bool(status, "controlled")) {
+            now.addProperty("idleSince", before != null && before.has("idleSince") ? num(before, "idleSince") : clock.getAsLong());
+        }
+        now.addProperty("checkedAt", clock.getAsLong());
+        lastStatus.put(instanceId, now);
         if (before == null) return out;
 
         if (bool(before, "online") != bool(now, "online")) {
@@ -358,7 +388,41 @@ public final class FlowEngine {
         boolean wasInZone = str(before, "afkState").equals("IN_ZONE");
         if (inZone != wasInZone) out.add(afkEvent(inZone ? "enteredZone" : "leftZone"));
         if (bool(now, "earning") != bool(before, "earning")) out.add(afkEvent(bool(now, "earning") ? "earningStarted" : "earningStopped"));
+        if (now.has("onlineSeconds")) {
+            var e = event("onlineTime");
+            e.addProperty("seconds", num(now, "onlineSeconds"));
+            e.addProperty("previous", before.has("onlineSeconds") ? num(before, "onlineSeconds") : -1);
+            out.add(e);
+        }
+        if (now.has("idleSince")) {
+            var e = event("unattended");
+            e.addProperty("seconds", (clock.getAsLong() - num(now, "idleSince")) / 1000);
+            e.addProperty("previous", before.has("idleSince") ? (lastIdleCheck(before) - num(now, "idleSince")) / 1000 : -1);
+            out.add(e);
+        }
+        if (now.has("x") && before.has("x") && (num(now, "x") != num(before, "x") || num(now, "z") != num(before, "z"))) {
+            var e = event("moved");
+            e.addProperty("x", num(now, "x"));
+            e.addProperty("z", num(now, "z"));
+            e.addProperty("previousX", num(before, "x"));
+            e.addProperty("previousZ", num(before, "z"));
+            out.add(e);
+        }
+        var had = new java.util.HashSet<String>();
+        if (before.has("players")) for (var p : before.getAsJsonArray("players")) had.add(p.getAsString());
+        for (var p : players) if (!had.contains(p)) out.add(proxyEvent("proxyJoin", p));
+        for (var p : had) if (!players.contains(p)) out.add(proxyEvent("proxyLeave", p));
         return out;
+    }
+
+    private long lastIdleCheck(JsonObject before) {
+        return before.has("checkedAt") ? (long) num(before, "checkedAt") : clock.getAsLong();
+    }
+
+    private static JsonObject proxyEvent(String kind, String player) {
+        var e = event(kind);
+        e.addProperty("player", player);
+        return e;
     }
 
     private static JsonObject afkEvent(String on) {
@@ -451,9 +515,24 @@ public final class FlowEngine {
             case "left" -> event.equals("left") && contains(str(data, "message"), str(trigger, "reason"));
             case "controlled", "afk" -> event.equals(kind) && str(data, "on").equals(str(trigger, "on"));
             case "receive" -> event.equals("receive") && str(data, "name").equalsIgnoreCase(str(trigger, "name"));
+            // once per session or stretch: when the time passes the mark
+            case "onlineFor" -> event.equals("onlineTime") && crossed(data, trigger.get("minutes").getAsDouble() * 60);
+            case "unattended" -> event.equals("unattended") && crossed(data, trigger.get("minutes").getAsDouble() * 60);
+            case "arrived" -> event.equals("moved")
+                && within(trigger, num(data, "x"), num(data, "z")) && !within(trigger, num(data, "previousX"), num(data, "previousZ"));
+            case "proxyJoin", "proxyLeave" -> event.equals(kind)
+                && (str(trigger, "who").equals("anyone") || str(trigger, "who").isEmpty() || str(trigger, "who").equalsIgnoreCase(str(data, "player")));
             case "manual", "every", "daily" -> false;
             default -> event.equals(kind);
         };
+    }
+
+    private static boolean crossed(JsonObject data, double mark) {
+        return num(data, "seconds") >= mark && num(data, "previous") < mark;
+    }
+
+    private static boolean within(JsonObject trigger, double x, double z) {
+        return Math.hypot(x - num(trigger, "x"), z - num(trigger, "z")) <= num(trigger, "radius");
     }
 
     private static boolean who(JsonObject trigger, JsonObject data) {
@@ -552,7 +631,6 @@ public final class FlowEngine {
             case "action" -> {
                 var action = Actions.parse(step.getAsJsonObject("run"));
                 need(run, action.capability());
-                if (action.alsoNeeds() != null) need(run, action.alsoNeeds());
                 if (action.command().startsWith("pearlLoader load ")) {
                     bot.loadPearl(id, action.command().substring("pearlLoader load ".length()), run.actor);
                 } else {
@@ -632,11 +710,21 @@ public final class FlowEngine {
             case "forever" -> {
                 while (true) loop(run, step);
             }
+            // to this bot, one other bot or every bot the owner controls; the receiving flows run as their own owners
             case "broadcast" -> {
+                var to = str(step, "to");
+                var owner = run.flow.get("ownerId").getAsString();
+                var targets = new ArrayList<String>();
+                if (to.isEmpty() || to.equals(id)) targets.add(id);
+                else if (to.equals("all")) {
+                    for (var other : bot.instances()) if (other.equals(id) || bot.capabilities(other, owner).contains(Capability.CONTROL)) targets.add(other);
+                } else if (bot.capabilities(to, owner).contains(Capability.CONTROL)) targets.add(to);
+                else throw new SecurityException(run.flow.get("ownerName").getAsString() + " can't control that bot anymore, or it was deleted");
                 var data = event("receive");
                 data.addProperty("name", step.get("name").getAsString());
                 data.addProperty("from", run.flow.get("name").getAsString());
-                Thread.ofVirtual().start(() -> dispatch(id, data));
+                data.addProperty("fromBot", bot.name(id));
+                Thread.ofVirtual().start(() -> targets.forEach(t -> dispatch(t, data.deepCopy())));
             }
             case "set" -> setVar(run, step.get("name").getAsString(), render(run, step.get("value").getAsString(), 200));
             case "change" -> {
@@ -839,6 +927,11 @@ public final class FlowEngine {
             case "afk" -> "AFK zone: " + str(data, "on");
             case "controlled" -> str(data, "on").equals("start") ? "someone started playing" : "nobody is playing";
             case "queue" -> "queue position " + number(num(data, "position"));
+            case "onlineTime" -> "online for " + number(Math.floor(num(data, "seconds") / 60)) + " min";
+            case "unattended" -> "nobody played for " + number(Math.floor(num(data, "seconds") / 60)) + " min";
+            case "moved" -> "arrived at " + number(Math.floor(num(data, "x"))) + ", " + number(Math.floor(num(data, "z")));
+            case "proxyJoin" -> "joined the proxy";
+            case "proxyLeave" -> "left the proxy";
             case "" -> "trigger";
             default -> event;
         });

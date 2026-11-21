@@ -176,11 +176,11 @@ class AppState {
 				this.#loginListeners.forEach((l) => l(msg.data as PendingLogin));
 				break;
 			case 'alert': {
-				// a task's "Notify me"; only the instance's owner gets these
+				// a flow's "Notify me"; only the instance's owner gets these
 				const text = (msg.data as { text?: string }).text ?? '';
 				const name = (msg.instanceId && this.instance(msg.instanceId)?.name) || 'ZenithHub';
 				toasts.show('alert', text, name);
-				// the system notification needs https or localhost, and permission from the Tasks tab
+				// the system notification needs https or localhost, and permission from the flow editor
 				if (typeof Notification !== 'undefined' && Notification.permission === 'granted' && document.hidden) {
 					try {
 						new Notification(name, { body: text, tag: `alert-${msg.instanceId}-${text}` });

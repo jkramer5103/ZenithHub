@@ -27,8 +27,14 @@ class FlowEngineTest {
         volatile Set<Capability> caps = EnumSet.allOf(Capability.class);
         volatile JsonObject status = JsonParser.parseString("{\"online\":true,\"health\":20,\"controlled\":false}").getAsJsonObject();
 
+        /** the instance of each command */
+        final List<String> where = new CopyOnWriteArrayList<>();
+        /** instances the owner may only view */
+        volatile Set<String> viewOnly = Set.of();
+
         @Override public JsonObject command(String instanceId, String command, String actor) {
             commands.add(command);
+            where.add(instanceId);
             return new JsonObject();
         }
 
@@ -58,8 +64,16 @@ class FlowEngineTest {
             return "Test SMP";
         }
 
+        @Override public List<String> instances() {
+            return List.of("i1", "i2", "i3");
+        }
+
+        @Override public String name(String instanceId) {
+            return "Bot " + instanceId;
+        }
+
         @Override public Set<Capability> capabilities(String instanceId, String userId) {
-            return caps;
+            return viewOnly.contains(instanceId) ? EnumSet.of(Capability.VIEW) : caps;
         }
     }
 
@@ -226,6 +240,56 @@ class FlowEngineTest {
         engine.runNow("i1", "a");
         await(bot, 1);
         assertEquals(List.of("notify from Sender"), bot.commands);
+    }
+
+    @Test void broadcastReachesOtherBotsTheOwnerControls() throws Exception {
+        var bot = new FakeBot();
+        var engine = new FlowEngine(dir, bot, new EventHub());
+        for (var i : List.of("i2", "i3")) engine.save(i, json("""
+            {'id':'b','name':'Receiver','enabled':true,'trigger':{'kind':'receive','name':'regroup'},'steps':[{'id':'r','type':'notify','text':'{from} on {fromBot}'}]}"""), "u2", "bob");
+        // the sender's owner may only watch i3 (the fake gives every user the same rights, so i3's receiver can't run either)
+        bot.viewOnly = Set.of("i3");
+        engine.save("i1", json("""
+            {'id':'a','name':'Leader','trigger':{'kind':'manual'},'steps':[{'id':'s','type':'broadcast','name':'regroup','to':'all'}]}"""), "u1", "alice");
+        engine.runNow("i1", "a");
+        await(bot, 1);
+        Thread.sleep(100);
+        assertEquals(List.of("notify Leader on Bot i1"), bot.commands);
+        assertEquals(List.of("i2"), bot.where, "i3 is only viewable");
+        // a single bot the owner can't control is an error
+        engine.save("i1", json("""
+            {'id':'c','name':'Bad','trigger':{'kind':'manual'},'steps':[{'id':'s','type':'broadcast','name':'regroup','to':'i3'}]}"""), "u1", "alice");
+        engine.runNow("i1", "c");
+        Thread.sleep(200);
+        var bad = engine.list("i1").asList().stream().map(e -> e.getAsJsonObject()).filter(f -> f.get("id").getAsString().equals("c")).findFirst().orElseThrow();
+        assertFalse(bad.getAsJsonObject("last").get("ok").getAsBoolean());
+    }
+
+    @Test void sessionTriggersFireOncePerStretch() {
+        long[] now = {1_000_000};
+        var engine = new FlowEngine(dir, new FakeBot(), new EventHub(), () -> now[0]);
+        var online = json("{'kind':'onlineFor','minutes':10}");
+        var unattended = json("{'kind':'unattended','minutes':5}");
+        var arrived = json("{'kind':'arrived','x':100,'z':100,'radius':5}");
+        engine.changes("i1", runtime("RUNNING", "{'online':true,'onlineSeconds':590,'controlled':false,'position':{'x':0,'z':0},'spectators':[]}"));
+        now[0] += 280_000;
+        var a = engine.changes("i1", runtime("RUNNING", "{'online':true,'onlineSeconds':600,'controlled':false,'position':{'x':98,'z':101},'controller':'Steve','spectators':['Alex']}"));
+        assertTrue(a.stream().anyMatch(e -> FlowEngine.matches(online, e)), a.toString());
+        assertFalse(a.stream().anyMatch(e -> FlowEngine.matches(unattended, e)));
+        assertTrue(a.stream().anyMatch(e -> FlowEngine.matches(arrived, e)));
+        assertTrue(a.stream().anyMatch(e -> FlowEngine.matches(json("{'kind':'proxyJoin','who':'alex'}"), e)));
+        assertEquals(2, a.stream().filter(e -> FlowEngine.matches(json("{'kind':'proxyJoin','who':'anyone'}"), e)).count());
+        now[0] += 30_000;
+        var b = engine.changes("i1", runtime("RUNNING", "{'online':true,'onlineSeconds':630,'controlled':false,'position':{'x':99,'z':100},'spectators':['Alex']}"));
+        assertFalse(b.stream().anyMatch(e -> FlowEngine.matches(online, e)), "once per session");
+        assertTrue(b.stream().anyMatch(e -> FlowEngine.matches(unattended, e)), b.toString());
+        assertFalse(b.stream().anyMatch(e -> FlowEngine.matches(arrived, e)), "already there");
+        assertTrue(b.stream().anyMatch(e -> FlowEngine.matches(json("{'kind':'proxyLeave','who':'Steve'}"), e)));
+        // someone plays: the unattended clock starts over
+        engine.changes("i1", runtime("RUNNING", "{'online':true,'onlineSeconds':640,'controlled':true,'controller':'Steve','spectators':[]}"));
+        now[0] += 10_000;
+        var c = engine.changes("i1", runtime("RUNNING", "{'online':true,'onlineSeconds':650,'controlled':false,'spectators':[]}"));
+        assertFalse(c.stream().anyMatch(e -> FlowEngine.matches(unattended, e)));
     }
 
     @Test void restartModeReplacesTheRun() throws Exception {

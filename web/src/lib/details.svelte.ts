@@ -2,7 +2,7 @@ import { api } from './api';
 import type { InstanceDetails } from './types';
 
 /**
- * Polls an instance's live details (inventory, pathfinder, tasks) while a panel that shows them is open.
+ * Polls an instance's live details (inventory, pathfinder, players) while a panel that shows them is open.
  * Call {@link start} from an $effect and return its result, so polling stops when the panel goes away.
  */
 export class DetailsPoller {

@@ -35,17 +35,17 @@ public final class FlowSpec {
     /** What a flow can start on. */
     public static final Set<String> TRIGGERS = Set.of("manual", "every", "daily", "chat", "whisper", "player", "playerLeft", "attacked", "totem",
         "noTotems", "health", "food", "death", "joined", "left", "crashed", "queueComplete", "queueBelow", "serverRestarting", "controlled", "afk",
-        "receive");
+        "receive", "onlineFor", "unattended", "arrived", "proxyJoin", "proxyLeave");
     /** What "wait until" can wait for: the events among the triggers. */
     static final Set<String> WAITABLE = Set.of("chat", "whisper", "player", "playerLeft", "attacked", "totem", "health", "food", "death", "joined",
-        "left", "queueComplete", "queueBelow", "controlled", "afk", "receive");
+        "left", "queueComplete", "queueBelow", "controlled", "afk", "receive", "arrived", "proxyJoin", "proxyLeave");
     static final Set<String> CONDITIONS = Set.of("health", "food", "playing", "online", "inQueue", "inAfkZone", "earning", "text", "friend",
         "time", "chance", "var", "near", "dimension", "hasItem");
     /** Values every message can use, so they can't be variable names. */
     static final Set<String> RESERVED = Set.of("player", "message", "health", "food", "x", "y", "z", "time", "date", "server", "dimension",
-        "totemsLeft", "position", "previous", "reason");
-    /** Actions with blocks of their own, or that would let a flow change tasks or type commands. */
-    private static final Set<String> NOT_AS_ACTION = Set.of("command", "addTask", "deleteTask", "notify");
+        "totemsLeft", "position", "previous", "reason", "from", "fromBot");
+    /** Actions with blocks of their own, or that would let a flow type commands. */
+    private static final Set<String> NOT_AS_ACTION = Set.of("command", "notify");
 
     private FlowSpec() {}
 
@@ -116,6 +116,18 @@ public final class FlowSpec {
             case "controlled" -> out.addProperty("on", oneOf(in, "on", Set.of("start", "stop")));
             case "afk" -> out.addProperty("on", oneOf(in, "on", Set.of("earningStopped", "earningStarted", "leftZone", "enteredZone")));
             case "receive" -> out.addProperty("name", match(in, "name", SIGNAL));
+            case "onlineFor", "unattended" -> out.addProperty("minutes", range(in, "minutes", 1, 10_080));
+            case "arrived" -> {
+                out.addProperty("x", range(in, "x", -30_000_000, 30_000_000));
+                out.addProperty("z", range(in, "z", -30_000_000, 30_000_000));
+                out.addProperty("radius", range(in, "radius", 1, 10_000));
+            }
+            case "proxyJoin", "proxyLeave" -> {
+                var who = optString(in, "who");
+                if (who.isEmpty()) who = "anyone";
+                if (!who.equals("anyone") && !PLAYER.matcher(who).matches()) throw new IllegalArgumentException("Not a player name: " + who);
+                out.addProperty("who", who);
+            }
             default -> {}
         }
         return out;
@@ -150,7 +162,6 @@ public final class FlowSpec {
                 if (NOT_AS_ACTION.contains(string(run, "action"))) throw new IllegalArgumentException("Not allowed in a flow: " + string(run, "action"));
                 var command = Actions.parse(run);
                 needs.add(command.capability());
-                if (command.alsoNeeds() != null) needs.add(command.alsoNeeds());
                 out.add("run", run.deepCopy());
             }
             case "say" -> {
@@ -195,7 +206,13 @@ public final class FlowSpec {
                 out.add("steps", steps(optArr(in, "steps"), needs, count, depth + 1));
             }
             case "forever" -> out.add("steps", steps(optArr(in, "steps"), needs, count, depth + 1));
-            case "broadcast" -> out.addProperty("name", match(in, "name", SIGNAL));
+            case "broadcast" -> {
+                out.addProperty("name", match(in, "name", SIGNAL));
+                // "" is this bot, "all" every bot the owner controls, else an instance id
+                var to = optString(in, "to");
+                if (!to.isEmpty() && !ID.matcher(to).matches()) throw new IllegalArgumentException("Unknown bot");
+                out.addProperty("to", to);
+            }
             case "set" -> {
                 out.addProperty("name", varName(in));
                 var value = optString(in, "value");

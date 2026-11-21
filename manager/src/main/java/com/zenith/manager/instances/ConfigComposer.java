@@ -81,7 +81,7 @@ public final class ConfigComposer {
         "server.loginRateLimiter.enabled", "server.extra.whitelist.enable", "server.extra.whitelist.autoAddClient",
         "server.extra.whitelist.whitelist", "server.spectator.whitelistEnabled", "server.spectator.whitelist",
         "client.server.address", "client.server.port", "client.autoConnect", "client.viaversion.enabled",
-        "discord.accountOwnerRoleId", "discord.notificationMentionRoleId",
+        "discord.accountOwnerRoleId", "discord.notificationMentionRoleId", "client.extra.tasks.enabled", "client.extra.tasks.tasks",
         "authentication.openBrowserOnLogin", "authentication.username", "authentication.accountType"
     );
 
@@ -119,6 +119,9 @@ public final class ConfigComposer {
         // Zenith's notifications reach the manager's bot through the control API; any role mention means "ping the account owner"
         forced.put("discord.accountOwnerRoleId", new JsonPrimitive("1"));
         forced.put("discord.notificationMentionRoleId", new JsonPrimitive(""));
+        // flows replaced Zenith's tasks; this also clears the tasks bots saved before
+        forced.put("client.extra.tasks.enabled", new JsonPrimitive(false));
+        forced.put("client.extra.tasks.tasks", new JsonObject());
         forced.put("authentication.openBrowserOnLogin", new JsonPrimitive(false));
         var account = ctx.account();
         forced.put("authentication.username", new JsonPrimitive(account.username));

@@ -11,13 +11,12 @@
 	import ControlPanel from '#lib/components/control/ControlPanel.svelte';
 	import PearlsPanel from '#lib/components/PearlsPanel.svelte';
 	import AfkPanel from '#lib/components/AfkPanel.svelte';
-	import TasksPanel from '#lib/components/TasksPanel.svelte';
 	import FlowsPanel from '#lib/components/flows/FlowsPanel.svelte';
 	import CopyField from '#lib/components/CopyField.svelte';
 	import { duration } from '#lib/format.js';
 	import { banIssue } from '#lib/issues.js';
 	import { page } from '$app/state';
-	import { Activity, ArrowLeft, CalendarClock, Gamepad2, Joystick, Settings2, Share2, SlidersHorizontal, Orbit, Terminal, MapPinned } from '@lucide/svelte';
+	import { Activity, ArrowLeft, Blocks, Gamepad2, Joystick, Settings2, Share2, SlidersHorizontal, Orbit, Terminal, MapPinned } from '@lucide/svelte';
 
 	const id = $derived(page.params.id ?? '');
 	const instance = $derived(app.instance(id));
@@ -26,8 +25,6 @@
 	const status = $derived(runtime?.phase === 'RUNNING' ? runtime.status : null);
 	const ban = $derived(instance ? banIssue(instance) : null);
 	let showSettings = $state(false);
-	// the flow editor takes the whole Tasks tab while it's open
-	let editingFlow = $state(false);
 	const can = (c: Capability) => !!instance?.capabilities.includes(c);
 
 	type Tab = 'overview' | 'control' | 'afk' | 'pearls' | 'tasks' | 'settings' | 'sharing' | 'console';
@@ -37,7 +34,7 @@
 			{ id: 'control' as Tab, label: 'Control', icon: Joystick, show: !!instance && (can('PLAY') || can('CONTROL')) },
 			{ id: 'afk' as Tab, label: 'AFK', icon: MapPinned, show: !!instance && (can('PLAY') || can('CONTROL')) },
 			{ id: 'pearls' as Tab, label: 'Pearls', icon: Orbit, show: can('PEARLS') },
-			{ id: 'tasks' as Tab, label: 'Tasks', icon: CalendarClock, show: can('CONTROL') },
+			{ id: 'tasks' as Tab, label: 'Flows', icon: Blocks, show: can('CONTROL') },
 			{ id: 'settings' as Tab, label: 'Settings', icon: SlidersHorizontal, show: !!instance?.capabilities.includes('SETTINGS') },
 			{ id: 'sharing' as Tab, label: 'Sharing', icon: Share2, show: !!instance?.capabilities.includes('SHARE') },
 			{ id: 'console' as Tab, label: 'Console', icon: Terminal, show: app.devMode }
@@ -164,8 +161,7 @@
 		{/key}
 	{:else if tab === 'tasks'}
 		{#key id}
-			<FlowsPanel instanceId={id} capabilities={instance.capabilities} running={runtime.phase === 'RUNNING'} bind:editing={editingFlow} />
-			{#if !editingFlow}<TasksPanel instanceId={id} capabilities={instance.capabilities} running={runtime.phase === 'RUNNING'} />{/if}
+			<FlowsPanel instanceId={id} capabilities={instance.capabilities} running={runtime.phase === 'RUNNING'} />
 		{/key}
 	{:else if tab === 'settings'}
 		{#key id}

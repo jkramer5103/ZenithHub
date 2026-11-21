@@ -22,13 +22,8 @@ import com.zenith.cache.data.entity.Entity;
 import com.zenith.cache.data.entity.EntityPlayer;
 import com.zenith.cache.data.inventory.Container;
 import com.zenith.feature.queue.Queue;
-import com.zenith.feature.tasks.CommandAction;
-import com.zenith.feature.tasks.EventCondition;
-import com.zenith.feature.tasks.IntervalCondition;
-import com.zenith.feature.tasks.OnceContinuation;
 import com.zenith.mc.item.ItemRegistry;
 import com.zenith.module.impl.ReplayMod;
-import com.zenith.module.impl.Tasks;
 import com.zenith.network.client.ClientCookies;
 import com.zenith.network.client.ClientSession;
 import com.zenith.network.client.CoreRegistryData;
@@ -66,7 +61,7 @@ import static java.util.Objects.nonNull;
  * POST /v1/command  - {"command": "..."} executes a Zenith command, returns its output
  * POST /v1/shutdown - graceful shutdown
  * GET  /v1/events   - server-sent events stream of structured log lines, Discord notifications and chat relay embeds
- * GET  /v1/details  - inventory, pathfinder, replay and tasks, for the web UI's controls
+ * GET  /v1/details  - inventory, pathfinder and replay, for the web UI's controls
  * GET  /v1/config   - the live config
  * POST /v1/config   - {"settings": {...nested partial config}} changes settings live and saves them
  */
@@ -244,35 +239,6 @@ public final class ControlServer {
         json.addProperty("recording", MODULE.get(ReplayMod.class).isEnabled());
         var click = CONFIG.client.extra.click;
         if (click.holdLeftClick || click.holdRightClick) json.addProperty("clicking", click.holdLeftClick ? "left" : "right");
-        var tasks = new JsonArray();
-        for (var task : MODULE.get(Tasks.class).getTasks()) {
-            var t = new JsonObject();
-            t.addProperty("id", task.getId());
-            switch (task.getCondition()) {
-                case IntervalCondition c -> {
-                    boolean once = task.getContinuation() instanceof OnceContinuation;
-                    t.addProperty("type", once ? "timed" : "interval");
-                    t.addProperty("intervalSeconds", c.getInterval().toSeconds());
-                    t.addProperty("next", c.getLastT().plus(c.getInterval()).toEpochMilli());
-                }
-                case EventCondition c -> {
-                    t.addProperty("type", "event");
-                    t.addProperty("event", c.getEvent().getSimpleName());
-                    t.addProperty("repeat", !(task.getContinuation() instanceof OnceContinuation));
-                }
-                case TriggerCondition c -> {
-                    t.addProperty("type", "trigger");
-                    t.addProperty("trigger", c.getSpec());
-                    t.addProperty("repeat", !(task.getContinuation() instanceof OnceContinuation));
-                    if (c.getNextDaily() != null) t.addProperty("next", c.getNextDaily().toEpochMilli());
-                }
-                default -> t.addProperty("type", "other");
-            }
-            if (task.getAction() instanceof CommandAction action) t.addProperty("command", action.getCommand());
-            tasks.add(t);
-        }
-        json.add("tasks", tasks);
-        json.addProperty("tasksEnabled", CONFIG.client.extra.tasks.enabled);
         var client = proxy.getClient();
         if (proxy.isConnected() && client != null) json.add("fingerprint", fingerprint(client));
         return json;

@@ -50,36 +50,8 @@ class ActionsTest {
     }
 
     @Test
-    void tasksWrapAnotherAction() {
-        var task = Actions.parse(json("{\"action\":\"addTask\",\"id\":\"pearl\",\"when\":\"after\",\"delaySeconds\":900,\"run\":{\"action\":\"loadPearl\",\"pearl\":\"Steve\"}}"));
-        assertEquals("tasks add timed pearl 900s pearlLoader load Steve", task.command());
-        assertEquals(Capability.CONTROL, task.capability());
-        assertEquals(Capability.PEARLS, task.alsoNeeds());
-        assertEquals("tasks add event t1 online once pathfinder goto 0 1500",
-            command("{\"action\":\"addTask\",\"id\":\"t1\",\"when\":\"event\",\"event\":\"online\",\"run\":{\"action\":\"goto\",\"x\":0,\"z\":1500}}"));
-        assertThrows(IllegalArgumentException.class, () -> command("{\"action\":\"addTask\",\"id\":\"t\",\"when\":\"after\",\"delaySeconds\":5,\"run\":{\"action\":\"deleteTask\",\"id\":\"x\"}}"));
-    }
-
-    @Test
-    void tasksWithTriggers() {
-        assertEquals("tasks add trigger t1 player;who=stranger;cooldown=120;delay=20;ifIdle=1 repeat notify A stranger is near",
-            command("{\"action\":\"addTask\",\"id\":\"t1\",\"when\":\"trigger\",\"repeat\":true,"
-                + "\"trigger\":{\"kind\":\"player\",\"who\":\"stranger\",\"cooldown\":120,\"delay\":20,\"ifIdle\":true},"
-                + "\"run\":{\"action\":\"notify\",\"text\":\"A stranger\\nis near\"}}"));
-        assertEquals("tasks add trigger t2 daily;at=08:30;days=135;zone=Europe/Berlin;jitter=15 repeat afkZone enter",
-            command("{\"action\":\"addTask\",\"id\":\"t2\",\"when\":\"trigger\",\"repeat\":true,"
-                + "\"trigger\":{\"kind\":\"daily\",\"at\":\"08:30\",\"days\":\"135\",\"zone\":\"Europe/Berlin\",\"jitter\":15},"
-                + "\"run\":{\"action\":\"afkEnter\"}}"));
-        assertEquals("tasks add trigger t3 arrived;x=-10;z=200;radius=5 once pathfinder stop",
-            command("{\"action\":\"addTask\",\"id\":\"t3\",\"when\":\"trigger\",\"repeat\":false,"
-                + "\"trigger\":{\"kind\":\"arrived\",\"x\":-10,\"z\":200,\"radius\":5},\"run\":{\"action\":\"stop\"}}"));
-        // a player name can't smuggle in more settings or a second command
-        assertThrows(IllegalArgumentException.class, () -> command("{\"action\":\"addTask\",\"id\":\"t\",\"when\":\"trigger\","
-            + "\"trigger\":{\"kind\":\"player\",\"who\":\"Steve;cooldown=0\"},\"run\":{\"action\":\"respawn\"}}"));
-        assertThrows(IllegalArgumentException.class, () -> command("{\"action\":\"addTask\",\"id\":\"t\",\"when\":\"trigger\","
-            + "\"trigger\":{\"kind\":\"player\",\"who\":\"anyone\",\"cooldown\":1},\"run\":{\"action\":\"respawn\"}}"));
-        assertThrows(IllegalArgumentException.class, () -> command("{\"action\":\"addTask\",\"id\":\"t\",\"when\":\"trigger\","
-            + "\"trigger\":{\"kind\":\"daily\",\"at\":\"8:30 x\",\"zone\":\"UTC\"},\"run\":{\"action\":\"respawn\"}}"));
+    void notifyIsOneLine() {
+        assertEquals("notify A stranger is near", command("{\"action\":\"notify\",\"text\":\"A stranger\\nis near\"}"));
         assertThrows(IllegalArgumentException.class, () -> command("{\"action\":\"notify\",\"text\":\"  \"}"));
     }
 

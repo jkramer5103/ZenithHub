@@ -90,13 +90,15 @@ export const blocks: BlockDef[] = [
 
 	{ key: 'set', cat: 'data', label: 'set a variable', needs: 'CONTROL', make: () => ({ type: 'set', name: 'last', value: '{player}' }) },
 	{ key: 'change', cat: 'data', label: 'change a counter by …', needs: 'CONTROL', make: () => ({ type: 'change', name: 'count', by: 1 }) },
-	{ key: 'broadcast', cat: 'data', label: 'broadcast to other flows', needs: 'CONTROL', make: () => ({ type: 'broadcast', name: 'go' }) },
+	{ key: 'broadcast', cat: 'data', label: 'broadcast to other flows or bots', needs: 'CONTROL', make: () => ({ type: 'broadcast', name: 'go', to: '' }) },
 	{ key: 'log', cat: 'data', label: 'write to the run log', needs: 'CONTROL', make: () => ({ type: 'log', text: '' }) },
 
 	{ key: 'connect', cat: 'connection', label: 'connect', needs: 'CONTROL', make: () => ({ type: 'connect' }) },
 	{ key: 'disconnect', cat: 'connection', label: 'disconnect', needs: 'CONTROL', make: () => ({ type: 'disconnect' }) },
 	{ key: 'requeue', cat: 'connection', label: 'requeue (2b2t)', needs: 'CONTROL', make: act('requeue') },
-	{ key: 'kick', cat: 'connection', label: 'kick everyone off the proxy', needs: 'CONTROL', make: act('kick') }
+	{ key: 'kick', cat: 'connection', label: 'kick everyone off the proxy', needs: 'CONTROL', make: act('kick') },
+	{ key: 'replayStart', cat: 'connection', label: 'start recording a replay', needs: 'CONTROL', make: act('replayStart') },
+	{ key: 'replayStop', cat: 'connection', label: 'stop recording', needs: 'CONTROL', make: act('replayStop') }
 ];
 
 /** Which block a step is, for its colour and picker entry. */
@@ -133,8 +135,9 @@ export const triggers: TriggerDef[] = [
 	{ kind: 'manual', label: 'I click Run', group: 'Start', gives: [], waitable: false },
 	{ kind: 'every', label: 'a timer goes off every', group: 'Start', gives: [], waitable: false, defaults: { minutes: 30 } },
 	{ kind: 'daily', label: 'it’s a time of day', group: 'Start', gives: [], waitable: false, defaults: { at: '08:00', days: '1234567' } },
-	{ kind: 'receive', label: 'another flow broadcasts', group: 'Start', gives: ['from'], waitable: true, defaults: { name: 'go' } },
+	{ kind: 'receive', label: 'another flow broadcasts', group: 'Start', gives: ['from', 'fromBot'], waitable: true, defaults: { name: 'go' } },
 	{ kind: 'joined', label: 'the bot gets into the game', group: 'Connection', gives: [], waitable: true },
+	{ kind: 'onlineFor', label: 'the bot has been online for', group: 'Connection', gives: [], waitable: false, defaults: { minutes: 60 } },
 	{ kind: 'left', label: 'the bot leaves the game', group: 'Connection', gives: ['message'], waitable: true, defaults: { reason: '' } },
 	{ kind: 'crashed', label: 'the bot crashes', group: 'Connection', gives: ['message'], waitable: false },
 	{ kind: 'queueBelow', label: 'the queue drops below', group: 'Connection', gives: ['position'], waitable: true, defaults: { position: 20 } },
@@ -145,13 +148,17 @@ export const triggers: TriggerDef[] = [
 	{ kind: 'player', label: 'someone comes into view', group: 'Players', gives: ['player', 'x', 'y', 'z'], waitable: true, defaults: { who: 'stranger' } },
 	{ kind: 'playerLeft', label: 'someone leaves view', group: 'Players', gives: ['player'], waitable: true, defaults: { who: 'anyone' } },
 	{ kind: 'controlled', label: 'someone starts or stops playing', group: 'Players', gives: ['player'], waitable: true, defaults: { on: 'start' } },
+	{ kind: 'unattended', label: 'nobody has played for', group: 'Players', gives: [], waitable: false, defaults: { minutes: 30 } },
+	{ kind: 'proxyJoin', label: 'someone joins the proxy', group: 'Players', gives: ['player'], waitable: true, defaults: { who: 'anyone' } },
+	{ kind: 'proxyLeave', label: 'someone leaves the proxy', group: 'Players', gives: ['player'], waitable: true, defaults: { who: 'anyone' } },
 	{ kind: 'attacked', label: 'a player attacks the bot', group: 'Danger', gives: ['player'], waitable: true },
 	{ kind: 'health', label: 'health drops below', group: 'Danger', gives: [], waitable: true, defaults: { below: 8 } },
 	{ kind: 'food', label: 'food drops below', group: 'Danger', gives: [], waitable: true, defaults: { below: 6 } },
 	{ kind: 'totem', label: 'a totem pops', group: 'Danger', gives: ['totemsLeft'], waitable: true },
 	{ kind: 'noTotems', label: 'the last totem is gone', group: 'Danger', gives: [], waitable: false },
 	{ kind: 'death', label: 'the bot dies', group: 'Danger', gives: ['x', 'y', 'z'], waitable: true },
-	{ kind: 'afk', label: 'the AFK zone changes', group: 'AFK zone', gives: [], waitable: true, defaults: { on: 'earningStopped' } }
+	{ kind: 'arrived', label: 'the bot arrives near', group: 'Where', gives: [], waitable: true, defaults: { x: 0, z: 0, radius: 5 } },
+	{ kind: 'afk', label: 'the AFK zone changes', group: 'Where', gives: [], waitable: true, defaults: { on: 'earningStopped' } }
 ];
 
 /** values every message can use, whatever the trigger */
@@ -184,6 +191,10 @@ const afkText: Record<string, string> = {
 	enteredZone: 'the bot enters the AFK zone'
 };
 export const afkOptions = Object.entries(afkText).map(([value, label]) => ({ value, label }));
+
+function minutesText(m: number) {
+	return m % 60 === 0 ? `${m / 60} h` : `${m} min`;
+}
 
 /** A trigger in words, for the flow list. */
 export function triggerText(t: FlowTrigger): string {
@@ -218,6 +229,17 @@ export function triggerText(t: FlowTrigger): string {
 			return t.on === 'start' ? 'When someone starts playing' : 'When nobody is playing anymore';
 		case 'afk':
 			return 'When ' + (afkText[String(t.on)] ?? 'the AFK zone changes');
+		case 'onlineFor':
+			return `After ${minutesText(Number(t.minutes))} online`;
+		case 'unattended':
+			return `When nobody has played for ${minutesText(Number(t.minutes))}`;
+		case 'arrived':
+			return `When the bot arrives within ${t.radius} blocks of ${t.x}, ${t.z}`;
+		case 'proxyJoin':
+		case 'proxyLeave': {
+			const who = !t.who || t.who === 'anyone' ? 'someone' : String(t.who);
+			return `When ${who} ${t.kind === 'proxyJoin' ? 'joins' : 'leaves'} the proxy`;
+		}
 		default:
 			return 'When ' + triggerDef(t.kind).label;
 	}

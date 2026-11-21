@@ -5,7 +5,7 @@
 	import { HAT, always, contains, copyFlow, countSteps, makeStep, shareCode, triggerDef, variablesIn, type BlockDef } from '#lib/flow-blocks.js';
 	import { attempt, toasts } from '#lib/toast.svelte.js';
 	import type { Capability, Flow, FlowStep, Pearl } from '#lib/types.js';
-	import { ArrowLeft, Copy, CopyPlus, Ellipsis, Play, Redo2, Send, Square, Trash2, Undo2, Zap } from '@lucide/svelte';
+	import { ArrowLeft, Bell, Copy, CopyPlus, Ellipsis, Play, Redo2, Send, Square, Trash2, Undo2, Zap } from '@lucide/svelte';
 	import Modal from '../Modal.svelte';
 	import Switch from '../settings/Switch.svelte';
 	import BlockPicker from './BlockPicker.svelte';
@@ -146,9 +146,16 @@
 	let picking = $state<{ list: FlowStep[]; index: number } | null>(null);
 	let drag = $state<{ list: FlowStep[]; index: number; step: FlowStep } | null>(null);
 	let textTarget: { obj: Record<string, unknown>; key: string } | null = null;
+	// "notify me" also pops a system notification once the browser allows it (needs https or localhost)
+	let permission = $state(typeof Notification === 'undefined' ? 'unsupported' : Notification.permission);
+	const hasNotify = $derived(JSON.stringify(flow.steps).includes('"type":"notify"'));
+
 	provideEditor({
 		get capabilities() {
 			return capabilities;
+		},
+		get bots() {
+			return (app.overview?.instances ?? []).filter((i) => i.id !== instanceId && i.capabilities.includes('CONTROL')).map((i) => ({ id: i.id, name: i.name }));
 		},
 		get waypoints() {
 			return waypoints;
@@ -404,6 +411,12 @@
 			{blockCount === 1 ? 'block' : 'blocks'}{flow.ownerName ? ` · runs with ${flow.ownerName === app.user?.username ? 'your' : `${flow.ownerName}’s`} permissions` : ''}
 		</span>
 	</div>
+
+	{#if permission === 'default' && hasNotify}
+		<button type="button" class="btn-ghost mt-2 px-0 py-1 text-xs" onclick={async () => (permission = await Notification.requestPermission())}>
+			<Bell size={13} /> Show “notify me” even when this tab is in the background
+		</button>
+	{/if}
 
 	{#if !isNew || everSaved}
 		<FlowActivity {instanceId} flowId={flow.id} onshow={(step, message) => show(step, 'This run stopped here: ' + message)} />

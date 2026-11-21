@@ -36,7 +36,9 @@
 		Trash2,
 		Unplug,
 		UserX,
-		Variable
+		Variable,
+		Video,
+		VideoOff
 	} from '@lucide/svelte';
 	import Condition from './Condition.svelte';
 	import { SELECT, SLOT, editor } from './context.js';
@@ -80,7 +82,9 @@
 		connect: Plug,
 		disconnect: Unplug,
 		requeue: ListRestart,
-		kick: UserX
+		kick: UserX,
+		replayStart: Video,
+		replayStop: VideoOff
 	};
 	const Icon = $derived(icons[key] ?? Square);
 	const fixed: Record<string, string> = {
@@ -98,7 +102,9 @@
 		connect: 'connect',
 		disconnect: 'disconnect',
 		requeue: 'requeue',
-		kick: 'kick everyone off the proxy'
+		kick: 'kick everyone off the proxy',
+		replayStart: 'start recording a replay',
+		replayStop: 'stop recording'
 	};
 
 	const running = $derived(ctx.live.step === step.id);
@@ -347,7 +353,17 @@
 				bind:value={step.name}
 				onfocus={() => ctx.focusText(null)}
 			/>
-			<span class="text-xs font-normal text-white/60">to this instance’s flows</span>
+			<span>to</span>
+			<select class={SELECT} aria-label="Which bots" bind:value={() => step.to ?? '', (v) => (step.to = v)}>
+				<option value="">this bot’s flows</option>
+				<option value="all">every bot I control</option>
+				{#if ctx.bots.length}
+					<optgroup label="One bot">
+						{#each ctx.bots as b (b.id)}<option value={b.id}>{b.name}</option>{/each}
+					</optgroup>
+				{/if}
+				{#if step.to && step.to !== 'all' && !ctx.bots.some((b) => b.id === step.to)}<option value={step.to}>a bot you can’t control</option>{/if}
+			</select>
 		{:else if key === 'goto'}
 			<span>walk to</span>
 			<input class="{SLOT} w-16 text-center" inputmode="numeric" placeholder="x" aria-label="X" value={run.x ?? ''} oninput={(e) => (run.x = num(e.currentTarget.value))} />

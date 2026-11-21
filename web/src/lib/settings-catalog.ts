@@ -1324,8 +1324,7 @@ export const catalog: Group[] = [
 				title: 'Other notifications',
 				description: 'Everything else the bot reports.',
 				fields: [
-					{ path: 'client.extra.tasks.taskCommandExecutedNotification', label: 'Scheduled tasks ran' },
-					{ path: 'discord.notifications.taskAlerts', label: 'Notify me (from tasks)', help: 'The "Notify me" action of scheduled tasks.' },
+					{ path: 'discord.notifications.taskAlerts', label: 'Notify me (from flows)', help: 'The "notify me" block of flows.' },
 					{ path: 'discord.notifications.spawnPatrol', label: 'Spawn patrol targets' },
 					{ path: 'discord.notifications.replays', label: 'Replay recordings' },
 					{ path: 'discord.notifications.plugins', label: 'Plugins' }
@@ -1545,14 +1544,6 @@ export const catalog: Group[] = [
 					{ path: 'client.extra.click.additionalEntityReach', label: 'Extra entity reach', unit: 'blocks', advanced: true },
 					priority('client.extra.click.priority', 9000)
 				]
-			},
-			{
-				id: 'tasks',
-				title: 'Scheduled tasks',
-				description: 'Run the instance’s scheduled tasks.',
-				toggle: 'client.extra.tasks.enabled',
-				advanced: true,
-				fields: [{ path: 'client.extra.tasks.logCommandActionOutput', label: 'Log what tasks do' }]
 			},
 			{
 				id: 'inventory',

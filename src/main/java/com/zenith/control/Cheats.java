@@ -14,7 +14,7 @@ import static com.zenith.Globals.DEFAULT_LOG;
  * ZENITH_DISABLE_CHEATS: turns off every module that plays the game for you or gives an unfair advantage.
  * Their commands don't exist and the modules can't be enabled by config, commands or tasks.
  *
- * Pathfinder, PearlLoader, AutoDisconnect, VisualRange and Tasks stay available.
+ * Pathfinder, PearlLoader, AutoDisconnect and VisualRange stay available.
  * Keep this list in sync with the manager's Cheats class.
  */
 public final class Cheats {

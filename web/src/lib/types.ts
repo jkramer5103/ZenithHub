@@ -271,23 +271,7 @@ export interface Inventory {
 	slots: (ItemStack | null)[];
 }
 
-export type TaskEvent = 'connect' | 'death' | 'disconnect' | 'online' | 'playerConnect' | 'playerDisconnect';
-
-export interface ScheduledTask {
-	id: string;
-	type: 'timed' | 'interval' | 'event' | 'trigger' | 'other';
-	intervalSeconds?: number;
-	/** the bot's trigger spec, like "player;who=stranger;cooldown=60" */
-	trigger?: string;
-	/** epoch ms of the next run, for timed, interval and daily tasks */
-	next?: number;
-	event?: string;
-	repeat?: boolean;
-	/** missing for tasks whose action isn't a command */
-	command?: string;
-}
-
-/** Live details for the Control and Tasks tabs, polled while they're open. */
+/** someone connected through the proxy */
 export interface ConnectedPlayer {
 	name: string;
 	uuid: string | null;
@@ -337,9 +321,6 @@ export interface InstanceDetails {
 	recording?: boolean;
 	/** a held mouse button, while the bot keeps clicking */
 	clicking?: 'left' | 'right';
-	tasks: ScheduledTask[];
-	/** the Tasks module is on; tasks only run when it is */
-	tasksEnabled?: boolean;
 	waypoints: Waypoint[];
 	/** what the server can see of the bot's client, while it's connected */
 	fingerprint?: Fingerprint;
@@ -519,6 +500,8 @@ export interface FlowStep {
 	steps?: FlowStep[];
 	/** broadcast: the message; set/change: the variable */
 	name?: string;
+	/** broadcast: '' this bot, 'all' every bot, else an instance id */
+	to?: string;
 	value?: string;
 	by?: number;
 }

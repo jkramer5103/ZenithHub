@@ -234,7 +234,7 @@ public final class Supervisor {
         return status != null && status.get("connected").getAsBoolean();
     }
 
-    /** Inventory, pathfinder, replay and tasks of a running instance. */
+    /** Inventory, pathfinder and replay of a running instance. */
     public JsonObject details(String instanceId) throws IOException, InterruptedException {
         var response = http.send(request(runtime(instanceId), "/v1/details").timeout(Duration.ofSeconds(10)).GET().build(),
             HttpResponse.BodyHandlers.ofString());
@@ -463,7 +463,7 @@ public final class Supervisor {
                             case "log" -> appendLog(rt, str(json, "logger"), str(json, "level"), str(json, "text"), str(json, "ansi"), json.get("ts").getAsLong());
                             // what Zenith's own Discord bot would have posted
                             case "notification" -> events.publish(json.get("type").getAsString(), rt.instanceId, json);
-                            // a task's "Notify me", for the owner's browser
+                            // a flow's "Notify me", for the owner's browser
                             case "alert" -> events.publish("alert", rt.instanceId, json);
                             // what happens to the bot in game, for integrations
                             case "game" -> events.publish("game", rt.instanceId, json);

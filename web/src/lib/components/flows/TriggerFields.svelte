@@ -72,9 +72,29 @@
 	<select class={SELECT} aria-label="Food" bind:value={trigger.below}>
 		{#each [2, 4, 6, 8, 10, 12, 14, 16, 18] as f}<option value={f}>{f / 2} 🍗</option>{/each}
 	</select>
-{:else if trigger.kind === 'every'}
+{:else if trigger.kind === 'every' || trigger.kind === 'onlineFor' || trigger.kind === 'unattended'}
 	<input class="{SLOT} w-16 text-center" inputmode="numeric" aria-label="Minutes" bind:value={trigger.minutes} />
 	<span>minutes</span>
+{:else if trigger.kind === 'proxyJoin' || trigger.kind === 'proxyLeave'}
+	<span>named</span>
+	<input
+		class="{SLOT} field-sizing-content min-w-20"
+		placeholder="anyone"
+		maxlength="16"
+		autocapitalize="off"
+		spellcheck="false"
+		aria-label="Player name"
+		value={trigger.who === 'anyone' ? '' : trigger.who}
+		oninput={(e) => (trigger.who = (e.currentTarget as HTMLInputElement).value.trim() || 'anyone')}
+	/>
+{:else if trigger.kind === 'arrived'}
+	<span>x</span>
+	<input class="{SLOT} w-20 text-center" inputmode="numeric" aria-label="X" bind:value={trigger.x} />
+	<span>z</span>
+	<input class="{SLOT} w-20 text-center" inputmode="numeric" aria-label="Z" bind:value={trigger.z} />
+	<span>within</span>
+	<input class="{SLOT} w-14 text-center" inputmode="numeric" aria-label="Radius" bind:value={trigger.radius} />
+	<span>blocks</span>
 {:else if trigger.kind === 'daily'}
 	<span>at</span>
 	<input type="time" class="{SLOT} [color-scheme:dark]" aria-label="Time of day" required bind:value={trigger.at} />

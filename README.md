@@ -23,10 +23,11 @@ settings all happen in the browser.
 - **Control without commands:** a Control tab for movement (go to, follow, mine, fly and more),
   waypoints, clicking and looking, the inventory and open containers, connected players (kick, make
   player, make spectator, connection history), nearby players, requeue, transfers and replay
-  recording. A Pearls tab loads stasis pearls, and a Tasks tab runs any action later, on a schedule,
-  at a time of day, or when something happens: a stranger comes into view, health drops, a totem
-  pops, the bot leaves the AFK zone or stops earning, arrives somewhere, or nobody has played for a
-  while. "Notify me" sends you an alert in the browser and on Discord.
+  recording. A Pearls tab loads stasis pearls, and a Flows tab builds automations from blocks: on a
+  timer, at a time of day, or when something happens (a stranger comes into view, health drops, a
+  totem pops, the bot leaves the AFK zone or stops earning, arrives somewhere, nobody has played for
+  a while), with waits, ifs, loops and variables. Flows can signal each other, also across bots.
+  "Notify me" sends you an alert in the browser and on Discord.
 - **Dashboard:** every account at a glance, with its status, AFK-zone reward now, a day at the
   current rate, over the last week and in total, and what needs attention (not verified, not earning, banned, crashed, sign-in failed).
 - **Clean settings:** curated pages instead of commands for every Zenith setting, layered

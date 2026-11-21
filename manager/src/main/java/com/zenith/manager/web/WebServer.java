@@ -535,7 +535,7 @@ public final class WebServer {
         });
     }
 
-    // --- controls: actions, pearls, tasks, replays ---
+    // --- controls: actions, pearls, replays ---
 
     private void registerControlRoutes() {
         app.get("/api/instances/{id}/details", ctx -> {
@@ -543,17 +543,9 @@ public final class WebServer {
             JsonObject details;
             if (supervisor.isRunning(id)) {
                 details = supervisor.details(id);
-                // the manager's names for task triggers
-                if (details.has("tasks")) {
-                    for (var t : details.getAsJsonArray("tasks")) {
-                        var task = t.getAsJsonObject();
-                        if (task.has("event")) task.addProperty("event", Actions.TASK_EVENT_CLASSES.getOrDefault(task.get("event").getAsString(), task.get("event").getAsString()));
-                    }
-                }
             } else {
                 details = new JsonObject();
                 details.addProperty("online", false);
-                details.add("tasks", new JsonArray());
             }
             details.addProperty("running", supervisor.isRunning(id));
             var waypoints = settings.effective(id, "client.extra.waypoints.waypoints");
@@ -564,7 +556,6 @@ public final class WebServer {
             var body = body(ctx);
             var action = Actions.parse(body);
             var instance = requireCapability(ctx, action.capability());
-            if (action.alsoNeeds() != null) requireCapability(ctx, action.alsoNeeds());
             if (action.command().startsWith("pearlLoader load ")) {
                 var result = pearls.load(instance.id, action.command().substring("pearlLoader load ".length()), actor(ctx));
                 if (!result.ok()) throw ApiException.badRequest(result.message());

@@ -127,6 +127,16 @@ public final class ManagerMain {
             }
 
             @Override
+            public java.util.List<String> instances() {
+                return store.read(s -> s.instances.stream().map(i -> i.id).toList());
+            }
+
+            @Override
+            public String name(String instanceId) {
+                return store.read(s -> s.instances.stream().filter(i -> i.id.equals(instanceId)).findFirst().map(i -> i.name).orElse(""));
+            }
+
+            @Override
             public Set<Capability> capabilities(String instanceId, String userId) {
                 return store.read(s -> {
                     var user = s.users.stream().filter(u -> u.id.equals(userId)).findFirst().orElse(null);

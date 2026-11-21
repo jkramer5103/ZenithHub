@@ -14,7 +14,7 @@
 		{ cap: 'PEARLS', hint: 'Pull any pearl on the bot’s pearl list' },
 		{ cap: 'CHAT', hint: 'Say and whisper as the bot' },
 		{ cap: 'PLAY', hint: 'Walk, mine, click and use the inventory' },
-		{ cap: 'CONTROL', hint: 'Connect, disconnect, requeue, kick and tasks' },
+		{ cap: 'CONTROL', hint: 'Connect, disconnect, requeue, kick and flows' },
 		{ cap: 'COMMANDS', hint: 'Run any ZenithProxy command' },
 		{ cap: 'SETTINGS', hint: 'Change settings, like waypoints' }
 	];

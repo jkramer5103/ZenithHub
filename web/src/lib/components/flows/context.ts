@@ -6,6 +6,8 @@ export interface EditorContext {
 	capabilities: Capability[];
 	waypoints: string[];
 	pearls: Pearl[];
+	/** the other bots this user controls, for "broadcast to" */
+	bots: { id: string; name: string }[];
 	/** the running block, and the one the last run failed on */
 	live: { step?: string; error?: string; message?: string };
 	/** opens the block picker; the block goes into list at index */
