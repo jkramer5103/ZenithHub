@@ -2,10 +2,10 @@
 	import { ApiError, api } from '#lib/api.js';
 	import { app } from '#lib/app.svelte.js';
 	import { copyText } from '#lib/clipboard.js';
-	import { HAT, always, contains, copyFlow, countSteps, makeStep, shareCode, triggerDef, variablesIn, type BlockDef } from '#lib/flow-blocks.js';
+	import { HAT, always, contains, copyFlow, countSteps, makeStep, shareCode, triggerDef, valuesIn, variablesIn, type BlockDef } from '#lib/flow-blocks.js';
 	import { attempt, toasts } from '#lib/toast.svelte.js';
 	import type { Capability, Flow, FlowStep, Pearl } from '#lib/types.js';
-	import { ArrowLeft, Bell, Copy, CopyPlus, Ellipsis, Play, Redo2, Send, Square, Trash2, Undo2, Zap } from '@lucide/svelte';
+	import { ArrowLeft, Bell, Copy, CopyPlus, Ellipsis, FlaskConical, Pause, Play, Redo2, Send, Square, Trash2, Undo2, Zap } from '@lucide/svelte';
 	import Modal from '../Modal.svelte';
 	import Switch from '../settings/Switch.svelte';
 	import BlockPicker from './BlockPicker.svelte';
@@ -44,11 +44,13 @@
 
 	/** what the user edits; also what undo goes back through */
 	function snapshot(f: Flow) {
-		const { name, enabled, cooldown, mode, trigger, steps } = f;
-		return JSON.stringify({ name, enabled, cooldown, mode: mode ?? 'ignore', trigger, steps });
+		const { name, enabled, cooldown, mode, burst, trigger, steps } = f;
+		return JSON.stringify({ name, enabled, cooldown, mode: mode ?? 'ignore', burst: burst && burst.count > 1 ? burst : undefined, trigger, steps });
 	}
 	function apply(json: string) {
-		Object.assign(flow, JSON.parse(json));
+		const next = JSON.parse(json);
+		if (!next.burst) delete flow.burst;
+		Object.assign(flow, next);
 	}
 
 	// --- undo and redo: each pause in typing is a step ---
@@ -102,7 +104,7 @@
 	}
 
 	// --- live: the running block, or where the last run stopped ---
-	const live = $state<{ step?: string; error?: string; message?: string }>({
+	const live = $state<{ step?: string; error?: string; message?: string; timings?: Record<string, number> }>({
 		// svelte-ignore state_referenced_locally
 		step: initial.running?.step,
 		// svelte-ignore state_referenced_locally
@@ -112,11 +114,15 @@
 	});
 	// svelte-ignore state_referenced_locally
 	let isRunning = $state(!!initial.running);
+	// svelte-ignore state_referenced_locally
+	let paused = $state(!!initial.running?.paused);
 	$effect(() =>
 		app.onFlow((id, e) => {
 			if (id !== instanceId || e.flowId !== flow.id) return;
-			if (e.state === 'started') {
+			if (e.state === 'paused' || e.state === 'resumed') paused = e.state === 'paused';
+			else if (e.state === 'started') {
 				isRunning = true;
+				paused = false;
 				live.error = live.message = undefined;
 			} else if (e.state === 'step') live.step = e.step;
 			else if (e.state === 'done' || e.state === 'error') {
@@ -133,10 +139,15 @@
 	}
 
 	let waypoints = $state<string[]>([]);
+	let otherFlows = $state<{ id: string; name: string }[]>([]);
 	let pearls = $state<Pearl[]>([]);
 	$effect(() => {
 		api.get<{ waypoints?: { id: string }[] }>(`/instances/${instanceId}/details`).then(
 			(d) => (waypoints = (d.waypoints ?? []).map((w) => w.id)),
+			() => {}
+		);
+		api.get<Flow[]>(`/instances/${instanceId}/flows`).then(
+			(list) => (otherFlows = list.filter((f) => f.id !== flow.id).map((f) => ({ id: f.id, name: f.name }))),
 			() => {}
 		);
 		if (capabilities.includes('PEARLS')) api.get<Pearl[]>(`/instances/${instanceId}/pearls`).then((p) => (pearls = p), () => {});
@@ -145,7 +156,7 @@
 	// --- the editor context every block reads ---
 	let picking = $state<{ list: FlowStep[]; index: number } | null>(null);
 	let drag = $state<{ list: FlowStep[]; index: number; step: FlowStep } | null>(null);
-	let textTarget: { obj: Record<string, unknown>; key: string } | null = null;
+	let textTarget: { obj: Record<string, unknown>; key: string; replace?: boolean } | null = null;
 	// "notify me" also pops a system notification once the browser allows it (needs https or localhost)
 	let permission = $state(typeof Notification === 'undefined' ? 'unsupported' : Notification.permission);
 	const hasNotify = $derived(JSON.stringify(flow.steps).includes('"type":"notify"'));
@@ -159,6 +170,9 @@
 		},
 		get waypoints() {
 			return waypoints;
+		},
+		get flows() {
+			return otherFlows;
 		},
 		get pearls() {
 			return pearls;
@@ -194,12 +208,13 @@
 			return;
 		}
 		const current = String(textTarget.obj[textTarget.key] ?? '');
-		textTarget.obj[textTarget.key] = (current && !current.endsWith(' ') ? current + ' ' : current) + `{${name}}`;
+		textTarget.obj[textTarget.key] = textTarget.replace ? `{${name}}` : (current && !current.endsWith(' ') ? current + ' ' : current) + `{${name}}`;
 	}
 
 	const gives = $derived(triggerDef(flow.trigger.kind).gives);
 	const vars = $derived(variablesIn(flow.steps));
-	const chips = $derived([...new Set([...gives, ...vars, ...always])]);
+	const local = $derived(valuesIn(flow.steps));
+	const chips = $derived([...new Set([...gives, ...local, ...vars, ...always])]);
 	const blockCount = $derived(countSteps(flow.steps));
 	const timed = $derived(['manual', 'every', 'daily'].includes(flow.trigger.kind));
 	// a flow that connects first can run while the bot is offline
@@ -228,6 +243,44 @@
 	async function runNow() {
 		if (dirty && !(await save())) return;
 		await attempt(() => api.post(`/instances/${instanceId}/flows/${flow.id}/run`));
+	}
+
+	// a test run: the trigger's values, made up, so the flow can be tried without waiting for it
+	let testing = $state<Record<string, string> | null>(null);
+	const samples: Record<string, string> = {
+		player: 'Steve',
+		message: 'hello there',
+		entity: 'zombie',
+		distance: '6',
+		x: '100',
+		y: '64',
+		z: '-200',
+		item: 'totem_of_undying',
+		count: '1',
+		block: 'air',
+		previous: 'chest',
+		why: 'kicked',
+		dimension: 'the_nether',
+		error: 'Something went wrong',
+		flow: 'Another flow'
+	};
+	function openTest() {
+		menuOpen = false;
+		testing = Object.fromEntries(gives.map((g) => [g, samples[g] ?? '']));
+	}
+	async function testRun() {
+		if (!testing) return;
+		if (dirty && !(await save())) return;
+		const sample = Object.fromEntries(
+			Object.entries(testing)
+				.filter(([, v]) => v.trim() !== '')
+				.map(([k, v]) => [k, /^-?\d+(\.\d+)?$/.test(v.trim()) ? Number(v) : v])
+		);
+		if (await attempt(() => api.post(`/instances/${instanceId}/flows/${flow.id}/run`, { sample }))) testing = null;
+	}
+
+	async function setPaused(on: boolean) {
+		await attempt(() => api.post(`/instances/${instanceId}/flows/${flow.id}/${on ? 'pause' : 'resume'}`));
 	}
 
 	async function stopRun() {
@@ -267,6 +320,8 @@
 		if (await attempt(() => api.put(`/instances/${id}/flows/${copy.id}`, copy), `Copied to ${name}, switched off`)) copyingTo = false;
 	}
 
+	const blocksList = ['chest', 'barrel', 'shulker_box', 'ender_chest', 'crafting_table', 'furnace', 'obsidian', 'diamond_ore', 'deepslate_diamond_ore', 'ancient_debris', 'stone', 'cobblestone', 'air'];
+	const mobs = ['zombie', 'skeleton', 'creeper', 'spider', 'enderman', 'piglin', 'wither_skeleton', 'villager', 'cow', 'sheep', 'pig', 'chicken', 'item_frame'];
 	const items = ['totem_of_undying', 'ender_pearl', 'golden_apple', 'enchanted_golden_apple', 'end_crystal', 'obsidian', 'experience_bottle', 'firework_rocket'];
 </script>
 
@@ -279,6 +334,9 @@
 
 <datalist id="flow-vars">{#each vars as v}<option value={v}></option>{/each}</datalist>
 <datalist id="flow-items">{#each items as i}<option value={i}></option>{/each}</datalist>
+<datalist id="flow-blocks">{#each blocksList as b}<option value={b}></option>{/each}</datalist>
+<datalist id="flow-mobs">{#each mobs as m}<option value={m}></option>{/each}</datalist>
+<datalist id="flow-waypoints">{#each waypoints as w}<option value={w}></option>{/each}</datalist>
 
 <div class="mx-auto w-full max-w-3xl">
 	<!-- header: name, on/off, run and save -->
@@ -300,6 +358,9 @@
 			>
 			<button class="btn-ghost hidden p-1.5 sm:inline-flex" aria-label="Redo" title="Redo (Ctrl+Shift+Z)" disabled={!future.length} onclick={redo}><Redo2 size={16} /></button>
 			{#if isRunning}
+				<button class="btn-ghost p-1.5" aria-label={paused ? 'Go on' : 'Pause'} title={paused ? 'Go on' : 'Pause before the next block'} onclick={() => setPaused(!paused)}
+					>{#if paused}<Play size={16} />{:else}<Pause size={16} />{/if}</button
+				>
 				<button class="btn-secondary py-1.5" onclick={stopRun}><Square size={14} /> Stop</button>
 			{:else}
 				<button
@@ -326,6 +387,12 @@
 							class="flex w-full items-center gap-2 px-3 py-1.5 hover:bg-zinc-800 disabled:opacity-40 sm:hidden"
 							disabled={!future.length}
 							onclick={() => ((menuOpen = false), redo())}><Redo2 size={14} /> Redo</button
+						>
+						<button
+							type="button"
+							class="flex w-full items-center gap-2 px-3 py-1.5 hover:bg-zinc-800 disabled:opacity-40"
+							disabled={isRunning || (!running && !connects)}
+							onclick={openTest}><FlaskConical size={14} /> Test run with made-up values</button
 						>
 						<button type="button" class="flex w-full items-center gap-2 px-3 py-1.5 hover:bg-zinc-800" onclick={copyCode}><Copy size={14} /> Copy flow code</button>
 						{#if !isNew || everSaved}
@@ -368,10 +435,16 @@
 							type="button"
 							class="rounded px-1.5 py-px font-mono hover:bg-black/40 {vars.includes(g)
 								? 'bg-lime-800 text-white'
-								: gives.includes(g)
+								: gives.includes(g) || local.includes(g)
 									? 'bg-black/30 text-white'
 									: 'bg-black/15 text-white/70'}"
-							title={vars.includes(g) ? 'A variable of this flow' : gives.includes(g) ? 'From the trigger' : 'From the bot'}
+							title={vars.includes(g)
+								? 'A variable of this flow'
+								: gives.includes(g)
+									? 'From the trigger'
+									: local.includes(g)
+										? 'From a block of this flow'
+										: 'From the bot'}
 							onmousedown={(e) => e.preventDefault()}
 							onclick={() => addValue(g)}>{`{${g}}`}</button
 						>
@@ -399,6 +472,34 @@
 				</select>
 			</label>
 		{/if}
+		{#if !timed}
+			<label class="flex flex-wrap items-center gap-x-2 gap-y-1">
+				Only start once it happened
+				<select
+					class="{SELECT} bg-zinc-900 text-zinc-200"
+					aria-label="How often"
+					value={flow.burst?.count ?? 1}
+					onchange={(e) => {
+						const count = Number((e.currentTarget as HTMLSelectElement).value);
+						if (count > 1) flow.burst = { count, seconds: flow.burst?.seconds ?? 60 };
+						else delete flow.burst;
+					}}
+				>
+					<option value={1}>once</option>
+					{#each [2, 3, 5, 10, 20] as c}<option value={c}>{c} times</option>{/each}
+				</select>
+				{#if flow.burst}
+					within
+					<select class="{SELECT} bg-zinc-900 text-zinc-200" aria-label="Within" bind:value={flow.burst.seconds}>
+						<option value={10}>10 seconds</option>
+						<option value={30}>30 seconds</option>
+						<option value={60}>a minute</option>
+						<option value={300}>5 minutes</option>
+						<option value={3600}>an hour</option>
+					</select>
+				{/if}
+			</label>
+		{/if}
 		<label class="flex items-center gap-2">
 			If it’s still running:
 			<select class="{SELECT} bg-zinc-900 text-zinc-200" bind:value={flow.mode}>
@@ -419,12 +520,39 @@
 	{/if}
 
 	{#if !isNew || everSaved}
-		<FlowActivity {instanceId} flowId={flow.id} onshow={(step, message) => show(step, 'This run stopped here: ' + message)} />
+		<FlowActivity
+			{instanceId}
+			flowId={flow.id}
+			onshow={(step, message) => show(step, 'This run stopped here: ' + message)}
+			ontimings={(t) => (live.timings = t)}
+		/>
 	{/if}
 </div>
 
 {#if picking}
 	<BlockPicker {capabilities} onpick={insert} onclose={() => (picking = null)} />
+{/if}
+
+{#if testing}
+	<Modal title="Test run" onclose={() => (testing = null)}>
+		<p class="mb-3 text-sm text-zinc-400">
+			Runs the flow now, as if its trigger had happened with these values. The blocks really run, so the bot moves and chats like it would.
+		</p>
+		{#if Object.keys(testing).length}
+			<div class="grid grid-cols-[auto_1fr] items-center gap-x-3 gap-y-2">
+				{#each Object.keys(testing) as k (k)}
+					<label class="font-mono text-xs text-zinc-400" for="sample-{k}">{`{${k}}`}</label>
+					<input id="sample-{k}" class="input py-1.5" maxlength="100" bind:value={testing[k]} />
+				{/each}
+			</div>
+		{:else}
+			<p class="text-sm text-zinc-500">This trigger has no values of its own.</p>
+		{/if}
+		<div class="mt-4 flex justify-end gap-2">
+			<button class="btn-ghost" onclick={() => (testing = null)}>Cancel</button>
+			<button class="btn-primary" onclick={testRun}><FlaskConical size={14} /> Run the test</button>
+		</div>
+	</Modal>
 {/if}
 
 {#if copyingTo}

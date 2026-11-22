@@ -92,6 +92,7 @@ public final class ControlServer {
         server.createContext("/v1/status", ex -> handle(ex, "GET", this::status));
         server.createContext("/v1/command", ex -> handle(ex, "POST", this::command));
         server.createContext("/v1/details", ex -> handle(ex, "GET", this::details));
+        server.createContext("/v1/block", ex -> handle(ex, "GET", this::block));
         server.createContext("/v1/shutdown", ex -> handle(ex, "POST", this::shutdown));
         server.createContext("/v1/events", this::events);
         // ZenithHub plugins: their own routes, and their settings changing live
@@ -209,6 +210,7 @@ public final class ControlServer {
             var dimension = CACHE.getChunkCache().getCurrentDimension();
             pos.addProperty("dimension", nonNull(dimension) ? dimension.name() : null);
             json.add("position", pos);
+            FlowStatus.add(json);
         }
         var controller = proxy.getCurrentPlayer().get();
         json.addProperty("controller", nonNull(controller) ? controller.getName() : null);
@@ -219,6 +221,25 @@ public final class ControlServer {
         var afk = MODULE.get(AfkZone.class);
         if (afk.inUse()) json.add("afkZone", afk.json());
         return json;
+    }
+
+    /** {@code /v1/block?x=&y=&z=}: the block there, for flows. */
+    private JsonObject block(HttpExchange ex) {
+        var query = ex.getRequestURI().getQuery();
+        var values = new java.util.HashMap<String, Integer>();
+        if (query != null) {
+            for (var part : query.split("&")) {
+                var kv = part.split("=", 2);
+                if (kv.length == 2) values.put(kv[0], Integer.parseInt(kv[1]));
+            }
+        }
+        if (!values.containsKey("x") || !values.containsKey("y") || !values.containsKey("z")) throw new IllegalArgumentException("missing x, y or z");
+        if (!inGame(Proxy.getInstance())) {
+            var json = new JsonObject();
+            json.addProperty("loaded", false);
+            return json;
+        }
+        return FlowStatus.block(values.get("x"), values.get("y"), values.get("z"));
     }
 
     private JsonObject details(HttpExchange ex) {

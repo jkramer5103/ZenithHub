@@ -142,6 +142,23 @@ public final class ManagerMain {
             }
 
             @Override
+            public JsonObject block(String instanceId, int x, int y, int z) throws Exception {
+                return supervisor.isRunning(instanceId) ? supervisor.block(instanceId, x, y, z) : null;
+            }
+
+            /** Web requests from flows go out like the account's other requests. */
+            @Override
+            public java.net.InetSocketAddress proxy(String instanceId) {
+                var accountId = store.read(s -> s.instances.stream().filter(i -> i.id.equals(instanceId)).findFirst().map(i -> i.accountId).orElse(null));
+                return accountId != null ? proxies.forAccount(accountId) : proxies.global();
+            }
+
+            @Override
+            public boolean isAdmin(String userId) {
+                return store.read(s -> s.users.stream().anyMatch(u -> u.id.equals(userId) && u.admin));
+            }
+
+            @Override
             public Set<Capability> capabilities(String instanceId, String userId) {
                 return store.read(s -> {
                     var user = s.users.stream().filter(u -> u.id.equals(userId)).findFirst().orElse(null);

@@ -1,12 +1,19 @@
 <script lang="ts">
 	// a condition, inline: for "if", "repeat until" and "wait until"
-	import { conditions, dimensions, makeCondition } from '#lib/flow-blocks.js';
+	import { conditions, dimensions, makeCondition, scopes } from '#lib/flow-blocks.js';
 	import type { FlowCondition } from '#lib/types.js';
+	import { Plus, X } from '@lucide/svelte';
+	import Condition from './Condition.svelte';
 	import { SELECT, SLOT, editor } from './context.js';
+	import EntityFilter from './EntityFilter.svelte';
 
-	let { cond = $bindable() }: { cond: FlowCondition } = $props();
+	let { cond = $bindable(), depth = 0 }: { cond: FlowCondition; depth?: number } = $props();
 	const ctx = editor();
-	const groups = [...new Set(conditions.map((c) => c.group))];
+	// groups nest up to 4 deep (FlowSpec.MAX_COND_DEPTH)
+	const groups = $derived([...new Set(conditions.filter((c) => depth < 3 || (c.kind !== 'all' && c.kind !== 'any')).map((c) => c.group))]);
+	const shown = $derived(conditions.filter((c) => depth < 3 || (c.kind !== 'all' && c.kind !== 'any')));
+	const inner = $derived((cond.conds ?? []) as FlowCondition[]);
+	const optNum = (v: string) => (v.trim() === '' ? null : Number(v));
 </script>
 
 <select class={SELECT} aria-label="Yes or not" bind:value={cond.not}>
@@ -16,7 +23,7 @@
 <select class={SELECT} aria-label="Condition" value={cond.kind} onchange={(e) => (cond = makeCondition((e.currentTarget as HTMLSelectElement).value, cond.not))}>
 	{#each groups as g}
 		<optgroup label={g}>
-			{#each conditions.filter((c) => c.group === g) as c}<option value={c.kind}>{c.label}</option>{/each}
+			{#each shown.filter((c) => c.group === g) as c}<option value={c.kind}>{c.label}</option>{/each}
 		</optgroup>
 	{/each}
 </select>
@@ -45,6 +52,15 @@
 	/>
 {:else if cond.kind === 'near'}
 	<input class="{SLOT} w-16 text-center" inputmode="numeric" placeholder="x" aria-label="X" bind:value={cond.x} />
+	<input
+		class="{SLOT} w-14 text-center"
+		inputmode="numeric"
+		placeholder="y"
+		title="Leave empty to ignore the height"
+		aria-label="Y"
+		value={cond.y ?? ''}
+		oninput={(e) => (cond.y = optNum(e.currentTarget.value))}
+	/>
 	<input class="{SLOT} w-16 text-center" inputmode="numeric" placeholder="z" aria-label="Z" bind:value={cond.z} />
 	<span>within</span>
 	<input class="{SLOT} w-14 text-center" inputmode="numeric" aria-label="Radius" bind:value={cond.radius} />
@@ -53,6 +69,58 @@
 	<select class={SELECT} aria-label="Dimension" bind:value={cond.is}>
 		{#each dimensions as d}<option value={d.value}>{d.label}</option>{/each}
 	</select>
+{:else if cond.kind === 'entityNear'}
+	<EntityFilter filter={cond} />
+{:else if cond.kind === 'holding'}
+	<input
+		class="{SLOT} field-sizing-content min-w-28 font-mono text-xs"
+		placeholder="item id"
+		maxlength="74"
+		autocapitalize="off"
+		spellcheck="false"
+		aria-label="Item"
+		list="flow-items"
+		bind:value={cond.item}
+	/>
+{:else if cond.kind === 'block'}
+	<input class="{SLOT} w-16 text-center" inputmode="numeric" placeholder="x" aria-label="X" bind:value={cond.x} />
+	<input class="{SLOT} w-14 text-center" inputmode="numeric" placeholder="y" aria-label="Y" bind:value={cond.y} />
+	<input class="{SLOT} w-16 text-center" inputmode="numeric" placeholder="z" aria-label="Z" bind:value={cond.z} />
+	<span>is</span>
+	<input
+		class="{SLOT} field-sizing-content min-w-20 font-mono text-xs"
+		placeholder="block id"
+		maxlength="74"
+		autocapitalize="off"
+		spellcheck="false"
+		aria-label="Block"
+		list="flow-blocks"
+		bind:value={cond.is}
+	/>
+{:else if cond.kind === 'result'}
+	<select class={SELECT} aria-label="Result" bind:value={cond.is}>
+		<option value="done">finished</option>
+		<option value="timeout">ran out of time</option>
+		<option value="failed">failed</option>
+	</select>
+{:else if cond.kind === 'all' || cond.kind === 'any'}
+	<div class="flex w-full flex-col gap-1 border-l-2 border-white/30 pl-2">
+		{#each inner as _, i (i)}
+			<div class="flex flex-wrap items-center gap-x-1.5 gap-y-1">
+				<Condition bind:cond={inner[i]} depth={depth + 1} />
+				{#if inner.length > 1}
+					<button type="button" class="rounded p-0.5 text-white/60 hover:bg-black/20 hover:text-white" aria-label="Remove this condition" onclick={() => inner.splice(i, 1)}
+						><X size={13} /></button
+					>
+				{/if}
+			</div>
+		{/each}
+		<button
+			type="button"
+			class="inline-flex w-fit items-center gap-1 rounded px-1.5 py-0.5 text-xs font-normal text-white/70 hover:bg-black/20 hover:text-white"
+			onclick={() => (cond.conds = [...inner, makeCondition('online')])}><Plus size={12} /> {cond.kind === 'all' ? 'and' : 'or'} …</button
+		>
+	</div>
 {:else if cond.kind === 'var'}
 	<input
 		class="{SLOT} field-sizing-content min-w-16 font-mono text-xs"
@@ -79,6 +147,9 @@
 		bind:value={cond.value}
 		onfocus={() => ctx.focusText({ obj: cond as Record<string, unknown>, key: 'value' })}
 	/>
+	<select class="{SELECT} text-xs" aria-label="Whose variable" bind:value={() => cond.scope ?? 'flow', (v) => (cond.scope = v)}>
+		{#each scopes as o}<option value={o.value}>in {o.label}</option>{/each}
+	</select>
 {:else if cond.kind === 'time'}
 	<input type="time" class="{SLOT} [color-scheme:dark]" aria-label="From" required bind:value={cond.from} />
 	<span>and</span>

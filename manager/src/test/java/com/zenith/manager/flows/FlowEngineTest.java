@@ -341,4 +341,143 @@ class FlowEngineTest {
         assertEquals(FlowEngine.CHAT_LIMIT, bot.commands.size());
         engine.stop("i1", "f");
     }
+
+    @Test void entityComingIntoRangeStartsAFlow() throws Exception {
+        var bot = new FakeBot();
+        var hub = new EventHub();
+        var engine = new FlowEngine(dir, bot, hub);
+        engine.save("i1", json("""
+            {'id':'f','name':'F','enabled':true,'cooldown':0,'trigger':{'kind':'entityNear','what':'stranger','radius':10},
+             'steps':[{'id':'a','type':'say','text':'{player} at {distance}'}]}"""), "u1", "alice");
+        hub.publish("runtime", "i1", runtime("RUNNING", "{'online':true,'entities':[{'id':1,'kind':'player','name':'Steve','distance':30,'friend':false}]}"));
+        hub.publish("runtime", "i1", runtime("RUNNING", "{'online':true,'entities':[{'id':1,'kind':'player','name':'Steve','distance':20,'friend':false},{'id':2,'kind':'hostile','type':'zombie','distance':3}]}"));
+        Thread.sleep(100);
+        assertTrue(bot.commands.isEmpty(), "still too far, and a zombie isn't a stranger");
+        hub.publish("runtime", "i1", runtime("RUNNING", "{'online':true,'entities':[{'id':1,'kind':'player','name':'Steve','distance':8,'friend':false}]}"));
+        await(bot, 1);
+        assertEquals(List.of("say Steve at 8"), bot.commands);
+        var mobs = json("{'what':'hostile','radius':5}");
+        assertEquals(1, FlowEngine.near(mobs, JsonParser.parseString("[{'id':2,'kind':'hostile','type':'zombie','distance':3}]".replace('\'', '"'))).size());
+    }
+
+    @Test void actionsTakeValues() throws Exception {
+        var bot = new FakeBot();
+        var engine = new FlowEngine(dir, bot, new EventHub());
+        engine.save("i1", json("""
+            {'id':'f','name':'F','trigger':{'kind':'entityNear','what':'type','mob':'zombie','radius':8},
+             'steps':[{'id':'a','type':'action','run':{'action':'follow','player':'{player}'}},
+                      {'id':'b','type':'action','run':{'action':'goto','x':'{x}','y':'{y}','z':'{z}'}},
+                      {'id':'c','type':'action','run':{'action':'mine','block':'{item}'}}]}"""), "u1", "alice");
+        engine.runNow("i1", "f", json("{'player':'Steve','x':10.7,'y':64,'z':-3.2,'item':'diamond_ore'}"));
+        await(bot, 3);
+        assertEquals(List.of("pathfinder follow Steve", "pathfinder goto 10 64 -4", "pathfinder mine diamond_ore"), bot.commands);
+        // a {value} in a fixed choice is still checked as it is
+        assertThrows(IllegalArgumentException.class, () -> engine.save("i1", json("""
+            {'id':'g','name':'G','trigger':{'kind':'manual'},'steps':[{'id':'a','type':'action','run':{'action':'module','module':'{x}','on':true}}]}"""), "u1", "alice"));
+        var zombies = json("{'what':'type','mob':'zombie','radius':5}");
+        assertEquals(1, FlowEngine.near(zombies, JsonParser.parseString("[{'id':2,'kind':'hostile','type':'zombie','distance':3},{'id':3,'kind':'hostile','type':'skeleton','distance':3}]".replace('\'', '"'))).size());
+    }
+
+    @Test void reconnectDisconnectsWaitsAndConnects() throws Exception {
+        var bot = new FakeBot();
+        var engine = new FlowEngine(dir, bot, new EventHub());
+        engine.save("i1", json("""
+            {'id':'f','name':'F','trigger':{'kind':'manual'},'steps':[{'id':'a','type':'reconnect','seconds':0,'timeout':5}]}"""), "u1", "alice");
+        engine.runNow("i1", "f");
+        await(bot, 2);
+        Thread.sleep(100);
+        assertEquals(List.of("disconnect", "connect"), bot.commands);
+        assertTrue(engine.list("i1").get(0).getAsJsonObject().getAsJsonObject("last").get("ok").getAsBoolean());
+    }
+
+    @Test void tryCatchKeepGoingAndFlowFailed() throws Exception {
+        var bot = new FakeBot();
+        var hub = new EventHub();
+        var engine = new FlowEngine(dir, bot, hub);
+        // whispering to a value that isn't a name fails
+        engine.save("i1", json("""
+            {'id':'f','name':'Risky','trigger':{'kind':'manual'},
+             'steps':[{'id':'a','type':'try','steps':[{'id':'b','type':'whisper','player':'{nobody}','text':'hi'}],
+                       'catch':[{'id':'c','type':'notify','text':'caught {error}'}]},
+                      {'id':'d','type':'whisper','player':'{nobody}','text':'hi','keepGoing':true},
+                      {'id':'e','type':'notify','text':'still here, {result}'},
+                      {'id':'f2','type':'whisper','player':'{nobody}','text':'hi'}]}"""), "u1", "alice");
+        engine.save("i1", json("""
+            {'id':'watch','name':'Watch','enabled':true,'cooldown':0,'trigger':{'kind':'flowFailed','flow':''},
+             'steps':[{'id':'a','type':'notify','text':'{flow} failed'}]}"""), "u1", "alice");
+        engine.runNow("i1", "f");
+        await(bot, 3);
+        assertEquals("notify caught Not a player to whisper to: (empty)", bot.commands.get(0));
+        assertEquals("notify still here, failed", bot.commands.get(1));
+        assertEquals("notify Risky failed", bot.commands.get(2));
+    }
+
+    @Test void conditionGroupsAndScopedVariables() throws Exception {
+        var bot = new FakeBot();
+        var engine = new FlowEngine(dir, bot, new EventHub());
+        engine.save("i1", json("""
+            {'id':'a','name':'A','trigger':{'kind':'manual'},
+             'steps':[{'id':'s','type':'set','scope':'bot','name':'target','value':'Alex'}]}"""), "u1", "alice");
+        engine.save("i1", json("""
+            {'id':'b','name':'B','trigger':{'kind':'manual'},
+             'steps':[{'id':'i','type':'if','cond':{'kind':'all','conds':[{'kind':'online'},{'kind':'any','conds':[{'kind':'health','below':5},{'kind':'var','scope':'bot','name':'target','op':'=','value':'alex'}]}]},
+                       'then':[{'id':'t','type':'say','text':'go {target}'}],'else':[]}]}"""), "u1", "alice");
+        engine.runNow("i1", "a");
+        Thread.sleep(100);
+        engine.runNow("i1", "b");
+        await(bot, 1);
+        assertEquals(List.of("say go Alex"), bot.commands);
+        assertEquals("Alex", engine.activity("i1", "b").getAsJsonObject("botVariables").get("target").getAsString());
+    }
+
+    @Test void moreTriggers() {
+        var engine = new FlowEngine(dir, new FakeBot(), new EventHub());
+        assertEquals("network", FlowEngine.why(json("{'lastDisconnectReason':'The server didn\\u0027t respond in time.'}")));
+        assertEquals("banned", FlowEngine.why(json("{'lastDisconnectReason':'x','ban':{'reason':'x'}}")));
+        assertEquals("me", FlowEngine.why(json("{}")));
+        assertEquals("kicked", FlowEngine.why(json("{'lastDisconnectReason':'Server closed'}")));
+        var mention = json("{'kind':'chat','contains':'','from':'','match':'mention'}");
+        assertTrue(FlowEngine.matches(mention, json("{'event':'chat','message':'hey bob_bot come here','me':'Bob_Bot'}")));
+        assertFalse(FlowEngine.matches(mention, json("{'event':'chat','message':'hey bob_bots','me':'Bob_Bot'}")));
+        var starts = json("{'kind':'whisper','contains':'!tp','from':'','match':'starts'}");
+        assertTrue(FlowEngine.matches(starts, json("{'event':'whisper','message':'!tp home'}")));
+        assertFalse(FlowEngine.matches(starts, json("{'event':'whisper','message':'please !tp'}")));
+        var lowTotems = json("{'kind':'itemBelow','item':'totem_of_undying','count':2}");
+        assertNotNull(FlowEngine.hit(lowTotems, json("{'event':'items','now':{'totem_of_undying':1},'before':{'totem_of_undying':2}}")));
+        assertNull(FlowEngine.hit(lowTotems, json("{'event':'items','now':{'totem_of_undying':0},'before':{'totem_of_undying':1}}")));
+        var worn = json("{'kind':'durability','percent':10}");
+        var hit = FlowEngine.hit(worn, json("{'event':'durability','now':[{'slot':'main_hand','item':'diamond_pickaxe','left':150,'max':1561}],'before':[{'slot':'main_hand','item':'diamond_pickaxe','left':160,'max':1561}]}"));
+        assertNotNull(hit);
+        assertEquals("diamond_pickaxe", hit.get("item").getAsString());
+        engine.changes("i1", runtime("RUNNING", "{'online':true,'position':{'x':0,'y':70,'z':0,'dimension':'overworld'}}"));
+        var nether = engine.changes("i1", runtime("RUNNING", "{'online':true,'position':{'x':0,'y':-10,'z':0,'dimension':'the_nether'}}"));
+        assertTrue(nether.stream().anyMatch(e -> FlowEngine.matches(json("{'kind':'dimension','to':'the_nether'}"), e)), nether.toString());
+        assertTrue(nether.stream().anyMatch(e -> FlowEngine.matches(json("{'kind':'yBelow','y':0}"), e)));
+    }
+
+    @Test void burstNeedsSeveralTriggers() throws Exception {
+        var bot = new FakeBot();
+        var hub = new EventHub();
+        var engine = new FlowEngine(dir, bot, hub);
+        engine.save("i1", json("""
+            {'id':'f','name':'F','enabled':true,'cooldown':0,'burst':{'count':3,'seconds':60},'trigger':{'kind':'attacked'},
+             'steps':[{'id':'a','type':'notify','text':'under attack'}]}"""), "u1", "alice");
+        hub.publish("game", "i1", json("{'event':'attacked'}"));
+        hub.publish("game", "i1", json("{'event':'attacked'}"));
+        Thread.sleep(100);
+        assertTrue(bot.commands.isEmpty());
+        hub.publish("game", "i1", json("{'event':'attacked'}"));
+        await(bot, 1);
+        assertEquals(List.of("notify under attack"), bot.commands);
+    }
+
+    @Test void testRunsUseSampleValues() throws Exception {
+        var bot = new FakeBot();
+        var engine = new FlowEngine(dir, bot, new EventHub());
+        engine.save("i1", json("""
+            {'id':'f','name':'F','trigger':{'kind':'whisper'},'steps':[{'id':'a','type':'say','text':'hi {player}: {message}'}]}"""), "u1", "alice");
+        engine.runNow("i1", "f", json("{'player':'Steve','message':'yo','event':'nope'}"));
+        await(bot, 1);
+        assertEquals(List.of("say hi Steve: yo"), bot.commands);
+    }
 }

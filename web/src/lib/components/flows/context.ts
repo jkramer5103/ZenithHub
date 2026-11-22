@@ -8,12 +8,14 @@ export interface EditorContext {
 	pearls: Pearl[];
 	/** the other bots this user controls, for "broadcast to" */
 	bots: { id: string; name: string }[];
+	/** this bot's other flows, for "run another flow" and "another flow fails" */
+	flows: { id: string; name: string }[];
 	/** the running block, and the one the last run failed on */
-	live: { step?: string; error?: string; message?: string };
+	live: { step?: string; error?: string; message?: string; /** ms per block, from the last run */ timings?: Record<string, number> };
 	/** opens the block picker; the block goes into list at index */
 	pick: (list: FlowStep[], index: number) => void;
-	/** the text field {player} chips type into */
-	focusText: (target: { obj: Record<string, unknown>; key: string } | null) => void;
+	/** the text field {player} chips type into; replace: the chip becomes the whole value (numbers, names) */
+	focusText: (target: { obj: Record<string, unknown>; key: string; replace?: boolean } | null) => void;
 	/** drag and drop (desktop): the block being dragged, and where it may land */
 	drag: { list: FlowStep[]; index: number; step: FlowStep } | null;
 	startDrag: (list: FlowStep[], index: number) => void;

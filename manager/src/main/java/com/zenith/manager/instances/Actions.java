@@ -24,6 +24,10 @@ public final class Actions {
 
     public record Command(Capability capability, String command) {}
 
+    /** Modules a flow or the UI may switch on and off, by command name. The bot refuses cheats when they're disabled. */
+    public static final Set<String> MODULES = Set.of("autoEat", "antiAFK", "autoReconnect", "autoRespawn", "visualRange", "autoDisconnect",
+        "killAura", "autoTotem", "autoArmor", "autoFish", "autoMend", "spammer", "autoReply", "autoDrop", "spook");
+
     private Actions() {}
 
     public static Command parse(JsonObject body) {
@@ -90,6 +94,13 @@ public final class Actions {
             case "afkKeep" -> new Command(Capability.CONTROL, "afkZone keep " + (bool(body, "keep") ? "on" : "off"));
             case "afkEnter" -> play("afkZone enter");
             case "afkLeave" -> play("afkZone leave");
+
+            // --- modules: switching one on or off is a settings change ---
+            case "module" -> {
+                var module = string(body, "module");
+                if (!MODULES.contains(module)) throw new IllegalArgumentException("Unknown module: " + module);
+                yield new Command(Capability.SETTINGS, module + " " + (bool(body, "on") ? "on" : "off"));
+            }
 
             // --- pearls ---
             case "loadPearl" -> new Command(Capability.PEARLS, "pearlLoader load " + id(body, "pearl"));

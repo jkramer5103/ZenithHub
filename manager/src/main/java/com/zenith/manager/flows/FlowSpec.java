@@ -18,7 +18,9 @@ import java.util.regex.Pattern;
  *
  * <pre>
  * {id, name, enabled, cooldown, mode, trigger: {kind, …}, steps: [step…]}
- * step: {id, type, …}; "if" has cond, then, else; "repeat", "forever" and "repeatUntil" have steps
+ * step: {id, type, off?, keepGoing?, …}; "if" has cond, then, else; "try" has steps and catch; "repeat",
+ * "forever", "repeatUntil" and "forEach" have steps
+ * cond: {kind, not, …}; "all" and "any" have conds
  * </pre>
  */
 public final class FlowSpec {
@@ -31,19 +33,36 @@ public final class FlowSpec {
     static final int MAX_STEPS = 200;
     static final int MAX_DEPTH = 8;
     static final int MAX_WAIT = 3600;
+    /** Conditions inside "all"/"any" groups. */
+    static final int MAX_COND_DEPTH = 4;
+    static final int MAX_CONDS = 20;
 
     /** What a flow can start on. */
     public static final Set<String> TRIGGERS = Set.of("manual", "every", "daily", "chat", "whisper", "player", "playerLeft", "attacked", "totem",
         "noTotems", "health", "food", "death", "joined", "left", "crashed", "queueComplete", "queueBelow", "serverRestarting", "controlled", "afk",
-        "receive", "onlineFor", "unattended", "arrived", "proxyJoin", "proxyLeave");
+        "receive", "onlineFor", "unattended", "arrived", "proxyJoin", "proxyLeave", "entityNear", "entityLeft", "serverJoin", "serverLeave",
+        "outOfFood", "dimension", "respawned", "yBelow", "damaged", "itemBelow", "itemAbove", "inventoryFull", "durability", "containerOpened",
+        "containerClosed", "tpsBelow", "weather", "blockChanged", "flowFailed", "pathDone");
     /** What "wait until" can wait for: the events among the triggers. */
     static final Set<String> WAITABLE = Set.of("chat", "whisper", "player", "playerLeft", "attacked", "totem", "health", "food", "death", "joined",
-        "left", "queueComplete", "queueBelow", "controlled", "afk", "receive", "arrived", "proxyJoin", "proxyLeave");
+        "left", "queueComplete", "queueBelow", "controlled", "afk", "receive", "arrived", "proxyJoin", "proxyLeave", "entityNear", "entityLeft",
+        "serverJoin", "serverLeave", "outOfFood", "dimension", "respawned", "yBelow", "damaged", "itemBelow", "itemAbove", "inventoryFull",
+        "durability", "containerOpened", "containerClosed", "tpsBelow", "weather", "blockChanged", "pathDone");
     static final Set<String> CONDITIONS = Set.of("health", "food", "playing", "online", "inQueue", "inAfkZone", "earning", "text", "friend",
-        "time", "chance", "var", "near", "dimension", "hasItem");
+        "time", "chance", "var", "near", "dimension", "hasItem", "all", "any", "entityNear", "pathing", "containerOpen", "inventoryFull",
+        "holding", "block", "alive", "raining", "result");
     /** Values every message can use, so they can't be variable names. */
     static final Set<String> RESERVED = Set.of("player", "message", "health", "food", "x", "y", "z", "time", "date", "server", "dimension",
-        "totemsLeft", "position", "previous", "reason", "from", "fromBot");
+        "totemsLeft", "position", "previous", "reason", "from", "fromBot", "yaw", "pitch", "ping", "tps", "held", "freeSlots", "nearestPlayer",
+        "nearestDistance", "result", "response", "code", "error", "each", "eachCount", "eachDistance", "entity", "distance", "item", "block", "flow", "why",
+        "count");
+    /** Who or what "entity near" looks for. */
+    static final Set<String> ENTITY_WHAT = Set.of("anyone", "stranger", "friend", "player", "hostile", "mob", "type", "item", "vehicle", "any");
+    /** Actions that drive the pathfinder, so a flow can wait until they're done. */
+    static final Set<String> PATHING = Set.of("goto", "gotoWaypoint", "elytra", "thisway", "getTo", "mine", "pickup", "near", "clickBlock",
+        "clickEntity", "breakBlock", "placeBlock", "clearArea", "follow");
+    static final Set<String> SCOPES = Set.of("flow", "bot", "shared");
+    static final Set<String> LISTS = Set.of("nearbyPlayers", "nearbyEntities", "proxyPlayers", "inventory");
     /** Actions with blocks of their own, or that would let a flow type commands. */
     private static final Set<String> NOT_AS_ACTION = Set.of("command", "notify");
 
@@ -74,6 +93,13 @@ public final class FlowSpec {
         var mode = in.has("mode") ? string(in, "mode") : "ignore";
         if (!mode.equals("ignore") && !mode.equals("restart")) throw new IllegalArgumentException("Unknown mode " + mode);
         out.addProperty("mode", mode);
+        // only start once the trigger happened this often in a short time
+        if (in.get("burst") instanceof JsonObject burst && burst.has("count") && range(burst, "count", 1, 100) > 1) {
+            var b = new JsonObject();
+            b.addProperty("count", range(burst, "count", 1, 100));
+            b.addProperty("seconds", range(burst, "seconds", 1, 3600));
+            out.add("burst", b);
+        }
         try {
             out.add("trigger", trigger(obj(in, "trigger"), false));
         } catch (Invalid e) {
@@ -95,6 +121,8 @@ public final class FlowSpec {
             case "chat", "whisper" -> {
                 out.addProperty("contains", optText(in, "contains", 100));
                 out.addProperty("from", optPlayer(in, "from"));
+                var match = optString(in, "match");
+                out.addProperty("match", match.isEmpty() ? "contains" : oneOf(in, "match", Set.of("contains", "starts", "exact", "mention")));
             }
             case "player", "playerLeft" -> {
                 var who = optString(in, "who");
@@ -111,7 +139,11 @@ public final class FlowSpec {
                 out.addProperty("days", days.isEmpty() ? "1234567" : days);
                 out.addProperty("zone", zone(in));
             }
-            case "left" -> out.addProperty("reason", optText(in, "reason", 100));
+            case "left" -> {
+                out.addProperty("reason", optText(in, "reason", 100));
+                var why = optString(in, "why");
+                out.addProperty("why", why.isEmpty() ? "any" : oneOf(in, "why", Set.of("any", "kicked", "banned", "network", "me")));
+            }
             case "queueBelow" -> out.addProperty("position", range(in, "position", 1, 10_000));
             case "controlled" -> out.addProperty("on", oneOf(in, "on", Set.of("start", "stop")));
             case "afk" -> out.addProperty("on", oneOf(in, "on", Set.of("earningStopped", "earningStarted", "leftZone", "enteredZone")));
@@ -121,6 +153,38 @@ public final class FlowSpec {
                 out.addProperty("x", range(in, "x", -30_000_000, 30_000_000));
                 out.addProperty("z", range(in, "z", -30_000_000, 30_000_000));
                 out.addProperty("radius", range(in, "radius", 1, 10_000));
+                optY(in, out);
+            }
+            case "entityNear", "entityLeft" -> entity(in, out);
+            case "serverJoin", "serverLeave" -> {
+                var who = optString(in, "who");
+                if (who.isEmpty()) who = "anyone";
+                if (!Set.of("anyone", "stranger", "friend").contains(who) && !PLAYER.matcher(who).matches()) throw new IllegalArgumentException("Not a player name: " + who);
+                out.addProperty("who", who);
+            }
+            case "dimension" -> {
+                var to = optString(in, "to");
+                out.addProperty("to", to.isEmpty() ? "any" : oneOf(in, "to", Set.of("any", "overworld", "the_nether", "the_end")));
+            }
+            case "yBelow" -> out.addProperty("y", range(in, "y", -2048, 2048));
+            case "damaged" -> out.addProperty("amount", range(in, "amount", 1, 40));
+            case "itemBelow", "itemAbove" -> {
+                out.addProperty("item", item(in));
+                out.addProperty("count", range(in, "count", kind.equals("itemBelow") ? 1 : 0, 2304));
+            }
+            case "durability" -> out.addProperty("percent", range(in, "percent", 1, 99));
+            case "tpsBelow" -> out.addProperty("tps", range(in, "tps", 1, 19));
+            case "weather" -> out.addProperty("on", oneOf(in, "on", Set.of("rainStart", "rainStop")));
+            case "blockChanged" -> {
+                out.addProperty("x", range(in, "x", -30_000_000, 30_000_000));
+                out.addProperty("y", range(in, "y", -2048, 2048));
+                out.addProperty("z", range(in, "z", -30_000_000, 30_000_000));
+            }
+            case "flowFailed" -> {
+                // "" is any other flow of this bot
+                var flow = optString(in, "flow");
+                if (!flow.isEmpty() && !ID.matcher(flow).matches()) throw new IllegalArgumentException("Unknown flow");
+                out.addProperty("flow", flow);
             }
             case "proxyJoin", "proxyLeave" -> {
                 var who = optString(in, "who");
@@ -156,13 +220,76 @@ public final class FlowSpec {
         var type = string(in, "type");
         out.addProperty("type", type);
         if (bool(in, "off")) out.addProperty("off", true);
+        if (bool(in, "keepGoing")) out.addProperty("keepGoing", true);
         switch (type) {
             case "action" -> {
                 var run = obj(in, "run");
-                if (NOT_AS_ACTION.contains(string(run, "action"))) throw new IllegalArgumentException("Not allowed in a flow: " + string(run, "action"));
-                var command = Actions.parse(run);
+                var action = string(run, "action");
+                if (NOT_AS_ACTION.contains(action)) throw new IllegalArgumentException("Not allowed in a flow: " + action);
+                // {values} are filled in when it runs; check the rest with stand-ins
+                var command = Actions.parse(sample(run));
                 needs.add(command.capability());
                 out.add("run", run.deepCopy());
+                // pathfinder actions can wait: until done (with a time limit), or for a while and then stop
+                if (PATHING.contains(action)) {
+                    var wait = optString(in, "wait");
+                    if (wait.isEmpty()) wait = "no";
+                    if (!Set.of("no", "done", "for").contains(wait)) throw new IllegalArgumentException("Invalid wait: " + wait);
+                    out.addProperty("wait", wait);
+                    if (!wait.equals("no")) out.addProperty("timeout", range(in, "timeout", 1, MAX_WAIT));
+                }
+            }
+            case "reconnect" -> {
+                int seconds = range(in, "seconds", 0, MAX_WAIT);
+                out.addProperty("seconds", seconds);
+                if (in.has("upTo") && !in.get("upTo").isJsonNull() && in.get("upTo").getAsDouble() > seconds) out.addProperty("upTo", range(in, "upTo", seconds, MAX_WAIT));
+                out.addProperty("timeout", in.has("timeout") ? range(in, "timeout", 0, MAX_WAIT) : 120);
+                needs.add(Capability.CONTROL);
+            }
+            case "try" -> {
+                out.add("steps", steps(optArr(in, "steps"), needs, count, depth + 1));
+                out.add("catch", steps(optArr(in, "catch"), needs, count, depth + 1));
+            }
+            case "forEach" -> {
+                out.addProperty("list", oneOf(in, "list", LISTS));
+                out.add("steps", steps(optArr(in, "steps"), needs, count, depth + 1));
+            }
+            case "runFlow" -> {
+                out.addProperty("flow", match(in, "flow", ID));
+                out.addProperty("wait", bool(in, "wait"));
+            }
+            case "webhook" -> {
+                var url = string(in, "url").strip();
+                if (url.length() > 500 || !url.matches("(?i)https?://[^\\s]+")) throw new IllegalArgumentException("Give a web address starting with http:// or https://");
+                // the address itself can't come from someone else's chat
+                var host = url.replaceFirst("(?i)https?://", "").split("[/?#]", 2)[0];
+                if (host.contains("{")) throw new IllegalArgumentException("The server part of the address can't contain {values}");
+                out.addProperty("url", url);
+                out.addProperty("method", oneOf(in, "method", Set.of("GET", "POST")));
+                var body = optString(in, "body");
+                if (body.length() > 2000) throw new IllegalArgumentException("Keep the body under 2000 characters");
+                out.addProperty("body", body);
+            }
+            case "holdItem" -> {
+                out.addProperty("item", item(in));
+                needs.add(Capability.PLAY);
+            }
+            case "dropItem" -> {
+                out.addProperty("item", item(in));
+                out.addProperty("all", bool(in, "all"));
+                needs.add(Capability.PLAY);
+            }
+            case "lookAt" -> {
+                var target = oneOf(in, "target", Set.of("position", "entity"));
+                out.addProperty("target", target);
+                if (target.equals("position")) {
+                    out.addProperty("x", range(in, "x", -30_000_000, 30_000_000));
+                    out.addProperty("y", range(in, "y", -2048, 2048));
+                    out.addProperty("z", range(in, "z", -30_000_000, 30_000_000));
+                } else {
+                    entity(in, out);
+                }
+                needs.add(Capability.PLAY);
             }
             case "say" -> {
                 out.addProperty("text", text(in, "text", 256));
@@ -178,7 +305,14 @@ public final class FlowSpec {
             }
             case "notify" -> out.addProperty("text", text(in, "text", 200));
             case "log" -> out.addProperty("text", text(in, "text", 200));
-            case "connect", "disconnect", "stop" -> {}
+            case "connect" -> {
+                // wait until in the game, failing if that doesn't happen in time
+                if (bool(in, "wait")) {
+                    out.addProperty("wait", true);
+                    out.addProperty("timeout", in.has("timeout") ? range(in, "timeout", 5, MAX_WAIT) : 120);
+                }
+            }
+            case "disconnect", "stop" -> {}
             case "wait" -> {
                 int seconds = range(in, "seconds", 0, MAX_WAIT);
                 out.addProperty("seconds", seconds);
@@ -215,12 +349,14 @@ public final class FlowSpec {
             }
             case "set" -> {
                 out.addProperty("name", varName(in));
+                out.addProperty("scope", scope(in));
                 var value = optString(in, "value");
                 if (value.length() > 200) throw new IllegalArgumentException("Keep values under 200 characters");
                 out.addProperty("value", value);
             }
             case "change" -> {
                 out.addProperty("name", varName(in));
+                out.addProperty("scope", scope(in));
                 out.addProperty("by", range(in, "by", -1_000_000, 1_000_000));
             }
             default -> throw new IllegalArgumentException("Unknown block " + type);
@@ -229,6 +365,11 @@ public final class FlowSpec {
     }
 
     static JsonObject condition(JsonObject in) {
+        return condition(in, 0, new int[] {0});
+    }
+
+    private static JsonObject condition(JsonObject in, int depth, int[] count) {
+        if (++count[0] > MAX_CONDS) throw new IllegalArgumentException("Use at most " + MAX_CONDS + " conditions in one block");
         var kind = string(in, "kind");
         if (!CONDITIONS.contains(kind)) throw new IllegalArgumentException("Unknown condition " + kind);
         var out = new JsonObject();
@@ -249,6 +390,7 @@ public final class FlowSpec {
             case "chance" -> out.addProperty("percent", range(in, "percent", 1, 99));
             case "var" -> {
                 out.addProperty("name", varName(in));
+                out.addProperty("scope", scope(in));
                 out.addProperty("op", oneOf(in, "op", Set.of("=", "!=", "<", ">", "contains")));
                 var value = optString(in, "value");
                 if (value.length() > 100) throw new IllegalArgumentException("Keep values under 100 characters");
@@ -258,12 +400,30 @@ public final class FlowSpec {
                 out.addProperty("x", range(in, "x", -30_000_000, 30_000_000));
                 out.addProperty("z", range(in, "z", -30_000_000, 30_000_000));
                 out.addProperty("radius", range(in, "radius", 1, 10_000));
+                optY(in, out);
+            }
+            case "all", "any" -> {
+                if (depth >= MAX_COND_DEPTH) throw new IllegalArgumentException("Conditions are nested too deeply");
+                var conds = new JsonArray();
+                for (var c : optArr(in, "conds")) {
+                    if (!c.isJsonObject()) throw new IllegalArgumentException("Invalid condition");
+                    conds.add(condition(c.getAsJsonObject(), depth + 1, count));
+                }
+                if (conds.isEmpty()) throw new IllegalArgumentException("Add at least one condition to the group");
+                out.add("conds", conds);
+            }
+            case "entityNear" -> entity(in, out);
+            case "result" -> out.addProperty("is", oneOf(in, "is", Set.of("done", "timeout", "failed")));
+            case "holding" -> out.addProperty("item", item(in));
+            case "block" -> {
+                out.addProperty("x", range(in, "x", -30_000_000, 30_000_000));
+                out.addProperty("y", range(in, "y", -2048, 2048));
+                out.addProperty("z", range(in, "z", -30_000_000, 30_000_000));
+                out.addProperty("is", item(in, "is"));
             }
             case "dimension" -> out.addProperty("is", oneOf(in, "is", Set.of("overworld", "the_nether", "the_end")));
             case "hasItem" -> {
-                var item = string(in, "item").strip().toLowerCase(java.util.Locale.ROOT);
-                if (!RESOURCE.matcher(item).matches()) throw new IllegalArgumentException("Not an item id: " + item);
-                out.addProperty("item", item.replaceFirst("^minecraft:", ""));
+                out.addProperty("item", item(in));
                 out.addProperty("count", range(in, "count", 1, 2304));
             }
             default -> {}
@@ -272,6 +432,61 @@ public final class FlowSpec {
     }
 
     // --- helpers ---
+
+    /** {player}, {x}, {count:item} and friends, in the fields of an action. */
+    static final Pattern VALUE = Pattern.compile("\\{[a-zA-Z][a-zA-Z0-9_]*(?::[a-z0-9_]{1,64})?}");
+    /** Action fields that are numbers, so a value in them stands in for one. */
+    static final Set<String> NUMERIC = Set.of("x", "y", "z", "slot", "from", "to", "blocks", "range", "port", "yaw", "pitch");
+    /** Action fields that pick from a fixed list: no values there. */
+    private static final Set<String> FIXED = Set.of("action", "module", "button", "mode");
+
+    /** A copy of an action with every {value} replaced by something valid, so the rest of it can be checked. */
+    static JsonObject sample(JsonObject run) {
+        var out = new JsonObject();
+        for (var e : run.entrySet()) {
+            var v = e.getValue();
+            if (v instanceof JsonObject o) out.add(e.getKey(), sample(o));
+            else if (hasValue(e.getKey(), v)) out.addProperty(e.getKey(), NUMERIC.contains(e.getKey()) ? "0" : "a");
+            else out.add(e.getKey(), v.deepCopy());
+        }
+        return out;
+    }
+
+    static boolean hasValue(String key, JsonElement v) {
+        return !FIXED.contains(key) && v.isJsonPrimitive() && v.getAsJsonPrimitive().isString() && VALUE.matcher(v.getAsString()).find();
+    }
+
+    /** An entity filter with a radius: who/what, plus a name or a mob type where that needs one. */
+    private static void entity(JsonObject in, JsonObject out) {
+        var what = optString(in, "what");
+        if (what.isEmpty()) what = "anyone";
+        if (!ENTITY_WHAT.contains(what)) throw new IllegalArgumentException("Invalid what: " + what);
+        out.addProperty("what", what);
+        if (what.equals("player")) out.addProperty("name", match(in, "name", PLAYER));
+        // "mob", not "type": a step already has a type
+        if (what.equals("type")) out.addProperty("mob", item(in, "mob"));
+        out.addProperty("radius", range(in, "radius", 1, 64));
+    }
+
+    private static void optY(JsonObject in, JsonObject out) {
+        if (in.has("y") && !in.get("y").isJsonNull() && !optString(in, "y").isEmpty()) out.addProperty("y", range(in, "y", -2048, 2048));
+    }
+
+    private static String scope(JsonObject in) {
+        var scope = optString(in, "scope");
+        return scope.isEmpty() ? "flow" : oneOf(in, "scope", SCOPES);
+    }
+
+    private static String item(JsonObject in) {
+        return item(in, "item");
+    }
+
+    /** An item, block or mob id, without "minecraft:". */
+    private static String item(JsonObject in, String key) {
+        var item = string(in, key).strip().toLowerCase(java.util.Locale.ROOT).replace(' ', '_');
+        if (!RESOURCE.matcher(item).matches()) throw new IllegalArgumentException("Not an id: " + item);
+        return item.replaceFirst("^minecraft:", "");
+    }
 
     private static String varName(JsonObject in) {
         var name = string(in, "name").strip();

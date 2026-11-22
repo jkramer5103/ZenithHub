@@ -1,8 +1,9 @@
 <script lang="ts">
 	// the settings of a trigger, inline: for the hat block and "wait for"
-	import { afkOptions, makeTrigger, triggers, weekdays } from '#lib/flow-blocks.js';
+	import { afkOptions, dimensions, makeTrigger, triggers, weekdays, whyOptions } from '#lib/flow-blocks.js';
 	import type { FlowTrigger } from '#lib/types.js';
 	import { SELECT, SLOT, editor } from './context.js';
+	import EntityFilter from './EntityFilter.svelte';
 
 	let { trigger = $bindable(), waiting = false }: { trigger: FlowTrigger; waiting?: boolean } = $props();
 	const ctx = editor();
@@ -13,6 +14,7 @@
 	const who = $derived(String(trigger.who ?? 'anyone'));
 	const whoKind = $derived(who === 'anyone' || who === 'stranger' ? who : 'named');
 	const days = $derived(String(trigger.days ?? ''));
+	const optNum = (v: string) => (v.trim() === '' ? null : Number(v));
 
 	function toggleDay(d: string) {
 		const next = days.includes(d) ? days.replace(d, '') : [...days, d].sort().join('');
@@ -35,7 +37,12 @@
 </select>
 
 {#if trigger.kind === 'chat' || trigger.kind === 'whisper'}
-	<span>with</span>
+	<select class={SELECT} aria-label="How the text matches" bind:value={() => trigger.match ?? 'contains', (v) => (trigger.match = v)}>
+		<option value="contains">containing</option>
+		<option value="starts">starting with</option>
+		<option value="exact">saying exactly</option>
+		<option value="mention">mentioning the bot</option>
+	</select>
 	<input
 		class="{SLOT} field-sizing-content min-w-24"
 		placeholder="any text"
@@ -43,6 +50,7 @@
 		aria-label="Text it contains"
 		bind:value={trigger.contains}
 		onfocus={() => ctx.focusText(null)}
+		hidden={trigger.match === 'mention'}
 	/>
 	<span>from</span>
 	<input class="{SLOT} field-sizing-content min-w-20" placeholder="anyone" maxlength="16" autocapitalize="off" spellcheck="false" aria-label="From player" bind:value={trigger.from} />
@@ -64,6 +72,82 @@
 	{#if whoKind === 'named'}
 		<input class="{SLOT} field-sizing-content min-w-24" placeholder="name" maxlength="16" autocapitalize="off" spellcheck="false" aria-label="Player name" bind:value={trigger.who} />
 	{/if}
+{:else if trigger.kind === 'entityNear' || trigger.kind === 'entityLeft'}
+	<span>:</span>
+	<EntityFilter filter={trigger} />
+{:else if trigger.kind === 'serverJoin' || trigger.kind === 'serverLeave'}
+	<span>who is</span>
+	<select
+		class={SELECT}
+		aria-label="Which player"
+		value={['anyone', 'stranger', 'friend'].includes(who) ? who : 'named'}
+		onchange={(e) => {
+			const v = (e.currentTarget as HTMLSelectElement).value;
+			trigger.who = v === 'named' ? '' : v;
+		}}
+	>
+		<option value="anyone">anyone</option>
+		<option value="stranger">not a friend</option>
+		<option value="friend">a friend</option>
+		<option value="named">this player</option>
+	</select>
+	{#if !['anyone', 'stranger', 'friend'].includes(who)}
+		<input class="{SLOT} field-sizing-content min-w-24" placeholder="name" maxlength="16" autocapitalize="off" spellcheck="false" aria-label="Player name" bind:value={trigger.who} />
+	{/if}
+{:else if trigger.kind === 'damaged'}
+	<select class={SELECT} aria-label="Hearts" value={Number(trigger.amount) / 2} onchange={(e) => (trigger.amount = Number((e.currentTarget as HTMLSelectElement).value) * 2)}>
+		{#each [0.5, 1, 2, 3, 4, 5, 6, 8, 10] as h}<option value={h}>{h} ♥</option>{/each}
+	</select>
+	<span>at once</span>
+{:else if trigger.kind === 'dimension'}
+	<span>to</span>
+	<select class={SELECT} aria-label="Dimension" bind:value={trigger.to}>
+		<option value="any">any dimension</option>
+		{#each dimensions as d}<option value={d.value}>{d.label}</option>{/each}
+	</select>
+{:else if trigger.kind === 'yBelow'}
+	<span>y</span>
+	<input class="{SLOT} w-16 text-center" inputmode="numeric" aria-label="Height" bind:value={trigger.y} />
+{:else if trigger.kind === 'itemBelow' || trigger.kind === 'itemAbove'}
+	<span>:</span>
+	<input
+		class="{SLOT} field-sizing-content min-w-28 font-mono text-xs"
+		placeholder="item id"
+		maxlength="74"
+		autocapitalize="off"
+		spellcheck="false"
+		aria-label="Item"
+		list="flow-items"
+		bind:value={trigger.item}
+	/>
+	<span>{trigger.kind === 'itemBelow' ? 'drops below' : 'goes over'}</span>
+	<input class="{SLOT} w-14 text-center" inputmode="numeric" aria-label="Count" bind:value={trigger.count} />
+{:else if trigger.kind === 'durability'}
+	<select class={SELECT} aria-label="Percent left" bind:value={trigger.percent}>
+		{#each [5, 10, 15, 20, 25, 33, 50] as p}<option value={p}>{p}%</option>{/each}
+	</select>
+{:else if trigger.kind === 'tpsBelow'}
+	<select class={SELECT} aria-label="TPS" bind:value={trigger.tps}>
+		{#each [5, 8, 10, 12, 15, 18] as t}<option value={t}>{t}</option>{/each}
+	</select>
+{:else if trigger.kind === 'weather'}
+	<span>:</span>
+	<select class={SELECT} aria-label="Rain" bind:value={trigger.on}>
+		<option value="rainStart">it starts raining</option>
+		<option value="rainStop">it stops raining</option>
+	</select>
+{:else if trigger.kind === 'blockChanged'}
+	<span>:</span>
+	<input class="{SLOT} w-16 text-center" inputmode="numeric" placeholder="x" aria-label="X" bind:value={trigger.x} />
+	<input class="{SLOT} w-14 text-center" inputmode="numeric" placeholder="y" aria-label="Y" bind:value={trigger.y} />
+	<input class="{SLOT} w-16 text-center" inputmode="numeric" placeholder="z" aria-label="Z" bind:value={trigger.z} />
+	<span class="text-xs font-normal text-white/60">(checked while the chunk is loaded)</span>
+{:else if trigger.kind === 'flowFailed'}
+	<span>:</span>
+	<select class={SELECT} aria-label="Which flow" bind:value={trigger.flow}>
+		<option value="">any other flow</option>
+		{#each ctx.flows as f (f.id)}<option value={f.id}>{f.name}</option>{/each}
+	</select>
 {:else if trigger.kind === 'health'}
 	<select class={SELECT} aria-label="Hearts" value={Number(trigger.below) / 2} onchange={(e) => (trigger.below = Number((e.currentTarget as HTMLSelectElement).value) * 2)}>
 		{#each [1, 2, 3, 4, 5, 6, 7, 8, 9] as h}<option value={h}>{h} ♥</option>{/each}
@@ -90,6 +174,15 @@
 {:else if trigger.kind === 'arrived'}
 	<span>x</span>
 	<input class="{SLOT} w-20 text-center" inputmode="numeric" aria-label="X" bind:value={trigger.x} />
+	<span>y</span>
+	<input
+		class="{SLOT} w-14 text-center"
+		inputmode="numeric"
+		placeholder="any"
+		aria-label="Y, empty for any height"
+		value={trigger.y ?? ''}
+		oninput={(e) => (trigger.y = optNum(e.currentTarget.value))}
+	/>
 	<span>z</span>
 	<input class="{SLOT} w-20 text-center" inputmode="numeric" aria-label="Z" bind:value={trigger.z} />
 	<span>within</span>
@@ -120,6 +213,9 @@
 {:else if trigger.kind === 'queueBelow'}
 	<input class="{SLOT} w-16 text-center" inputmode="numeric" aria-label="Queue position" bind:value={trigger.position} />
 {:else if trigger.kind === 'left'}
+	<select class={SELECT} aria-label="Why" bind:value={() => trigger.why ?? 'any', (v) => (trigger.why = v)}>
+		{#each whyOptions as o}<option value={o.value}>{o.label}</option>{/each}
+	</select>
 	<span>with a reason containing</span>
 	<input
 		class="{SLOT} field-sizing-content min-w-24"

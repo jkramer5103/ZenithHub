@@ -241,6 +241,13 @@ public final class Supervisor {
         return controlResponse(response);
     }
 
+    /** The block at a position, for flows: {loaded, block}. */
+    public JsonObject block(String instanceId, int x, int y, int z) throws IOException, InterruptedException {
+        var response = http.send(request(runtime(instanceId), "/v1/block?x=" + x + "&y=" + y + "&z=" + z).timeout(Duration.ofSeconds(5)).GET().build(),
+            HttpResponse.BodyHandlers.ofString());
+        return controlResponse(response);
+    }
+
     /** The config the running instance is using right now, including changes made in-game. */
     public JsonObject liveConfig(String instanceId) throws IOException, InterruptedException {
         var response = http.send(request(runtime(instanceId), "/v1/config").timeout(Duration.ofSeconds(10)).GET().build(),

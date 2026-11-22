@@ -1,8 +1,39 @@
 <script lang="ts">
-	import { categoryOf, cloneStep, keyOf } from '#lib/flow-blocks.js';
+	import { PATHING, categoryOf, cloneStep, forEachLists, keyOf, modules, scopes } from '#lib/flow-blocks.js';
 	import type { FlowStep } from '#lib/types.js';
 	import {
+		Anchor,
 		ArrowDown,
+		ArrowLeftRight,
+		ArrowRightLeft,
+		ArrowUpRight,
+		Box,
+		Crosshair,
+		Eraser,
+		Eye,
+		Hammer,
+		Hand,
+		Hash,
+		ListOrdered,
+		MapPinOff,
+		MapPinPlus,
+		Package,
+		PackageMinus,
+		PackageOpen,
+		PackagePlus,
+		Pickaxe,
+		Plane,
+		RefreshCw,
+		RotateCw,
+		ShieldAlert,
+		ShieldCheck,
+		SquareMousePointer,
+		Target,
+		ToggleRight,
+		UserCheck,
+		UserMinus,
+		Webhook,
+		Workflow,
 		ArrowUp,
 		Bell,
 		ClipboardList,
@@ -42,6 +73,7 @@
 	} from '@lucide/svelte';
 	import Condition from './Condition.svelte';
 	import { SELECT, SLOT, editor } from './context.js';
+	import EntityFilter from './EntityFilter.svelte';
 	import StepList from './StepList.svelte';
 	import TriggerFields from './TriggerFields.svelte';
 
@@ -84,7 +116,42 @@
 		requeue: ListRestart,
 		kick: UserX,
 		replayStart: Video,
-		replayStop: VideoOff
+		replayStop: VideoOff,
+		try: ShieldAlert,
+		forEach: ListOrdered,
+		runFlow: Workflow,
+		reconnect: RefreshCw,
+		webhook: Webhook,
+		elytra: Plane,
+		near: Crosshair,
+		getTo: Target,
+		thisway: ArrowUpRight,
+		lookAt: Eye,
+		rotate: RotateCw,
+		mine: Pickaxe,
+		breakBlock: Hammer,
+		placeBlock: Box,
+		clearArea: Eraser,
+		pickup: Hand,
+		clickBlock: SquareMousePointer,
+		clickEntity: SquareMousePointer,
+		holdItem: Hand,
+		dropItem: PackageMinus,
+		hold: Hash,
+		swap: ArrowLeftRight,
+		drop: PackageMinus,
+		clickSlot: SquareMousePointer,
+		withdraw: PackageOpen,
+		deposit: PackagePlus,
+		closeContainer: Package,
+		transfer: ArrowRightLeft,
+		kickPlayer: UserX,
+		makePlayer: UserCheck,
+		makeSpectator: UserMinus,
+		module: ToggleRight,
+		afkKeep: Anchor,
+		addWaypoint: MapPinPlus,
+		deleteWaypoint: MapPinOff
 	};
 	const Icon = $derived(icons[key] ?? Square);
 	const fixed: Record<string, string> = {
@@ -104,7 +171,11 @@
 		requeue: 'requeue',
 		kick: 'kick everyone off the proxy',
 		replayStart: 'start recording a replay',
-		replayStop: 'stop recording'
+		replayStop: 'stop recording',
+		withdraw: 'take everything from the open chest',
+		deposit: 'put everything into the open chest',
+		closeContainer: 'close the open chest',
+		makeSpectator: 'turn the player into a spectator'
 	};
 
 	const running = $derived(ctx.live.step === step.id);
@@ -116,9 +187,14 @@
 					{ label: '', list: step.then ?? [] },
 					{ label: 'else', list: step.else ?? [] }
 				]
-			: step.type === 'repeat' || step.type === 'repeatUntil' || step.type === 'forever'
-				? [{ label: '', list: step.steps ?? [] }]
-				: []
+			: step.type === 'try'
+				? [
+						{ label: '', list: step.steps ?? [] },
+						{ label: 'if it fails', list: step.catch ?? [] }
+					]
+				: step.type === 'repeat' || step.type === 'repeatUntil' || step.type === 'forever' || step.type === 'forEach'
+					? [{ label: '', list: step.steps ?? [] }]
+					: []
 	);
 	const isC = $derived(inner.length > 0);
 
@@ -156,6 +232,20 @@
 
 	const run = $derived(step.run ?? { action: '' });
 	const num = (v: string) => (v.trim() === '' ? null : Number(v));
+	/** a number, or a {value} that becomes one when the block runs */
+	const nv = (v: string) => (v.trim() === '' ? null : v.includes('{') ? v.trim() : Number(v));
+	const paths = $derived(step.type === 'action' && PATHING.has(run.action));
+	const limits = [
+		[30, '30 s'],
+		[60, '1 min'],
+		[300, '5 min'],
+		[600, '10 min'],
+		[1800, '30 min'],
+		[3600, '1 hour']
+	] as const;
+	const hotbar = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+	const took = (ms: number) => (ms < 1000 ? `${ms} ms` : ms < 60_000 ? `${(ms / 1000).toFixed(1)} s` : `${Math.round(ms / 60_000)} min`);
+	const slotHelp = 'Slot numbers: 9–35 the inventory, 36–44 the hotbar, 45 the off hand, 5–8 armour';
 </script>
 
 <svelte:window
@@ -192,6 +282,15 @@
 				<button type="button" class="flex w-full items-center gap-2 px-3 py-1.5 hover:bg-zinc-800" onclick={() => ((step.off = !step.off), (menuOpen = false))}
 					><EyeOff size={14} /> {step.off ? 'Turn on' : 'Skip this block'}</button
 				>
+				<button
+					type="button"
+					class="flex w-full items-center gap-2 px-3 py-1.5 text-left hover:bg-zinc-800"
+					onclick={() => {
+						if (step.keepGoing) delete step.keepGoing;
+						else step.keepGoing = true;
+						menuOpen = false;
+					}}><ShieldCheck size={14} class="shrink-0" /> {step.keepGoing ? 'Stop the flow if it fails' : 'Keep going if it fails'}</button
+				>
 				<button type="button" class="flex w-full items-center gap-2 px-3 py-1.5 text-red-300 hover:bg-zinc-800" onclick={remove}><Trash2 size={14} /> Delete</button>
 			</div>
 		{/if}
@@ -219,6 +318,96 @@
 		<option value={300}>5 min</option>
 		<option value={1800}>30 min</option>
 		<option value={3600}>1 hour</option>
+	</select>
+{/snippet}
+
+{#snippet n(obj: Record<string, unknown>, k: string, placeholder: string, width = 'w-16')}
+	<input
+		class="{SLOT} {width} text-center"
+		inputmode="numeric"
+		{placeholder}
+		aria-label={placeholder}
+		value={obj[k] ?? ''}
+		oninput={(e) => (obj[k] = nv(e.currentTarget.value))}
+		onfocus={() => ctx.focusText({ obj, key: k, replace: true })}
+	/>
+{/snippet}
+
+{#snippet xyz(obj: Record<string, unknown>, yOptional = false)}
+	{@render n(obj, 'x', 'x')}
+	{@render n(obj, 'y', yOptional ? 'y (any)' : 'y', 'w-14')}
+	{@render n(obj, 'z', 'z')}
+{/snippet}
+
+{#snippet id(obj: Record<string, unknown>, k: string, placeholder: string, list = '', values = false)}
+	<input
+		class="{SLOT} field-sizing-content min-w-24 font-mono text-xs"
+		{placeholder}
+		maxlength="74"
+		autocapitalize="off"
+		spellcheck="false"
+		aria-label={placeholder}
+		list={list || undefined}
+		value={obj[k] ?? ''}
+		oninput={(e) => (obj[k] = e.currentTarget.value.trim())}
+		onfocus={() => ctx.focusText(values ? { obj, key: k, replace: true } : null)}
+	/>
+{/snippet}
+
+{#snippet player(obj: Record<string, unknown>, k: string, placeholder = 'name or {player}')}
+	<input
+		class="{SLOT} field-sizing-content min-w-24"
+		{placeholder}
+		maxlength="40"
+		autocapitalize="off"
+		spellcheck="false"
+		aria-label="Player"
+		value={obj[k] ?? ''}
+		oninput={(e) => (obj[k] = e.currentTarget.value.trim() || null)}
+		onfocus={() => ctx.focusText({ obj, key: k, replace: true })}
+	/>
+{/snippet}
+
+{#snippet button(obj: Record<string, unknown>)}
+	<select class={SELECT} aria-label="Mouse button" bind:value={obj.button}>
+		<option value="right">right-click</option>
+		<option value="left">left-click</option>
+	</select>
+{/snippet}
+
+{#snippet limit(label: string)}
+	<span>{label}</span>
+	<select class={SELECT} aria-label="Time limit" bind:value={step.timeout}>
+		{#each limits as [v, l]}<option value={v}>{l}</option>{/each}
+	</select>
+{/snippet}
+
+{#snippet pathWait()}
+	<select
+		class="{SELECT} text-xs"
+		aria-label="Wait for it"
+		value={step.wait ?? 'no'}
+		onchange={(e) => {
+			const v = (e.currentTarget as HTMLSelectElement).value as 'no' | 'done' | 'for';
+			step.wait = v;
+			if (v === 'no') delete step.timeout;
+			else if (!step.timeout) step.timeout = 600;
+		}}
+	>
+		<option value="no">then go on</option>
+		<option value="done">and wait until done</option>
+		<option value="for">for a while, then stop</option>
+	</select>
+	{#if step.wait === 'done'}
+		{@render limit('give up after')}
+	{:else if step.wait === 'for'}
+		{@render limit('stop after')}
+	{/if}
+{/snippet}
+
+{#snippet scope()}
+	<select class="{SELECT} text-xs" aria-label="Whose variable" bind:value={() => step.scope ?? 'flow', (v) => (step.scope = v)}>
+		{#each scopes as o}<option value={o.value}>in {o.label}</option>{/each}
 	</select>
 {/snippet}
 
@@ -338,11 +527,13 @@
 				bind:value={step.value}
 				onfocus={() => ctx.focusText({ obj: step as unknown as Record<string, unknown>, key: 'value' })}
 			/>
+			{@render scope()}
 		{:else if step.type === 'change'}
 			<span>change</span>
 			{@render varName()}
 			<span>by</span>
 			<input class="{SLOT} w-14 text-center" inputmode="numeric" aria-label="By" bind:value={step.by} />
+			{@render scope()}
 		{:else if step.type === 'broadcast'}
 			<span>broadcast</span>
 			<input
@@ -366,9 +557,7 @@
 			</select>
 		{:else if key === 'goto'}
 			<span>walk to</span>
-			<input class="{SLOT} w-16 text-center" inputmode="numeric" placeholder="x" aria-label="X" value={run.x ?? ''} oninput={(e) => (run.x = num(e.currentTarget.value))} />
-			<input class="{SLOT} w-14 text-center" inputmode="numeric" placeholder="y" aria-label="Y" value={run.y ?? ''} oninput={(e) => (run.y = num(e.currentTarget.value))} />
-			<input class="{SLOT} w-16 text-center" inputmode="numeric" placeholder="z" aria-label="Z" value={run.z ?? ''} oninput={(e) => (run.z = num(e.currentTarget.value))} />
+			{@render xyz(run, true)}
 		{:else if key === 'gotoWaypoint'}
 			<span>walk to waypoint</span>
 			{#if ctx.waypoints.length}
@@ -382,16 +571,265 @@
 			{/if}
 		{:else if key === 'follow'}
 			<span>follow</span>
+			{@render player(run, 'player', 'nearest player')}
+		{:else if step.type === 'try'}
+			<span>try</span>
+		{:else if step.type === 'forEach'}
+			<span>for each</span>
+			<select class={SELECT} aria-label="What to go through" bind:value={step.list}>
+				{#each forEachLists as l}<option value={l.value}>{l.label}</option>{/each}
+			</select>
+			<span class="text-xs font-normal text-white/60">as {'{each}'}</span>
+		{:else if step.type === 'runFlow'}
+			<span>run the flow</span>
+			<select class={SELECT} aria-label="Flow" bind:value={step.flow}>
+				<option value="" disabled>{ctx.flows.length ? 'pick one' : 'no other flows yet'}</option>
+				{#each ctx.flows as f (f.id)}<option value={f.id}>{f.name}</option>{/each}
+			</select>
+			<select class={SELECT} aria-label="Wait for it" bind:value={step.wait}>
+				<option value={true}>and wait for it</option>
+				<option value={false}>and go on</option>
+			</select>
+		{:else if step.type === 'webhook'}
+			<select class={SELECT} aria-label="Method" bind:value={step.method}>
+				<option value="POST">send to</option>
+				<option value="GET">open</option>
+			</select>
 			<input
-				class="{SLOT} field-sizing-content min-w-28"
-				placeholder="nearest player"
-				maxlength="16"
+				class="{SLOT} field-sizing-content max-w-full min-w-48 font-mono text-xs"
+				placeholder="https://example.com/hook"
+				maxlength="500"
 				autocapitalize="off"
 				spellcheck="false"
-				aria-label="Player"
-				value={run.player ?? ''}
-				oninput={(e) => (run.player = e.currentTarget.value.trim() || null)}
+				aria-label="Web address"
+				bind:value={step.url}
+				onfocus={() => ctx.focusText({ obj: step as unknown as Record<string, unknown>, key: 'url' })}
 			/>
+			{#if step.method === 'POST'}
+				<span>the text</span>
+				<input
+					class="{SLOT} field-sizing-content max-w-full min-w-32 font-mono text-xs"
+					placeholder={'{"text": "{player}"}'}
+					maxlength="2000"
+					aria-label="Body"
+					bind:value={step.body}
+					onfocus={() => ctx.focusText({ obj: step as unknown as Record<string, unknown>, key: 'body' })}
+				/>
+			{/if}
+		{:else if step.type === 'reconnect'}
+			<span>reconnect after</span>
+			<input class="{SLOT} w-14 text-center" inputmode="numeric" aria-label="Seconds" bind:value={step.seconds} />
+			{#if step.upTo !== undefined}
+				<span>to</span>
+				<input class="{SLOT} w-14 text-center" inputmode="numeric" aria-label="Up to seconds" bind:value={step.upTo} />
+				<span>seconds</span>
+				<button type="button" class="text-xs font-normal text-white/60 hover:text-white" onclick={() => delete step.upTo}>(exact)</button>
+			{:else}
+				<span>seconds</span>
+				<button type="button" class="text-xs font-normal text-white/60 hover:text-white" onclick={() => (step.upTo = Number(step.seconds ?? 0) * 2 || 60)}
+					>(random)</button
+				>
+			{/if}
+			<span>, wait until in the game for</span>
+			<select class={SELECT} aria-label="Time limit" bind:value={step.timeout}>
+				<option value={0}>no time (don’t wait)</option>
+				{#each limits as [v, l]}<option value={v}>{l}</option>{/each}
+			</select>
+		{:else if step.type === 'connect'}
+			<span>connect</span>
+			<select
+				class="{SELECT} text-xs"
+				aria-label="Wait until in the game"
+				value={step.wait ? 'yes' : 'no'}
+				onchange={(e) => {
+					if ((e.currentTarget as HTMLSelectElement).value === 'yes') [step.wait, step.timeout] = [true, step.timeout || 120];
+					else (delete step.wait, delete step.timeout);
+				}}
+			>
+				<option value="no">then go on</option>
+				<option value="yes">and wait until in the game</option>
+			</select>
+			{#if step.wait}{@render limit('give up after')}{/if}
+		{:else if step.type === 'holdItem'}
+			<span>hold</span>
+			{@render id(step, 'item', 'item id', 'flow-items')}
+		{:else if step.type === 'dropItem'}
+			<span>drop</span>
+			<select class={SELECT} aria-label="How many" bind:value={step.all}>
+				<option value={true}>every</option>
+				<option value={false}>one stack of</option>
+			</select>
+			{@render id(step, 'item', 'item id', 'flow-items')}
+		{:else if step.type === 'lookAt'}
+			<span>look at</span>
+			<select
+				class={SELECT}
+				aria-label="What to look at"
+				value={step.target}
+				onchange={(e) => {
+					const v = (e.currentTarget as HTMLSelectElement).value as 'entity' | 'position';
+					step.target = v;
+					if (v === 'position') [step.x, step.y, step.z] = [step.x ?? 0, step.y ?? 64, step.z ?? 0];
+					else [step.what, step.radius] = [step.what ?? 'anyone', step.radius ?? 16];
+				}}
+			>
+				<option value="entity">the nearest</option>
+				<option value="position">the block at</option>
+			</select>
+			{#if step.target === 'position'}
+				{@render xyz(step)}
+			{:else}
+				<EntityFilter filter={step} />
+			{/if}
+		{:else if key === 'elytra'}
+			<span>fly with the elytra to</span>
+			{@render xyz(run, true)}
+		{:else if key === 'near'}
+			<span>walk within</span>
+			{@render n(run, 'range', 'blocks', 'w-12')}
+			<span>blocks of</span>
+			{@render xyz(run)}
+		{:else if key === 'getTo'}
+			<span>walk to the nearest</span>
+			{@render id(run, 'block', 'block id', 'flow-blocks')}
+		{:else if key === 'thisway'}
+			<span>walk</span>
+			{@render n(run, 'blocks', 'blocks')}
+			<span>blocks straight ahead</span>
+		{:else if key === 'rotate'}
+			<span>turn to yaw</span>
+			{@render n(run, 'yaw', 'yaw', 'w-14')}
+			<span>pitch</span>
+			{@render n(run, 'pitch', 'pitch', 'w-14')}
+			<span class="text-xs font-normal text-white/60">(yaw 0 is south, 90 west; pitch 90 looks down)</span>
+		{:else if key === 'mine'}
+			<span>mine every</span>
+			{@render id(run, 'block', 'block id', 'flow-blocks')}
+			<span>nearby</span>
+		{:else if key === 'breakBlock'}
+			<span>break the block at</span>
+			{@render xyz(run)}
+		{:else if key === 'placeBlock'}
+			<span>place</span>
+			{@render id(run, 'item', 'block id', 'flow-blocks')}
+			<span>at</span>
+			{@render xyz(run)}
+		{:else if key === 'clearArea'}
+			<span>clear everything from</span>
+			{@render xyz(run.from as Record<string, unknown>)}
+			<span>to</span>
+			{@render xyz(run.to as Record<string, unknown>)}
+		{:else if key === 'pickup'}
+			<span>pick up</span>
+			<input
+				class="{SLOT} field-sizing-content min-w-24 font-mono text-xs"
+				placeholder="every item"
+				maxlength="74"
+				autocapitalize="off"
+				spellcheck="false"
+				aria-label="Item"
+				list="flow-items"
+				value={run.item ?? ''}
+				oninput={(e) => (run.item = e.currentTarget.value.trim() || null)}
+			/>
+			<span>nearby</span>
+		{:else if key === 'clickBlock'}
+			<span>walk to and</span>
+			{@render button(run)}
+			{#if run.waypoint !== undefined}
+				<span>the block at waypoint</span>
+				{@render id(run, 'waypoint', 'waypoint', 'flow-waypoints')}
+				<button
+					type="button"
+					class="text-xs font-normal text-white/60 hover:text-white"
+					onclick={() => {
+						delete run.waypoint;
+						[run.x, run.y, run.z] = [0, 64, 0];
+					}}>(position)</button
+				>
+			{:else}
+				<span>the block at</span>
+				{@render xyz(run)}
+				<button
+					type="button"
+					class="text-xs font-normal text-white/60 hover:text-white"
+					onclick={() => {
+						delete run.x, delete run.y, delete run.z;
+						run.waypoint = ctx.waypoints[0] ?? '';
+					}}>(waypoint)</button
+				>
+			{/if}
+		{:else if key === 'clickEntity'}
+			<span>walk to and</span>
+			{@render button(run)}
+			<span>the nearest</span>
+			{@render id(run, 'entity', 'mob id', 'flow-mobs')}
+		{:else if key === 'hold'}
+			<span>select hotbar slot</span>
+			<select class={SELECT} aria-label="Hotbar slot" value={Number(run.slot) - 35} onchange={(e) => (run.slot = Number((e.currentTarget as HTMLSelectElement).value) + 35)}>
+				{#each hotbar as h}<option value={h}>{h}</option>{/each}
+			</select>
+		{:else if key === 'swap'}
+			<span title={slotHelp}>swap slot</span>
+			{@render n(run, 'from', 'slot', 'w-12')}
+			<span>with slot</span>
+			{@render n(run, 'to', 'slot', 'w-12')}
+		{:else if key === 'drop'}
+			<span>drop</span>
+			<select class={SELECT} aria-label="How many" bind:value={run.stack}>
+				<option value={true}>the stack</option>
+				<option value={false}>one item</option>
+			</select>
+			<span title={slotHelp}>from slot</span>
+			{@render n(run, 'slot', 'slot', 'w-12')}
+		{:else if key === 'clickSlot'}
+			{@render button(run)}
+			<span title={slotHelp}>slot</span>
+			{@render n(run, 'slot', 'slot', 'w-12')}
+			<span class="text-xs font-normal text-white/60">(of the open chest, or the inventory)</span>
+		{:else if key === 'transfer'}
+			<span>move to the server</span>
+			<input
+				class="{SLOT} field-sizing-content min-w-32 font-mono text-xs"
+				placeholder="play.example.com"
+				maxlength="253"
+				autocapitalize="off"
+				spellcheck="false"
+				aria-label="Server address"
+				bind:value={run.address}
+			/>
+			{@render n(run, 'port', 'port', 'w-16')}
+		{:else if key === 'kickPlayer'}
+			<span>kick</span>
+			{@render player(run, 'player')}
+			<span>off the proxy</span>
+		{:else if key === 'makePlayer'}
+			<span>let</span>
+			{@render player(run, 'player')}
+			<span>take over</span>
+		{:else if key === 'module'}
+			<span>switch</span>
+			<select class={SELECT} aria-label="Module" bind:value={run.module}>
+				{#each modules as m}<option value={m.value}>{m.label}</option>{/each}
+			</select>
+			<select class={SELECT} aria-label="On or off" bind:value={run.on}>
+				<option value={true}>on</option>
+				<option value={false}>off</option>
+			</select>
+		{:else if key === 'afkKeep'}
+			<select class={SELECT} aria-label="Keep or not" bind:value={run.keep}>
+				<option value={true}>keep</option>
+				<option value={false}>stop keeping</option>
+			</select>
+			<span>the bot in the AFK zone</span>
+		{:else if key === 'addWaypoint'}
+			<span>save waypoint</span>
+			{@render id(run, 'id', 'name')}
+			<span>at</span>
+			{@render xyz(run)}
+		{:else if key === 'deleteWaypoint'}
+			<span>delete waypoint</span>
+			{@render id(run, 'id', 'name', 'flow-waypoints')}
 		{:else if key === 'loadPearl'}
 			<span>load</span>
 			<select class={SELECT} aria-label="Pearl" bind:value={run.pearl}>
@@ -400,6 +838,15 @@
 			</select>
 		{:else}
 			<span class="font-mono text-xs">{run.action}</span>
+		{/if}
+		{#if paths}{@render pathWait()}{/if}
+		{#if ctx.live.timings?.[step.id] !== undefined && !isC}
+			<span class="ml-auto text-xs font-normal text-white/55 tabular-nums" title="How long this block took in the last run">{took(ctx.live.timings[step.id])}</span>
+		{/if}
+		{#if step.keepGoing}
+			<span class="inline-flex items-center gap-1 rounded bg-black/20 px-1.5 py-px text-xs font-normal text-white/80" title="If this block fails, the flow goes on with {'{error}'}"
+				><ShieldCheck size={11} /> keeps going if it fails</span
+			>
 		{/if}
 		{@render menu()}
 	</div>

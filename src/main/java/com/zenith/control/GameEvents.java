@@ -1,11 +1,16 @@
 package com.zenith.control;
 
 import com.google.gson.JsonObject;
+import com.zenith.Proxy;
 import com.zenith.cache.data.entity.EntityPlayer;
 import com.zenith.cache.data.inventory.Container;
 import com.zenith.event.chat.PublicChatEvent;
 import com.zenith.event.chat.WhisperChatEvent;
 import com.zenith.event.client.ClientDeathEvent;
+import com.zenith.event.client.ClientOnlineEvent;
+import com.zenith.event.module.AutoEatOutOfFoodEvent;
+import com.zenith.event.server.ServerPlayerConnectedEvent;
+import com.zenith.event.server.ServerPlayerDisconnectedEvent;
 import com.zenith.event.module.NoTotemsEvent;
 import com.zenith.event.module.PlayerHealthChangedEvent;
 import com.zenith.event.module.ServerPlayerAttackedUsEvent;
@@ -34,6 +39,10 @@ import static com.zenith.Globals.*;
 public final class GameEvents {
     public static final GameEvents INSTANCE = new GameEvents();
 
+    /** The tab list fills up right after joining; those aren't players joining the server. */
+    private static final long TAB_LIST_SETTLE_MS = 10_000;
+    private volatile long onlineAt;
+
     private GameEvents() {}
 
     public void start() {
@@ -54,6 +63,10 @@ public final class GameEvents {
                 json.addProperty("seconds", e.queueDuration().toSeconds());
                 publish(json);
             }),
+            of(ClientOnlineEvent.class, e -> onlineAt = System.currentTimeMillis()),
+            of(ServerPlayerConnectedEvent.class, e -> onTabList("serverJoin", e.playerEntry())),
+            of(ServerPlayerDisconnectedEvent.class, e -> onTabList("serverLeave", e.playerEntry())),
+            of(AutoEatOutOfFoodEvent.class, e -> publish(event("outOfFood"))),
             of(ServerRestartingEvent.class, e -> {
                 var json = event("serverRestarting");
                 json.addProperty("message", e.message());
@@ -98,6 +111,20 @@ public final class GameEvents {
             json.addProperty("y", Math.floor(entity.getY()));
             json.addProperty("z", Math.floor(entity.getZ()));
             json.addProperty("friend", PLAYER_LISTS.getFriendsList().contains(entity.getUuid()));
+        }
+        publish(json);
+    }
+
+    /** Someone joins or leaves the server (its tab list), wherever they are. */
+    private void onTabList(String kind, PlayerListEntry entry) {
+        if (entry == null || entry.getName() == null || entry.getName().isBlank()) return;
+        if (System.currentTimeMillis() - onlineAt < TAB_LIST_SETTLE_MS || Proxy.getInstance().isInQueue()) return;
+        if (entry.getProfileId() != null && entry.getProfileId().equals(CACHE.getProfileCache().getProfile() != null ? CACHE.getProfileCache().getProfile().getId() : null)) return;
+        var json = event(kind);
+        json.addProperty("player", entry.getName());
+        if (entry.getProfileId() != null) {
+            json.addProperty("playerUuid", entry.getProfileId().toString());
+            json.addProperty("friend", PLAYER_LISTS.getFriendsList().contains(entry.getProfileId()));
         }
         publish(json);
     }

@@ -5,7 +5,7 @@
 	import { relative } from '#lib/format.js';
 	import { attempt } from '#lib/toast.svelte.js';
 	import type { Capability, Flow } from '#lib/types.js';
-	import { Blocks, ChevronRight, Import, Loader, Plus, Zap } from '@lucide/svelte';
+	import { Blocks, ChevronRight, Import, Loader, Pause, Plus, Zap } from '@lucide/svelte';
 	import Modal from '../Modal.svelte';
 	import Switch from '../settings/Switch.svelte';
 	import FlowEditor from './FlowEditor.svelte';
@@ -61,7 +61,9 @@
 			if (e.state === 'changed' || e.state === 'done' || e.state === 'error') void load();
 			else if (flows) {
 				const f = flows.find((f) => f.id === e.flowId);
-				if (f) f.running = { startedAt: f.running?.startedAt ?? Date.now(), step: e.step };
+				if (!f) return;
+				const paused = e.state === 'paused' ? true : e.state === 'resumed' ? false : f.running?.paused;
+				f.running = { startedAt: f.running?.startedAt ?? Date.now(), step: e.step ?? f.running?.step, paused };
 			}
 		});
 		const offReconnect = app.onReconnect(() => void load());
@@ -148,7 +150,11 @@
 									{countSteps(f.steps) === 1 ? 'block' : 'blocks'}
 								</span>
 								{#if f.running}
-									<span class="flex items-center gap-1 text-xs text-emerald-300"><Loader size={11} class="animate-spin" /> Running</span>
+									{#if f.running.paused}
+										<span class="flex items-center gap-1 text-xs text-amber-300"><Pause size={11} /> Paused</span>
+									{:else}
+										<span class="flex items-center gap-1 text-xs text-emerald-300"><Loader size={11} class="animate-spin" /> Running</span>
+									{/if}
 								{:else if f.last}
 									<span class="block truncate text-xs {f.last.ok ? 'text-zinc-500' : 'text-red-300'}">
 										{f.last.ok ? `Ran ${relative(f.last.at)}` : `Failed ${relative(f.last.at)}: ${f.last.message}`}

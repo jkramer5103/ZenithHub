@@ -620,7 +620,18 @@ public final class WebServer {
         });
         app.post("/api/instances/{id}/flows/{flowId}/run", ctx -> {
             var instance = requireCapability(ctx, Capability.CONTROL);
-            flows.runNow(instance.id, ctx.pathParam("flowId"));
+            // a test run brings made-up event values
+            JsonObject sample = null;
+            if (!ctx.body().isBlank() && body(ctx).get("sample") instanceof JsonObject s) sample = s;
+            flows.runNow(instance.id, ctx.pathParam("flowId"), sample);
+            send(ctx, ok());
+        });
+        app.post("/api/instances/{id}/flows/{flowId}/pause", ctx -> {
+            flows.pause(requireCapability(ctx, Capability.CONTROL).id, ctx.pathParam("flowId"), true);
+            send(ctx, ok());
+        });
+        app.post("/api/instances/{id}/flows/{flowId}/resume", ctx -> {
+            flows.pause(requireCapability(ctx, Capability.CONTROL).id, ctx.pathParam("flowId"), false);
             send(ctx, ok());
         });
         app.post("/api/instances/{id}/flows/{flowId}/stop", ctx -> {

@@ -469,6 +469,8 @@ export interface FlowTrigger {
 export interface FlowCondition {
 	kind: string;
 	not?: boolean;
+	/** "all" and "any" groups */
+	conds?: FlowCondition[];
 	[key: string]: unknown;
 }
 
@@ -490,7 +492,15 @@ export type FlowStepType =
 	| 'broadcast'
 	| 'set'
 	| 'change'
-	| 'stop';
+	| 'stop'
+	| 'reconnect'
+	| 'try'
+	| 'forEach'
+	| 'runFlow'
+	| 'webhook'
+	| 'holdItem'
+	| 'dropItem'
+	| 'lookAt';
 
 export interface FlowStep {
 	id: string;
@@ -516,6 +526,31 @@ export interface FlowStep {
 	to?: string;
 	value?: string;
 	by?: number;
+	/** a failure here doesn't stop the flow */
+	keepGoing?: boolean;
+	/** pathfinder actions: don't wait, wait until done, or walk for a while and stop; connect: wait until in */
+	wait?: 'no' | 'done' | 'for' | boolean;
+	/** set/change and "the variable": this flow, every flow of this bot, or all my bots */
+	scope?: 'flow' | 'bot' | 'shared';
+	/** try: what runs if a block inside fails */
+	catch?: FlowStep[];
+	/** forEach: what to go through */
+	list?: 'nearbyPlayers' | 'nearbyEntities' | 'proxyPlayers' | 'inventory';
+	/** runFlow: which flow */
+	flow?: string;
+	url?: string;
+	method?: 'GET' | 'POST';
+	body?: string;
+	item?: string;
+	all?: boolean;
+	/** lookAt */
+	target?: 'position' | 'entity';
+	x?: number;
+	y?: number;
+	z?: number;
+	what?: string;
+	radius?: number;
+	[key: string]: unknown;
 }
 
 export interface Flow {
@@ -525,12 +560,14 @@ export interface Flow {
 	cooldown: number;
 	/** what a trigger does while a run is going: nothing, or start over */
 	mode?: 'ignore' | 'restart';
+	/** only start once the trigger happened count times within seconds */
+	burst?: { count: number; seconds: number };
 	trigger: FlowTrigger;
 	steps: FlowStep[];
 	ownerId?: string;
 	ownerName?: string;
 	updated?: number;
-	running?: { startedAt: number; step?: string };
+	running?: { startedAt: number; step?: string; paused?: boolean };
 	last?: { ok: boolean; message?: string; step?: string; startedAt: number; at: number };
 	/** a daily flow's next start */
 	next?: number;
@@ -544,16 +581,20 @@ export interface FlowRun {
 	at: number;
 	cause: string;
 	log: string[];
+	/** ms spent in each block, by block id */
+	timings?: Record<string, number>;
 }
 
 export interface FlowActivity {
 	runs: FlowRun[];
 	variables: Record<string, string>;
+	botVariables?: Record<string, string>;
+	sharedVariables?: Record<string, string>;
 }
 
 export interface FlowEvent {
 	flowId?: string;
-	state: 'started' | 'step' | 'log' | 'done' | 'error' | 'changed';
+	state: 'started' | 'step' | 'log' | 'done' | 'error' | 'changed' | 'paused' | 'resumed';
 	step?: string;
 	message?: string;
 }
