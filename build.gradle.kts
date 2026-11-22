@@ -147,7 +147,7 @@ tasks {
         javaLauncher = javaLauncherProvider
         workingDir = layout.projectDirectory.dir("run").asFile
         classpath = sourceSets.main.get().runtimeClasspath
-        mainClass.set("com.zenith.ProxyLaunchWrapper")
+        mainClass.set("com.zenith.control.boot.PluginLaunch")
         jvmArgs = listOf(
             "-Xmx300m", "-XX:+UseG1GC", "-Xms32m", "-XX:MinHeapFreeRatio=10", "-XX:MaxHeapFreeRatio=20",
             "-XX:G1PeriodicGCInterval=30000", "-XX:TrimNativeHeapInterval=30000", "-XX:+UseCompactObjectHeaders",
@@ -172,15 +172,6 @@ tasks {
         environment("ZENITH_DEV", "true")
         jvmArgs = listOf("-Xmx300m", "--enable-native-access=ALL-UNNAMED", "--sun-misc-unsafe-memory-access=allow")
         outputs.file(outputFile)
-    }
-    val pluginLoadTestTask = register("pluginLoadTest", PluginLoadTestTask::class.java) {
-        group = "verification"
-        description = "Tests that plugins are able to load"
-        javaLauncher = javaLauncherProvider
-        workingDir = layout.projectDirectory.dir("run").asFile
-        classpath = sourceSets.main.get().runtimeClasspath
-        mainClass.set("com.zenith.ProxyLaunchWrapper")
-        jvmArgs = listOf("--enable-native-access=ALL-UNNAMED", "--sun-misc-unsafe-memory-access=allow")
     }
     val updateWikiTask = register<UpdateWikiTask>("updateWiki") {
         inputs.files(generateCommandDocsTask.get().outputs.files)
@@ -232,7 +223,7 @@ tasks {
             attributes(mapOf(
                 "Implementation-Title" to "ZenithProxy",
                 "Implementation-Version" to project.version,
-                "Main-Class" to "com.zenith.ProxyLaunchWrapper",
+                "Main-Class" to "com.zenith.control.boot.PluginLaunch",
                 "Multi-Release" to "true",
                 "Enable-Native-Access" to "ALL-UNNAMED"
             ))

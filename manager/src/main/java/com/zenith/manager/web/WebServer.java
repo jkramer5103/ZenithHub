@@ -27,6 +27,7 @@ import com.zenith.manager.instances.ProxyPool;
 import com.zenith.manager.instances.PlayerHistory;
 import com.zenith.manager.instances.SettingsService;
 import com.zenith.manager.instances.Supervisor;
+import com.zenith.manager.plugins.PluginService;
 import com.zenith.manager.state.State;
 import com.zenith.manager.state.StateStore;
 import com.zenith.manager.util.Json;
@@ -94,9 +95,11 @@ public final class WebServer {
     private final IntegrationTokens integrations;
     private final Map<WsContext, WsClient> wsClients = new ConcurrentHashMap<>();
     private Javalin app;
+    private final PluginService plugins;
 
-    public WebServer(ManagerConfig config, StateStore store, AccountService accounts, Supervisor supervisor, EventHub events, SettingsService settings, AccessService access, DiscordBot discord, PearlService pearls, PlayerHistory history, AfkHistory afkHistory, ProxyPool proxyPool, ProxyOverrides proxyOverrides, FlowEngine flows) {
+    public WebServer(ManagerConfig config, StateStore store, AccountService accounts, Supervisor supervisor, EventHub events, SettingsService settings, AccessService access, DiscordBot discord, PearlService pearls, PlayerHistory history, AfkHistory afkHistory, ProxyPool proxyPool, ProxyOverrides proxyOverrides, FlowEngine flows, PluginService plugins) {
         this.config = config;
+        this.plugins = plugins;
         this.pearls = pearls;
         this.flows = flows;
         this.history = history;
@@ -139,6 +142,7 @@ public final class WebServer {
             } else {
                 LOG.warn("Web UI directory {} not found, serving the API only", config.webDir());
             }
+            plugins.configureJavalin(cfg);
         });
 
         app.exception(ApiException.class, (e, ctx) -> error(ctx, e.status, e.getMessage()));
@@ -156,7 +160,8 @@ public final class WebServer {
             var method = ctx.method().name();
             if (!method.equals("GET") && !method.equals("HEAD") && !method.equals("OPTIONS")) {
                 var type = ctx.contentType();
-                if (type == null || !type.startsWith("application/json")) throw new ApiException(415, "Expected application/json");
+                boolean upload = ctx.path().equals("/api/plugins/upload") && type != null && (type.startsWith("application/zip") || type.startsWith("application/octet-stream"));
+                if (!upload && (type == null || !type.startsWith("application/json"))) throw new ApiException(415, "Expected application/json");
             }
         });
         // integration tokens: instead of the session cookie, and only for the few routes an integration needs
@@ -174,6 +179,8 @@ public final class WebServer {
             ctx.attribute(TOKEN_ATTR, token);
         });
 
+        // ahead of the built-in routes, so plugins can replace them
+        plugins.registerRoutes(app);
         registerSessionRoutes();
         registerAccountRoutes();
         registerServerRoutes();
@@ -182,12 +189,13 @@ public final class WebServer {
         registerAccessRoutes();
         registerControlRoutes();
         registerIntegrationRoutes();
+        registerPluginRoutes();
         registerWebSocket();
         // single page app: unknown non-API paths get index.html, the client-side router takes over
         var index = config.webDir().resolve("index.html");
         app.error(404, ctx -> {
             // a missing script from an older build must fail as one, not load the page as JavaScript
-            if (ctx.path().startsWith("/api") || ctx.path().startsWith("/_app/") || ctx.method() != HandlerType.GET || !Files.exists(index)) return;
+            if (ctx.path().startsWith("/api") || ctx.path().startsWith("/_app/") || ctx.path().startsWith("/plugin-assets/") || ctx.method() != HandlerType.GET || !Files.exists(index)) return;
             ctx.status(200).contentType("text/html").header("Cache-Control", "no-cache").result(Files.readString(index));
         });
         // unknown API paths are errors
@@ -1204,6 +1212,8 @@ public final class WebServer {
             // the owner asked for it; friends' alerts would be noise
             case "alert" -> instance != null && who.user().id.equals(instance.ownerId);
             // flow progress, for whoever can edit the instance's flows
+            // from a plugin: for everyone who can see the instance, or everyone signed in without one
+            case "plugin" -> instance == null ? client.token == null : Permissions.has(who, instance, Capability.VIEW);
             case "flow" -> client.token == null && instance != null && Permissions.has(who, instance, Capability.CONTROL);
             case "log" -> instance != null && client.subscribed.contains(instance.id) && Permissions.has(who, instance, Capability.VIEW);
             default -> instance != null && Permissions.has(who, instance, Capability.VIEW);
@@ -1371,6 +1381,7 @@ public final class WebServer {
                 instances.add(v);
             }
             json.add("instances", instances);
+            json.add("plugins", plugins.webPlugins());
             var servers = new JsonArray();
             for (var server : s.servers) {
                 boolean usable = canUseServer(user, server);
@@ -1437,6 +1448,161 @@ public final class WebServer {
         return json;
     }
 
+    // --- plugins ---
+
+    private void registerPluginRoutes() {
+        app.get("/api/plugins", ctx -> {
+            requireAdmin(ctx);
+            send(ctx, plugins.list());
+        });
+        app.post("/api/plugins/upload", ctx -> {
+            requireAdmin(ctx);
+            long length = ctx.req().getContentLengthLong();
+            if (length > PluginService.MAX_UPLOAD) throw new ApiException(413, "The zip is larger than " + (PluginService.MAX_UPLOAD >> 20) + " MB");
+            try (var in = new LimitedInputStream(ctx.req().getInputStream(), PluginService.MAX_UPLOAD)) {
+                send(ctx, plugins.stage(in));
+            }
+        });
+        app.post("/api/plugins/staged/{token}/install", ctx -> {
+            requireAdmin(ctx);
+            var body = body(ctx);
+            boolean enable = !body.has("enable") || body.get("enable").getAsBoolean();
+            send(ctx, idJson(plugins.install(ctx.pathParam("token"), enable)));
+        });
+        app.delete("/api/plugins/staged/{token}", ctx -> {
+            requireAdmin(ctx);
+            plugins.discard(ctx.pathParam("token"));
+            send(ctx, ok());
+        });
+        app.post("/api/plugins/restart", ctx -> {
+            requireAdmin(ctx);
+            if (!"1".equals(System.getenv("ZENITH_SUPERVISED"))) throw new ApiException(409, "Restart the container to apply the changes");
+            plugins.restartManager();
+            send(ctx, ok());
+        });
+        app.post("/api/plugins/restart-instances", ctx -> {
+            requireAdmin(ctx);
+            var json = new JsonObject();
+            json.addProperty("restarted", plugins.restartStaleInstances());
+            send(ctx, json);
+        });
+        app.patch("/api/plugins/{id}", ctx -> {
+            requireAdmin(ctx);
+            var body = body(ctx);
+            if (!body.has("enabled")) throw ApiException.badRequest("Missing enabled");
+            plugins.setEnabled(ctx.pathParam("id"), body.get("enabled").getAsBoolean());
+            send(ctx, ok());
+        });
+        app.delete("/api/plugins/{id}", ctx -> {
+            requireAdmin(ctx);
+            var body = ctx.body().isBlank() ? new JsonObject() : body(ctx);
+            plugins.remove(ctx.pathParam("id"), body.has("deleteData") && body.get("deleteData").getAsBoolean());
+            send(ctx, ok());
+        });
+        app.get("/api/plugins/{id}/settings", ctx -> {
+            requireAdmin(ctx);
+            send(ctx, plugins.settingsView(ctx.pathParam("id")));
+        });
+        app.put("/api/plugins/{id}/settings", ctx -> {
+            requireAdmin(ctx);
+            var body = body(ctx);
+            var values = body.has("values") && body.get("values").isJsonObject() ? body.getAsJsonObject("values") : body;
+            plugins.updateSettings(ctx.pathParam("id"), values);
+            send(ctx, ok());
+        });
+        // a plugin's bot side, for its web side: reading needs View, anything else Control
+        for (var method : List.of(HandlerType.GET, HandlerType.POST, HandlerType.PUT, HandlerType.PATCH, HandlerType.DELETE)) {
+            app.addHttpHandler(method, "/api/plugins/{plugin}/instances/{id}/bot/<path>", ctx -> {
+                requireCapability(ctx, method == HandlerType.GET ? Capability.VIEW : Capability.CONTROL);
+                var plugin = ctx.pathParam("plugin");
+                var body = method == HandlerType.GET || ctx.body().isBlank() ? null : ctx.body();
+                var response = supervisor.pluginRequest(ctx.pathParam("id"), plugin, method.name(), ctx.pathParam("path"), ctx.queryString(), body);
+                ctx.status(response.statusCode()).contentType("application/json").result(response.body());
+            });
+        }
+        // a plugin's scripts, styles and other files from its web/ folder, for signed-in users
+        app.get("/plugin-assets/{id}/<path>", ctx -> {
+            if (currentUser(ctx) == null) throw new ApiException(401, "Not logged in");
+            var file = plugins.webFile(ctx.pathParam("id"), ctx.pathParam("path"));
+            if (file == null) throw ApiException.notFound();
+            ctx.contentType(contentType(file.getFileName().toString()));
+            ctx.header("X-Content-Type-Options", "nosniff");
+            ctx.header("Cache-Control", ctx.queryParam("v") != null ? "private, max-age=31536000, immutable" : "no-cache");
+            ctx.result(Files.newInputStream(file));
+        });
+    }
+
+    private static String contentType(String name) {
+        var dot = name.lastIndexOf('.');
+        var ext = dot < 0 ? "" : name.substring(dot + 1).toLowerCase(Locale.ROOT);
+        return switch (ext) {
+            case "js", "mjs" -> "text/javascript; charset=utf-8";
+            case "css" -> "text/css; charset=utf-8";
+            case "json", "map" -> "application/json";
+            case "html" -> "text/html; charset=utf-8";
+            case "svg" -> "image/svg+xml";
+            case "png" -> "image/png";
+            case "jpg", "jpeg" -> "image/jpeg";
+            case "gif" -> "image/gif";
+            case "webp" -> "image/webp";
+            case "woff2" -> "font/woff2";
+            case "woff" -> "font/woff";
+            case "txt" -> "text/plain; charset=utf-8";
+            case "wasm" -> "application/wasm";
+            default -> "application/octet-stream";
+        };
+    }
+
+    /** Stops reading after a limit, for uploads without a Content-Length. */
+    private static final class LimitedInputStream extends java.io.FilterInputStream {
+        private long left;
+
+        LimitedInputStream(java.io.InputStream in, long limit) {
+            super(in);
+            this.left = limit;
+        }
+
+        @Override
+        public int read() throws java.io.IOException {
+            if (left <= 0) throw new ApiException(413, "The zip is too large");
+            int b = super.read();
+            if (b >= 0) left--;
+            return b;
+        }
+
+        @Override
+        public int read(byte[] buf, int off, int len) throws java.io.IOException {
+            if (left <= 0) throw new ApiException(413, "The zip is too large");
+            int n = super.read(buf, off, (int) Math.min(len, left + 1));
+            if (n > 0) left -= n;
+            return n;
+        }
+    }
+
+    // --- for plugins ---
+
+    /** The signed-in user of a request, or null. */
+    public State.User user(Context ctx) {
+        return currentUser(ctx);
+    }
+
+    public State.User requireSignedIn(Context ctx) {
+        return requireUser(ctx);
+    }
+
+    public State.User requireAdminUser(Context ctx) {
+        return requireAdmin(ctx);
+    }
+
+    public State.Instance requireInstanceCapability(Context ctx, String instanceId, Capability capability) {
+        return requireCapability(ctx, instanceId, capability);
+    }
+
+    /** The Javalin app, once {@link #start()} created it. */
+    public Javalin app() {
+        return app;
+    }
+
     // --- request helpers ---
 
     private State.User currentUser(Context ctx) {
@@ -1459,8 +1625,12 @@ public final class WebServer {
     }
 
     private State.Instance requireCapability(Context ctx, Capability cap) {
+        return requireCapability(ctx, ctx.pathParam("id"), cap);
+    }
+
+    private State.Instance requireCapability(Context ctx, String instanceId, Capability cap) {
         var who = Permissions.Identity.of(requireUser(ctx));
-        var instance = store.read(s -> findInstance(s, ctx.pathParam("id")));
+        var instance = store.read(s -> findInstance(s, instanceId));
         var caps = Permissions.capabilities(who, instance);
         IntegrationTokens.Token token = ctx.attribute(TOKEN_ATTR);
         if (token != null) caps = IntegrationTokens.scope(token, instance.id, caps);

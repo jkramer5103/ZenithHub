@@ -25,6 +25,7 @@ class AppState {
 	#loginListeners = new Set<LoginListener>();
 	#reconnectListeners = new Set<() => void>();
 	#flowListeners = new Set<FlowListener>();
+	#messageListeners = new Set<(msg: { type: string; instanceId: string | null; data: unknown }) => void>();
 	#refetchQueued = false;
 
 	constructor() {
@@ -105,6 +106,14 @@ class AppState {
 		return () => this.#flowListeners.delete(listener);
 	}
 
+	/** Every WebSocket message, for plugins. */
+	onMessage(listener: (msg: { type: string; instanceId: string | null; data: unknown }) => void) {
+		this.#messageListeners.add(listener);
+		return () => {
+			this.#messageListeners.delete(listener);
+		};
+	}
+
 	/** Called after the WebSocket reconnects, so views can refetch what they may have missed. */
 	onReconnect(listener: () => void) {
 		this.#reconnectListeners.add(listener);
@@ -163,6 +172,13 @@ class AppState {
 	}
 
 	#handle(msg: { type: string; instanceId: string | null; data: unknown }) {
+		for (const l of this.#messageListeners) {
+			try {
+				l(msg);
+			} catch (e) {
+				console.error('A plugin failed handling a message', e);
+			}
+		}
 		switch (msg.type) {
 			case 'runtime': {
 				const instance = msg.instanceId ? this.instance(msg.instanceId) : undefined;

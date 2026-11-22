@@ -129,6 +129,18 @@ export interface Overview {
 	accounts: Account[];
 	/** admin only */
 	settings?: ManagerSettings;
+	/** plugins that are on, for their scripts and styles */
+	plugins?: WebPlugin[];
+}
+
+export interface WebPlugin {
+	id: string;
+	name: string;
+	version: string;
+	scripts: string[];
+	styles: string[];
+	/** the settings plugin.json marks as public */
+	settings: Record<string, unknown>;
 }
 
 export interface DiscordStatus {
@@ -544,4 +556,65 @@ export interface FlowEvent {
 	state: 'started' | 'step' | 'log' | 'done' | 'error' | 'changed';
 	step?: string;
 	message?: string;
+}
+
+export interface PluginParts {
+	manager: { present: boolean; mixins: number; jars: number };
+	bot: { present: boolean; mixins: number; jars: number };
+	web: { present: boolean; scripts: number; styles: number };
+}
+
+/** What plugin.json says, as the Plugins page shows it. */
+export interface PluginInfo {
+	id: string;
+	name: string;
+	version: string;
+	description: string;
+	authors: string[];
+	url: string | null;
+	parts: PluginParts;
+	hasSettings: boolean;
+}
+
+export interface PluginView extends Partial<Omit<PluginInfo, 'id'>> {
+	id: string;
+	enabled: boolean;
+	installedAt: number;
+	updatedAt: number;
+	errors: string[];
+	/** the manager runs another revision than the one installed */
+	needsRestart: boolean;
+	managerLoaded: boolean;
+}
+
+export interface PluginList {
+	plugins: PluginView[];
+	needsRestart: boolean;
+	/** the entrypoint restarts the manager when it asks */
+	canRestart: boolean;
+	/** why manager plugins weren't loaded, or null */
+	safeMode: string | null;
+	errors: string[];
+	staleInstances: { id: string; name: string }[];
+	jvm: boolean;
+}
+
+export interface StagedPlugin {
+	token: string;
+	plugin: PluginInfo;
+	/** the installed version this update replaces */
+	replaces?: string;
+}
+
+export interface PluginSettingField {
+	key: string;
+	label: string;
+	type: 'boolean' | 'number' | 'string' | 'text' | 'select' | 'secret';
+	description: string;
+	min?: number;
+	max?: number;
+	options: { value: string; label: string }[];
+	value?: unknown;
+	/** secrets only: whether one is saved */
+	set?: boolean;
 }

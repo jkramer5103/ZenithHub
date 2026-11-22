@@ -1,13 +1,14 @@
 <script lang="ts">
 	import { app } from '#lib/app.svelte.js';
-	import { settingsSections } from '#lib/settings-sections.js';
+	import { visibleSections } from '#lib/settings-sections.js';
+	import PluginIcon from '#lib/components/plugins/PluginIcon.svelte';
 	import { page } from '$app/state';
 	import { ArrowLeft } from '@lucide/svelte';
 	import type { LayoutProps } from './$types';
 
 	let { children }: LayoutProps = $props();
 
-	const sections = $derived(settingsSections.filter((s) => !s.admin || app.isAdmin));
+	const sections = $derived(visibleSections(app.isAdmin));
 	const index = $derived(page.url.pathname.replace(/\/$/, '') === '/settings');
 	// one level up: a server's settings go back to Servers, a section to the list (phones only, wider screens have the sidebar)
 	const section = $derived(sections.find((s) => page.url.pathname.startsWith(s.href + '/')));
@@ -25,7 +26,7 @@
 						? 'bg-zinc-800 text-zinc-100'
 						: 'text-zinc-400 hover:bg-zinc-900 hover:text-zinc-100'}"
 				>
-					<s.icon size={16} />
+					{#if s.icon}<s.icon size={16} />{:else}<PluginIcon svg={s.svg} size={16} />{/if}
 					{s.label}
 				</a>
 			{/each}

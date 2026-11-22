@@ -19,7 +19,9 @@ public record ManagerConfig(
     /** Off only for local testing: lets unauthenticated clients into the lobby. */
     boolean lobbyOnlineMode,
     /** ZENITH_DISABLE_CHEATS: turns off KillAura, AutoEat, AntiAFK and the other cheat modules everywhere. */
-    boolean cheatsDisabled
+    boolean cheatsDisabled,
+    /** ZENITH_JVM_COMMAND: how to start ZenithProxy on the JVM, for instances with bot plugins (the native image can't load jars). */
+    List<String> zenithJvmCommand
 ) {
     public static ManagerConfig fromEnv() {
         var env = System.getenv();
@@ -34,8 +36,18 @@ public record ManagerConfig(
             Integer.parseInt(env.getOrDefault("ZENITH_CONTROL_PORT_BASE", "40000")),
             Integer.parseInt(env.getOrDefault("ZENITH_LOBBY_PORT", "25565")),
             !"false".equalsIgnoreCase(env.get("ZENITH_LOBBY_ONLINE_MODE")),
-            com.zenith.manager.instances.Cheats.isTruthy(env.get("ZENITH_DISABLE_CHEATS"))
+            com.zenith.manager.instances.Cheats.isTruthy(env.get("ZENITH_DISABLE_CHEATS")),
+            jvmCommand(env)
         );
+    }
+
+    private static List<String> jvmCommand(java.util.Map<String, String> env) {
+        var explicit = env.get("ZENITH_JVM_COMMAND");
+        if (explicit != null && !explicit.isBlank()) return Arrays.stream(explicit.trim().split("\\s+")).toList();
+        var command = env.getOrDefault("ZENITH_COMMAND", "/app/zenith/ZenithProxy");
+        if (command.contains(".jar")) return Arrays.stream(command.trim().split("\\s+")).toList();
+        return List.of("java", "-Xmx300m", "-XX:+UseSerialGC", "--enable-native-access=ALL-UNNAMED",
+            "--sun-misc-unsafe-memory-access=allow", "-jar", "/app/zenith/ZenithProxy.jar");
     }
 
     public Path stateFile() {

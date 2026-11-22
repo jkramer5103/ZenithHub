@@ -57,11 +57,15 @@ settings all happen in the browser.
   actually earning, the reward over time and every stay.
 - **Optional cheat lock:** `ZENITH_DISABLE_CHEATS=true` removes combat and automation modules for
   servers that don't allow them.
+- **Plugins:** the admin installs zip files under Settings → Plugins. A plugin can add pages, tabs,
+  settings and routes, run code in the manager and in every bot, and change any class with mixins. No
+  sandbox, so only install plugins you trust. See [docs/plugins.md](docs/plugins.md).
 - Instances return to their previous state after a restart and are restarted with backoff if they crash.
 
 Deleted compared to upstream: Zenith's own per-instance Discord bot and its Discord commands, the
 Discord chat relay, the interactive terminal, the self-updater and its commands, the Python
-launcher, the VPS install scripts, the release workflows and the setup guides in the wiki. Updates
+launcher, the VPS install scripts, the release workflows, the setup guides in the wiki and upstream's
+plugin loader (replaced by ZenithHub plugins). Updates
 come from new Docker images.
 
 ## Quickstart
@@ -155,6 +159,8 @@ on the JVM and uses more memory per instance.
 | `ZENITH_INSTANCE_PORT_BASE` / `ZENITH_CONTROL_PORT_BASE` | `30000` / `40000` | Localhost ports for instances |
 | `ZENITH_LOBBY_ONLINE_MODE` | `true` | Set to `false` only for local testing |
 | `ZENITH_DISABLE_CHEATS` | off | Set to `true` to turn off cheats for every instance (see below) |
+| `ZENITH_JVM_COMMAND` | `java … -jar /app/zenith/ZenithProxy.jar` | How instances start while a plugin has a bot part (native images can't load plugins) |
+| `ZENITH_SAFE_MODE` | off | Set to `1` to start without manager plugins, e.g. when one breaks the start |
 
 With `ZENITH_DISABLE_CHEATS=true`, these modules are off, their settings are hidden and their commands
 don't exist: KillAura, SpawnPatrol, TickRate, AutoTotem, AutoArmor, AutoMend, Spook, AntiAFK,

@@ -1,4 +1,6 @@
 <script lang="ts">
+	import PluginMount from '#lib/components/plugins/PluginMount.svelte';
+	import { plugins } from '#lib/plugins.svelte.js';
 	import { api } from '#lib/api.js';
 	import { app } from '#lib/app.svelte.js';
 	import OwnerBadge from '#lib/components/OwnerBadge.svelte';
@@ -110,6 +112,8 @@
 	function href(r: Row) {
 		return `/instances/${r.instance.id}${r.afk || summary[r.instance.id] ? '?tab=afk' : ''}`;
 	}
+
+	const cards = $derived(plugins.dashboardCards);
 </script>
 
 <svelte:head><title>Dashboard · ZenithHub</title></svelte:head>
@@ -259,4 +263,13 @@
 			</ul>
 		</section>
 	{/each}
+{/if}
+
+{#if cards.length}
+	<!-- what plugins add -->
+	<section class="mt-8 grid gap-3 md:grid-cols-2">
+		{#each cards as card (`${card.plugin}-${card.id}`)}
+			<PluginMount mount={card.mount} ctx={{ hub: card.hub }} plugin={card.plugin} class="card h-full p-4" />
+		{/each}
+	</section>
 {/if}

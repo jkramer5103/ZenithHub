@@ -74,7 +74,6 @@ public class CommandManager {
         new PathfinderCommand(),
         new PearlLoader(),
         new PlaytimeCommand(),
-        new PluginsCommand(),
         new QueueStatusCommand(),
         new QueueWarningCommand(),
         new RateLimiterCommand(),
@@ -209,10 +208,6 @@ public class CommandManager {
     }
 
     private void execute0(final CommandContext context, final ParseResults<CommandContext> parse) throws CommandSyntaxException {
-        if (CONFIG.plugins.enabled && CONFIG.plugins.blockCommandsUntilLoaded && !PLUGIN_MANAGER.isInitialized()) {
-            DEFAULT_LOG.warn("Blocked command execution until plugins are loaded: `{}`", context.getInput());
-            return;
-        }
         var commandNodeOptional = parse.getContext()
             .getNodes()
             .stream()

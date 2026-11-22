@@ -24,9 +24,8 @@ import com.zenith.mc.language.TranslationRegistryInitializer;
 import com.zenith.mc.map.MapBlockColorManager;
 import com.zenith.module.ModuleManager;
 import com.zenith.network.server.handler.player.InGameCommandManager;
-import com.zenith.plugin.DefaultGsonConfigSerializer;
-import com.zenith.plugin.PluginManager;
-import com.zenith.plugin.api.ConfigSerializer;
+import com.zenith.util.config.GsonConfigSerializer;
+import com.zenith.util.config.ConfigSerializer;
 import com.zenith.terminal.TerminalManager;
 import com.zenith.util.KotlinUtil;
 import com.zenith.util.Wait;
@@ -88,7 +87,6 @@ public class Globals {
     public static final Baritone BARITONE;
     public static final InventoryManager INVENTORY;
     public static final ZenithViaInitializer VIA_INITIALIZER;
-    public static final PluginManager PLUGIN_MANAGER;
     public static final InGameGuiManager GUI;
     public static final String MC_VERSION;
     public static final String VERSION;
@@ -140,12 +138,12 @@ public class Globals {
 
     @Locked
     public static Config loadConfig() {
-        return loadConfig(CONFIG_FILE, Config.class, DefaultGsonConfigSerializer.INSTANCE);
+        return loadConfig(CONFIG_FILE, Config.class, GsonConfigSerializer.INSTANCE);
     }
 
     @Locked
     public static LaunchConfig loadLaunchConfig() {
-        return loadConfig(LAUNCH_CONFIG_FILE, LaunchConfig.class, DefaultGsonConfigSerializer.INSTANCE);
+        return loadConfig(LAUNCH_CONFIG_FILE, LaunchConfig.class, GsonConfigSerializer.INSTANCE);
     }
 
     @Locked
@@ -182,12 +180,11 @@ public class Globals {
 
     @Locked
     public static void saveConfig() {
-        saveConfig(CONFIG_FILE, CONFIG, DefaultGsonConfigSerializer.INSTANCE);
-        PLUGIN_MANAGER.saveConfigs(Globals::saveConfig);
+        saveConfig(CONFIG_FILE, CONFIG, GsonConfigSerializer.INSTANCE);
     }
     @Locked
     public static void saveLaunchConfig() {
-        saveConfig(LAUNCH_CONFIG_FILE, LAUNCH_CONFIG, DefaultGsonConfigSerializer.INSTANCE);
+        saveConfig(LAUNCH_CONFIG_FILE, LAUNCH_CONFIG, GsonConfigSerializer.INSTANCE);
     }
 
     @Locked
@@ -245,7 +242,6 @@ public class Globals {
             CONFIG = loadConfig();
             LAUNCH_CONFIG = loadLaunchConfig();
             VERSION = getVersion();
-            PLUGIN_MANAGER = new PluginManager();
             PLAYER_LISTS.init(); // must be init after config
             TPS = new TPSCalculator(CONFIG.client.extra.tpsBufferSize);
             CLIENT_TPS = new ClientTPSCalculator(CONFIG.client.extra.tpsBufferSize * 20);

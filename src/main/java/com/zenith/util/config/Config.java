@@ -25,7 +25,6 @@ public final class Config {
     public final Client client = new Client();
     public final Debug debug = new Debug();
     public final Server server = new Server();
-    public final Plugins plugins = new Plugins();
     public final InGameCommands inGameCommands = new InGameCommands();
     public final Theme theme = new Theme();
     public final Discord discord = new Discord();
@@ -959,11 +958,6 @@ public final class Config {
         }
     }
 
-    public static class Plugins {
-        public boolean enabled = true;
-        public boolean blockCommandsUntilLoaded = false;
-    }
-
     public static final class InGameCommands {
         public boolean enable = true;
         public boolean slashCommands = true;
@@ -1014,7 +1008,6 @@ public final class Config {
             public boolean blockedLogins = true;
             public boolean spawnPatrol = true;
             public boolean replays = true;
-            public boolean plugins = true;
             // ZenithHub: "Notify me" task actions
             public boolean taskAlerts = true;
             public boolean taskAlertsMention = true;

@@ -44,13 +44,18 @@ dependencies {
         exclude(group = "com.google.crypto.tink")
     }
 
+    // plugins: mixins into the manager's own classes (see boot/Boot.java)
+    implementation("net.lenni0451.classtransform:core:1.15.1")
+    implementation("net.lenni0451.classtransform:mixinstranslator:1.15.1")
+    implementation("net.lenni0451.classtransform:mixinsdummy:1.15.1")
+
     testImplementation(platform("org.junit:junit-bom:6.1.3"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 application {
-    mainClass = "com.zenith.manager.ManagerMain"
+    mainClass = "com.zenith.manager.boot.Boot"
 }
 
 tasks {

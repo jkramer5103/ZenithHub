@@ -284,7 +284,9 @@ public final class Supervisor {
         accounts.syncAuthCache(ctx.account(), dir);
 
         rt.token = Passwords.randomToken(32);
-        var pb = new ProcessBuilder(config.zenithCommand())
+        // instances with bot plugins run on the JVM: the native image can't load jars
+        var launch = plugins != null ? plugins.launchFor(rt.instanceId) : null;
+        var pb = new ProcessBuilder(launch != null ? config.zenithJvmCommand() : config.zenithCommand())
             .directory(dir.toFile())
             .redirectErrorStream(true);
         var env = pb.environment();
@@ -292,6 +294,9 @@ public final class Supervisor {
         env.put("ZENITH_CONTROL_PORT", Integer.toString(ctx.instance().controlPort));
         env.put("ZENITH_CONTROL_TOKEN", rt.token);
         env.remove("ZENITH_LAUNCHER");
+        if (launch != null) env.put("ZENITH_PLUGINS_FILE", launch.file().toString());
+        else env.remove("ZENITH_PLUGINS_FILE");
+        rt.pluginKey = launch != null ? launch.key() : "";
         if (config.cheatsDisabled()) env.put("ZENITH_DISABLE_CHEATS", "1");
         else env.remove("ZENITH_DISABLE_CHEATS");
 
@@ -471,6 +476,9 @@ public final class Supervisor {
                             case "afk" -> afkEvents.accept(rt.instanceId, json);
                             case "disconnect" -> disconnectEvents.accept(rt.instanceId, json);
                             case "ban" -> banned(rt.instanceId, json);
+                            case "plugin" -> {
+                                if (plugins != null) plugins.botEvent(rt.instanceId, json);
+                            }
                             default -> {}
                         }
                     });
@@ -550,6 +558,47 @@ public final class Supervisor {
         json.addProperty("text", line.text());
         json.addProperty("ansi", line.ansi());
         return json;
+    }
+
+    private volatile com.zenith.manager.plugins.PluginService plugins;
+
+    public void setPlugins(com.zenith.manager.plugins.PluginService plugins) {
+        this.plugins = plugins;
+    }
+
+    /** The plugin revisions a running instance started with, or null if it isn't running. */
+    public String pluginKey(String instanceId) {
+        var rt = runtimes.get(instanceId);
+        return rt != null && isRunning(instanceId) ? rt.pluginKey : null;
+    }
+
+    /** Calls a route of a plugin's bot side, {@code /v1/plugin/<plugin>/<path>}, in a running instance. */
+    public HttpResponse<String> pluginRequest(String instanceId, String plugin, String method, String path, String query, String body)
+        throws IOException, InterruptedException {
+        if (!isRunning(instanceId)) throw new IllegalStateException("The instance isn't running");
+        var clean = path == null ? "" : path.startsWith("/") ? path.substring(1) : path;
+        var encoded = java.util.Arrays.stream(clean.split("/", -1))
+            .map(seg -> java.net.URLEncoder.encode(seg, java.nio.charset.StandardCharsets.UTF_8).replace("+", "%20"))
+            .collect(java.util.stream.Collectors.joining("/"));
+        var builder = request(runtime(instanceId), "/v1/plugin/" + plugin + "/" + encoded + (query == null || query.isEmpty() ? "" : "?" + query))
+            .timeout(Duration.ofSeconds(30))
+            .method(method, body == null ? HttpRequest.BodyPublishers.noBody() : HttpRequest.BodyPublishers.ofString(body));
+        if (body != null) builder.header("Content-Type", "application/json");
+        return http.send(builder.build(), HttpResponse.BodyHandlers.ofString());
+    }
+
+    /** Hands a plugin's new settings to a running instance. */
+    public void pushPluginSettings(String instanceId, String plugin, JsonObject settings) throws IOException, InterruptedException {
+        var body = new JsonObject();
+        body.addProperty("id", plugin);
+        body.add("settings", settings);
+        var response = http.send(request(runtime(instanceId), "/v1/plugins/settings")
+                .timeout(Duration.ofSeconds(10))
+                .POST(HttpRequest.BodyPublishers.ofString(Json.COMPACT.toJson(body)))
+                .header("Content-Type", "application/json")
+                .build(),
+            HttpResponse.BodyHandlers.ofString());
+        controlResponse(response);
     }
 
     private void publishRuntime(InstanceRuntime rt) {

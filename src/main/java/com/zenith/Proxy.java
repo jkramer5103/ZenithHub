@@ -27,7 +27,7 @@ import com.zenith.network.codec.McplPacketFixes;
 import com.zenith.network.server.LanBroadcaster;
 import com.zenith.network.server.ProxyServerListener;
 import com.zenith.network.server.ServerSession;
-import com.zenith.plugin.bootstrap.BootstrapMessageConsumer;
+import com.zenith.control.plugins.BotPlugins;
 import com.zenith.terminal.logback.TerminalConsoleAppender;
 import com.zenith.util.ImageInfo;
 import com.zenith.util.Wait;
@@ -140,7 +140,6 @@ public class Proxy {
     }
 
     public void start() {
-        BootstrapMessageConsumer.drainLogs();
         DEFAULT_LOG.info("Starting ZenithProxy-{}", VERSION);
         var exeReleaseVersion = getExecutableReleaseVersion();
         if (exeReleaseVersion == null) {
@@ -189,9 +188,9 @@ public class Proxy {
                     DATABASE_LOG.error("Database start timeout", e);
                 }
             }
-            BootstrapMessageConsumer.drain();
             NotificationEventListener.INSTANCE.subscribeEvents();
-            if (CONFIG.plugins.enabled) PLUGIN_MANAGER.initialize();
+            // ZenithHub plugins: only when the manager started this instance through the plugin launcher
+            BotPlugins.start();
             Queue.start();
             saveConfigAsync();
             if (CONFIG.client.viaversion.enabled || CONFIG.server.viaversion.enabled) {

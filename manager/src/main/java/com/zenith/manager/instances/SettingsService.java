@@ -37,7 +37,7 @@ public final class SettingsService {
      */
     private static final List<String> HIDDEN_PREFIXES = List.of(
         "authentication.", "discord.", "server.bind.", "client.server.",
-        "database.", "plugins.", "server.extra.whitelist.", "server.loginRateLimiter."
+        "database.", "server.extra.whitelist.", "server.loginRateLimiter."
     );
     private static final Set<String> HIDDEN = Set.of(
         "warning", "server.enabled", "debug.lockFile", "client.extra.chat.ignoreReplace2b2tChatCommandWhileDatabaseOn"

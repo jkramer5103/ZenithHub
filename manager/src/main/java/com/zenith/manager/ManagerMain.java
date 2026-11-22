@@ -25,6 +25,8 @@ import com.zenith.manager.util.MojangProfiles;
 import com.zenith.manager.instances.Supervisor;
 import com.zenith.manager.state.StateStore;
 import com.zenith.manager.web.WebServer;
+import com.zenith.manager.plugins.Hub;
+import com.zenith.manager.plugins.PluginService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,8 +44,11 @@ public final class ManagerMain {
 
         var store = new StateStore(config.stateFile());
         var events = new EventHub();
+        var plugins = new PluginService(config, events);
         var accounts = new AccountService(config, store, events);
         var supervisor = new Supervisor(config, store, accounts, events);
+        supervisor.setPlugins(plugins);
+        plugins.setSupervisor(supervisor);
         var settings = new SettingsService(config, store, supervisor);
         var proxies = new OutboundProxies(config, store, supervisor);
         accounts.setProxies(proxies);
@@ -146,10 +151,14 @@ public final class ManagerMain {
             }
         }, events);
         flows.start();
-        var web = new WebServer(config, store, accounts, supervisor, events, settings, access, discord, pearls, history, afkHistory, proxyPool, proxyOverrides, flows);
+        var web = new WebServer(config, store, accounts, supervisor, events, settings, access, discord, pearls, history, afkHistory, proxyPool, proxyOverrides, flows, plugins);
+        // plugins see every service and may add routes and mixins before anything serves requests
+        plugins.load(new Hub(config, store, events, accounts, supervisor, settings, proxies, proxyPool, proxyOverrides, access, players,
+            pearls, history, afkHistory, discord, flows, web, plugins));
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             LOG.info("Stopping instances...");
+            plugins.stop();
             discord.stop();
             supervisor.shutdownAll();
             web.stop();
@@ -170,6 +179,7 @@ public final class ManagerMain {
             settings.refreshSchema();
             supervisor.restorePreviousState();
         });
+        plugins.started();
         if (store.read(s -> s.users.isEmpty())) {
             LOG.info("First run: open the web UI to create the admin account");
         }

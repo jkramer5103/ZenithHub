@@ -8,8 +8,6 @@ import com.zenith.event.client.*;
 import com.zenith.event.discord.NotificationSentEvent;
 import com.zenith.event.module.*;
 import com.zenith.event.player.*;
-import com.zenith.event.plugin.PluginLoadFailureEvent;
-import com.zenith.event.plugin.PluginLoadedEvent;
 import com.zenith.event.queue.QueueStartEvent;
 import com.zenith.event.server.ServerPlayerConnectedEvent;
 import com.zenith.event.server.ServerPlayerDisconnectedEvent;
@@ -76,8 +74,6 @@ public class NotificationEventListener {
             of(ReplayStoppedEvent.class, this::handleReplayStoppedEvent),
             of(PlayerTotemPopAlertEvent.class, this::handleTotemPopEvent),
             of(NoTotemsEvent.class, this::handleNoTotemsEvent),
-            of(PluginLoadFailureEvent.class, this::handlePluginLoadFailure),
-            of(PluginLoadedEvent.class, this::handlePluginLoadedEvent),
             of(SpawnPatrolTargetAcquiredEvent.class, this::handleSpawnPatrolTargetAcquiredEvent),
             of(SpawnPatrolTargetKilledEvent.class, this::handleSpawnPatrolTargetKilledEvent),
             of(SessionTimeLimitWarningEvent.class, this::handleSessionTimeLimitEvent),
@@ -720,32 +716,6 @@ public class NotificationEventListener {
             sendEmbedMessage(notificationMention(), embed);
         else
             sendEmbedMessage(embed);
-    }
-
-    public void handlePluginLoadFailure(PluginLoadFailureEvent event) {
-        if (!CONFIG.discord.notifications.plugins) return;
-        String id = event.id() != null ? event.id() : "?";
-        var embed = Embed.builder()
-            .title("Plugin Load Failure")
-            .errorColor()
-            .description("Error: " + escape(event.message()))
-            .addField("Plugin ID", escape(id), false)
-            .addField("Plugin Jar", escape(event.jarPath().getFileName().toString()), false);
-        sendEmbedMessage(embed);
-    }
-
-    public void handlePluginLoadedEvent(PluginLoadedEvent event) {
-        if (!CONFIG.discord.notifications.plugins) return;
-        var embed = Embed.builder()
-            .title("Plugin Loaded")
-            .successColor()
-            .addField("ID", escape(event.pluginInfo().id()), false)
-            .addField("Description", escape(event.pluginInfo().description()))
-            .addField("Version", escape(event.pluginInfo().version().toString()), false)
-            .addField("URL", escape(event.pluginInfo().url()), false)
-            .addField("Author(s)", String.join(", ", event.pluginInfo().authors()), false)
-            .addField("Mixins", event.pluginInfo().mixins().isEmpty() ? "no" : "yes");
-        sendEmbedMessage(embed);
     }
 
     /**

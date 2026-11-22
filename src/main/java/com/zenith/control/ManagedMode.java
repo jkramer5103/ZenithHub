@@ -1,6 +1,6 @@
 package com.zenith.control;
 
-import com.zenith.plugin.DefaultGsonConfigSerializer;
+import com.zenith.util.config.GsonConfigSerializer;
 import com.zenith.util.config.Config;
 
 import java.io.File;
@@ -71,7 +71,7 @@ public final class ManagedMode {
         try {
             var tmp = new File(DEFAULTS_FILE.getPath() + ".tmp");
             try (Writer out = new FileWriter(tmp)) {
-                DefaultGsonConfigSerializer.INSTANCE.write(new Config(), out);
+                GsonConfigSerializer.INSTANCE.write(new Config(), out);
             }
             Files.move(tmp.toPath(), DEFAULTS_FILE.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
             var schemaTmp = new File(SCHEMA_FILE.getPath() + ".tmp");

@@ -15,6 +15,9 @@
 	import CopyField from '#lib/components/CopyField.svelte';
 	import { duration } from '#lib/format.js';
 	import { banIssue } from '#lib/issues.js';
+	import PluginIcon from '#lib/components/plugins/PluginIcon.svelte';
+	import PluginMount from '#lib/components/plugins/PluginMount.svelte';
+	import { plugins } from '#lib/plugins.svelte.js';
 	import { page } from '$app/state';
 	import { Activity, ArrowLeft, Blocks, Gamepad2, Joystick, Settings2, Share2, SlidersHorizontal, Orbit, Terminal, MapPinned } from '@lucide/svelte';
 
@@ -27,23 +30,40 @@
 	let showSettings = $state(false);
 	const can = (c: Capability) => !!instance?.capabilities.includes(c);
 
-	type Tab = 'overview' | 'control' | 'afk' | 'pearls' | 'tasks' | 'settings' | 'sharing' | 'console';
-	const tabs = $derived(
+	type Tab = 'overview' | 'control' | 'afk' | 'pearls' | 'tasks' | 'settings' | 'sharing' | 'console' | `ext-${string}`;
+	// tabs plugins add go before Settings
+	const pluginTabs = $derived(
+		instance
+			? plugins.instanceTabs
+					.filter((t) => {
+						try {
+							return !t.show || t.show(instance);
+						} catch {
+							return false;
+						}
+					})
+					.map((t) => ({ id: `ext-${t.plugin}-${t.id}` as Tab, label: t.label, svg: t.icon, show: true, spec: t }))
+			: []
+	);
+	type TabItem = { id: Tab; label: string; show: boolean; icon?: typeof Activity; svg?: string; spec?: (typeof plugins.instanceTabs)[number] };
+	const tabs: TabItem[] = $derived(
 		[
 			{ id: 'overview' as Tab, label: 'Overview', icon: Activity, show: true },
 			{ id: 'control' as Tab, label: 'Control', icon: Joystick, show: !!instance && (can('PLAY') || can('CONTROL')) },
 			{ id: 'afk' as Tab, label: 'AFK', icon: MapPinned, show: !!instance && (can('PLAY') || can('CONTROL')) },
 			{ id: 'pearls' as Tab, label: 'Pearls', icon: Orbit, show: can('PEARLS') },
 			{ id: 'tasks' as Tab, label: 'Flows', icon: Blocks, show: can('CONTROL') },
+			...pluginTabs,
 			{ id: 'settings' as Tab, label: 'Settings', icon: SlidersHorizontal, show: !!instance?.capabilities.includes('SETTINGS') },
 			{ id: 'sharing' as Tab, label: 'Sharing', icon: Share2, show: !!instance?.capabilities.includes('SHARE') },
 			{ id: 'console' as Tab, label: 'Console', icon: Terminal, show: app.devMode }
-		].filter((t) => t.show)
+		].filter((t: TabItem) => t.show)
 	);
 	const tab = $derived.by(() => {
 		const requested = page.url.searchParams.get('tab');
 		return tabs.find((t) => t.id === requested)?.id ?? 'overview';
 	});
+	const activeTab = $derived(tabs.find((t) => t.id === tab));
 
 	const stats = $derived.by(() => {
 		if (!status) return [];
@@ -140,7 +160,11 @@
 						? 'bg-zinc-800 text-zinc-100 sm:border-emerald-500'
 						: 'text-zinc-400 hover:text-zinc-200 sm:border-transparent'}"
 				>
-					<t.icon size={15} class="shrink-0 {tab === t.id ? 'text-emerald-400 sm:text-current' : ''}" />
+					{#if t.icon}
+						<t.icon size={15} class="shrink-0 {tab === t.id ? 'text-emerald-400 sm:text-current' : ''}" />
+					{:else}
+						<PluginIcon svg={t.svg} size={15} class={tab === t.id ? 'text-emerald-400 sm:text-current' : ''} />
+					{/if}
 					{t.label}
 				</a>
 			{/each}
@@ -170,6 +194,10 @@
 	{:else if tab === 'sharing'}
 		{#key id}
 			<SharingPanel instanceId={id} />
+		{/key}
+	{:else if activeTab?.spec && instance}
+		{#key `${id}-${activeTab.id}`}
+			<PluginMount mount={activeTab.spec.mount} ctx={{ hub: activeTab.spec.hub, instanceId: id, instance }} plugin={activeTab.spec.plugin} />
 		{/key}
 	{:else if tab === 'console'}
 		<div class="flex h-[calc(100dvh-24rem-env(safe-area-inset-bottom))] min-h-[320px] flex-col md:h-[calc(100dvh-16rem)]">

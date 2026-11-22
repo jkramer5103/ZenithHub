@@ -438,35 +438,6 @@ Kicks all players or a specific player. Only usable by account owners.
   ```kick <player>```
 
 
-### plugins
-
-[BETA]
-
-
-
-Configures the ZenithProxy plugin manager.
-
-
-
-Plugins are user-created add-ons that add modules and commands.
-
-
-
-Plugins are only supported on the `java` release channel.
-
-**Aliases:** `plugin`
-
-**Usage**
-
-  ```plugins on/off```
-
-  ```plugins list```
-
-  ```plugins download <url>```
-
-  ```plugins remove <pluginId>```
-
-
 ### reconnect
 
 Disconnect and reconnects from the destination MC server.

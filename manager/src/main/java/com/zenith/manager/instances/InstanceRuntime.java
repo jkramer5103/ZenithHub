@@ -16,6 +16,8 @@ public final class InstanceRuntime {
     /** Completes once the manager has finished handling the current process's exit. */
     volatile java.util.concurrent.CompletableFuture<Void> exitHandled = java.util.concurrent.CompletableFuture.completedFuture(null);
     volatile String token;
+    /** Which plugin revisions the process started with (see PluginService.botKey), "" without any. */
+    volatile String pluginKey = "";
     volatile JsonObject status;
     volatile String lastError;
     volatile long startedAt;

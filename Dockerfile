@@ -7,7 +7,8 @@
 #
 # ZENITH_RUNTIME=native (default) compiles Zenith with GraalVM: low memory per
 # instance, x86-64-v3 CPUs only. ZENITH_RUNTIME=jar runs Zenith on the JVM:
-# works on any CPU (including ARM) but uses more memory per instance.
+# works on any CPU (including ARM) but uses more memory per instance. Both ship
+# ZenithProxy.jar: instances with bot plugins always run on the JVM.
 ARG ZENITH_RUNTIME=native
 
 FROM node:24-alpine AS web
@@ -31,8 +32,9 @@ COPY manager/src/ ./manager/src/
 # The native build also generates command docs, which runs Zenith in ./run.
 RUN --mount=type=cache,target=/root/.gradle mkdir -p run && \
     if [ "$ZENITH_RUNTIME" = "native" ]; then \
-      ./gradlew --no-daemon -x test nativeCompile :manager:shadowJar \
-      && cp build/native/nativeCompile/ZenithProxy /tmp/ZenithProxy; \
+      ./gradlew --no-daemon -x test nativeCompile shadowJar :manager:shadowJar \
+      && cp build/native/nativeCompile/ZenithProxy /tmp/ZenithProxy \
+      && cp build/libs/ZenithProxy.jar /tmp/ZenithProxy.jar; \
     else \
       ./gradlew --no-daemon -x test shadowJar :manager:shadowJar \
       && cp build/libs/ZenithProxy.jar /tmp/ZenithProxy.jar; \
@@ -46,13 +48,16 @@ RUN groupadd --system zenith && useradd --system --gid zenith --home-dir /data z
     && mkdir -p /data && chown zenith:zenith /data
 COPY --from=java /out/ /app/
 COPY --from=web /web/build /app/web
+COPY --chmod=755 docker/entrypoint.sh /app/entrypoint.sh
 ENV ZENITH_DATA_DIR=/data \
     ZENITH_WEB_DIR=/app/web \
-    ZENITH_WEB_PORT=8080
+    ZENITH_WEB_PORT=8080 \
+    ZENITH_JVM_COMMAND="java -Xmx300m -XX:+UseSerialGC --enable-native-access=ALL-UNNAMED --sun-misc-unsafe-memory-access=allow -jar /app/zenith/ZenithProxy.jar"
 VOLUME /data
 EXPOSE 8080 25565
 USER zenith
-ENTRYPOINT ["java", "-XX:+UseSerialGC", "-Xmx160m", "-XX:+ExitOnOutOfMemoryError", "-jar", "/app/manager.jar"]
+# restarts the manager when the Plugins page asks for it (exit code 75)
+ENTRYPOINT ["/app/entrypoint.sh"]
 
 FROM runtime-base AS runtime-native
 ENV ZENITH_COMMAND=/app/zenith/ZenithProxy

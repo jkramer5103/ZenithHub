@@ -1326,8 +1326,7 @@ export const catalog: Group[] = [
 				fields: [
 					{ path: 'discord.notifications.taskAlerts', label: 'Notify me (from flows)', help: 'The "notify me" block of flows.' },
 					{ path: 'discord.notifications.spawnPatrol', label: 'Spawn patrol targets' },
-					{ path: 'discord.notifications.replays', label: 'Replay recordings' },
-					{ path: 'discord.notifications.plugins', label: 'Plugins' }
+					{ path: 'discord.notifications.replays', label: 'Replay recordings' }
 				]
 			},
 			{

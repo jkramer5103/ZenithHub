@@ -9,11 +9,12 @@ records what is done. Keep it up to date when you change behaviour.
 - `src/`: ZenithProxy (the bot). Upstream code, minus the parts listed under "Removed in the fork"
   in PLAN.md (its own Discord bot, chat relay, terminal input, self-updater, launcher). Don't bring
   those back. Otherwise keep fork changes small so upstream merges stay easy. Fork-specific code
-  lives in `com.zenith.control` (managed mode, control API, outbound proxy), `command/impl/LobbyCommand.java` and
+  lives in `com.zenith.control` (managed mode, control API, outbound proxy, plugin launch in `boot` and `plugins`), `command/impl/LobbyCommand.java` and
   `command/impl/ControllerCommand.java`.
   `discord/DiscordBot.java` no longer logs in to Discord: it posts events that the control API
   forwards to the manager's central bot.
-- `manager/`: the manager (Java 25, Javalin, MCProtocolLib, ViaVersion). Packages: `accounts`
+- `manager/`: the manager (Java 25, Javalin, MCProtocolLib, ViaVersion). Packages: `boot` (main
+  class, loads plugins and their mixins), `plugins` (plugin service and API), `accounts`
   (MSA login, token refresh), `auth` (users, grants, capabilities), `instances` (supervisor,
   settings layering, config composer), `lobby` (router, lobby server, player
   directory), `discord` (central bot), `web` (REST/WebSocket API), `state` (state.json).
@@ -52,6 +53,8 @@ prettier config either: use `npx prettier --use-tabs --single-quote --print-widt
 - Secrets are files with 0600 permissions under `/data/manager/secrets`. The API never returns them.
 - `ZENITH_DISABLE_CHEATS` lists cheat modules twice: `com.zenith.control.Cheats` (bot) and
   `manager/.../instances/Cheats.java` (settings). Change both together.
+- Plugins (docs/plugins.md) are trusted code with no sandbox, installed by the admin only. Keep their
+  APIs (`PluginContext`, `BotPluginContext`, the web hub) stable; plugins compile against them.
 - Copy buttons must work over plain `http://<ip>`, where `navigator.clipboard` is missing.
 - While an outbound proxy is on, everything an instance or the manager sends for it goes through it (see PLAN.md). New outbound requests must use `OutboundProxy` (bot) or `OutboundProxies` (manager), never a bare `HttpClient` or `Socket`.
 

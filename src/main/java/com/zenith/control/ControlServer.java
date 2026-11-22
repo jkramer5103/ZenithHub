@@ -19,6 +19,8 @@ import com.zenith.event.player.PlayerDisconnectedEvent;
 import com.zenith.event.player.SpectatorConnectedEvent;
 import com.zenith.event.player.SpectatorDisconnectedEvent;
 import com.zenith.cache.data.entity.Entity;
+import com.zenith.control.plugins.BotPluginContext;
+import com.zenith.control.plugins.BotPlugins;
 import com.zenith.cache.data.entity.EntityPlayer;
 import com.zenith.cache.data.inventory.Container;
 import com.zenith.feature.queue.Queue;
@@ -92,6 +94,9 @@ public final class ControlServer {
         server.createContext("/v1/details", ex -> handle(ex, "GET", this::details));
         server.createContext("/v1/shutdown", ex -> handle(ex, "POST", this::shutdown));
         server.createContext("/v1/events", this::events);
+        // ZenithHub plugins: their own routes, and their settings changing live
+        server.createContext("/v1/plugin/", this::pluginRoute);
+        server.createContext("/v1/plugins/settings", ex -> handle(ex, "POST", this::pluginSettings));
         server.createContext("/v1/config", ex -> handle(ex, ex.getRequestMethod().equals("POST") ? "POST" : "GET",
             ex.getRequestMethod().equals("POST") ? this::updateConfig : this::config));
         EVENT_BUS.subscribe(
@@ -185,6 +190,8 @@ public final class ControlServer {
         json.addProperty("tps", TPS.getTPSValue());
         var ban = ServerBan.current();
         if (ban != null) json.add("ban", banJson(ban));
+        var plugins = BotPlugins.status();
+        if (plugins != null) json.add("plugins", plugins);
         var reason = lastDisconnectReason;
         if (!connected && reason != null) {
             json.addProperty("lastDisconnectReason", reason);
@@ -405,6 +412,62 @@ public final class ControlServer {
         });
         saveConfigAsync();
         return config(ex);
+    }
+
+    private JsonObject pluginSettings(HttpExchange ex) throws IOException {
+        JsonObject body;
+        try (var reader = new InputStreamReader(ex.getRequestBody(), StandardCharsets.UTF_8)) {
+            body = com.google.gson.JsonParser.parseReader(reader).getAsJsonObject();
+        }
+        BotPlugins.settingsChanged(body.get("id").getAsString(), body.getAsJsonObject("settings"));
+        var json = new JsonObject();
+        json.addProperty("ok", true);
+        return json;
+    }
+
+    /** {@code /v1/plugin/<id>/<path>}: answered by the plugin's bot side, with any method. */
+    private void pluginRoute(HttpExchange ex) throws IOException {
+        try (ex) {
+            if (!authorized(ex)) {
+                send(ex, 401, error("unauthorized"));
+                return;
+            }
+            var rest = ex.getRequestURI().getRawPath().substring("/v1/plugin/".length());
+            int slash = rest.indexOf('/');
+            var id = slash < 0 ? rest : rest.substring(0, slash);
+            var path = slash < 0 ? "" : java.net.URLDecoder.decode(rest.substring(slash + 1), StandardCharsets.UTF_8);
+            var handler = BotPlugins.route(id, path);
+            if (handler == null) {
+                send(ex, 404, error("no such plugin route"));
+                return;
+            }
+            var query = new java.util.LinkedHashMap<String, String>();
+            var raw = ex.getRequestURI().getRawQuery();
+            if (raw != null) {
+                for (var pair : raw.split("&")) {
+                    if (pair.isEmpty()) continue;
+                    int eq = pair.indexOf('=');
+                    var key = java.net.URLDecoder.decode(eq < 0 ? pair : pair.substring(0, eq), StandardCharsets.UTF_8);
+                    query.put(key, eq < 0 ? "" : java.net.URLDecoder.decode(pair.substring(eq + 1), StandardCharsets.UTF_8));
+                }
+            }
+            var text = new String(ex.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
+            var body = text.isBlank() ? null : com.google.gson.JsonParser.parseString(text);
+            var result = handler.handle(new BotPluginContext.Request(ex.getRequestMethod(), path, java.util.Map.copyOf(query), body));
+            var bytes = COMPACT_GSON.toJson(result == null ? com.google.gson.JsonNull.INSTANCE : result).getBytes(StandardCharsets.UTF_8);
+            ex.getResponseHeaders().set("Content-Type", "application/json");
+            ex.sendResponseHeaders(200, bytes.length);
+            ex.getResponseBody().write(bytes);
+        } catch (final IllegalArgumentException | com.google.gson.JsonParseException e) {
+            try {
+                send(ex, 400, error(e.getMessage()));
+            } catch (IOException ignored) { }
+        } catch (final Exception e) {
+            DEFAULT_LOG.debug("Plugin route error", e);
+            try {
+                send(ex, 500, error(e.getClass().getSimpleName() + ": " + e.getMessage()));
+            } catch (IOException ignored) { }
+        }
     }
 
     /** The manager reads stdout only while nobody is subscribed, so lines aren't seen twice. */

@@ -1,9 +1,10 @@
 <script lang="ts">
 	import { app } from '#lib/app.svelte.js';
-	import { settingsSections } from '#lib/settings-sections.js';
+	import { visibleSections } from '#lib/settings-sections.js';
+	import PluginIcon from '#lib/components/plugins/PluginIcon.svelte';
 	import { ChevronRight } from '@lucide/svelte';
 
-	const sections = $derived(settingsSections.filter((s) => !s.admin || app.isAdmin));
+	const sections = $derived(visibleSections(app.isAdmin));
 </script>
 
 <svelte:head><title>Settings · ZenithHub</title></svelte:head>
@@ -13,7 +14,7 @@
 	{#each sections as s (s.href)}
 		<li>
 			<a href={s.href} class="flex items-center gap-3 px-4 py-3.5 hover:bg-zinc-900">
-				<span class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-zinc-800 text-zinc-300"><s.icon size={18} /></span>
+				<span class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-zinc-800 text-zinc-300">{#if s.icon}<s.icon size={18} />{:else}<PluginIcon svg={s.svg} size={18} />{/if}</span>
 				<span class="min-w-0 flex-1">
 					<span class="block font-medium">{s.label}</span>
 					<span class="block text-xs text-zinc-500">{s.description}</span>

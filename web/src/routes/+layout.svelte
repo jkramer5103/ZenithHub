@@ -8,6 +8,8 @@
 	import McLinkModal from '#lib/components/McLinkModal.svelte';
 	import Toasts from '#lib/components/Toasts.svelte';
 	import Switch from '#lib/components/settings/Switch.svelte';
+	import PluginIcon from '#lib/components/plugins/PluginIcon.svelte';
+	import { plugins, pageHref } from '#lib/plugins.svelte.js';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import { ChevronDown, Code, Gamepad2, Gauge, KeyRound, LayoutGrid, LogOut, MessageSquare, RotateCw, Settings, WifiOff } from '@lucide/svelte';
@@ -32,9 +34,17 @@
 		{ href: '/instances', label: 'Instances', icon: LayoutGrid },
 		{ href: '/settings', label: 'Settings', icon: Settings }
 	];
+	// pages plugins put in the bar go before Settings
+	const pluginNav = $derived(
+		plugins.pages.filter((p) => p.nav && (!p.admin || app.isAdmin)).map((p) => ({ href: pageHref(p), label: p.title, svg: p.icon }))
+	);
+
+	$effect(() => {
+		if (app.overview) plugins.sync(app.overview.plugins ?? []);
+	});
 
 	// Settings hides these from members; a typed URL or old bookmark goes home instead of failing to load
-	const adminOnly = $derived(!!app.user && !app.isAdmin && /^\/(users|settings\/(users|general|defaults))(\/|$)/.test(page.url.pathname));
+	const adminOnly = $derived(!!app.user && !app.isAdmin && /^\/(users|settings\/(users|general|defaults|plugins))(\/|$)/.test(page.url.pathname));
 	$effect(() => {
 		if (adminOnly) void goto('/', { replaceState: true });
 	});
@@ -75,7 +85,25 @@
 			<div class="mx-auto flex h-14 max-w-6xl items-center gap-6 px-4">
 				<a href="/" class="flex items-center gap-2 font-semibold"><Logo /> ZenithHub</a>
 				<nav class="hidden items-center gap-1 md:flex">
-					{#each nav as item (item.href)}
+					{#each nav.slice(0, 2) as item (item.href)}
+						<a
+							href={item.href}
+							class="btn px-3 py-1.5 {active(item.href) ? 'bg-zinc-800 text-zinc-100' : 'text-zinc-400 hover:text-zinc-100'}"
+						>
+							<item.icon size={16} />
+							{item.label}
+						</a>
+					{/each}
+					{#each pluginNav as item (item.href)}
+						<a
+							href={item.href}
+							class="btn px-3 py-1.5 {active(item.href) ? 'bg-zinc-800 text-zinc-100' : 'text-zinc-400 hover:text-zinc-100'}"
+						>
+							<PluginIcon svg={item.svg} size={16} />
+							{item.label}
+						</a>
+					{/each}
+					{#each nav.slice(2) as item (item.href)}
 						<a
 							href={item.href}
 							class="btn px-3 py-1.5 {active(item.href) ? 'bg-zinc-800 text-zinc-100' : 'text-zinc-400 hover:text-zinc-100'}"
@@ -173,7 +201,25 @@
 		<nav
 			class="fixed inset-x-0 bottom-0 z-30 flex border-t border-zinc-800 bg-zinc-950/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden"
 		>
-			{#each nav as item (item.href)}
+			{#each nav.slice(0, 2) as item (item.href)}
+				<a
+					href={item.href}
+					class="flex flex-1 flex-col items-center gap-0.5 py-2 text-[11px] {active(item.href) ? 'text-emerald-400' : 'text-zinc-500'}"
+				>
+					<item.icon size={20} />
+					{item.label}
+				</a>
+			{/each}
+			{#each pluginNav as item (item.href)}
+				<a
+					href={item.href}
+					class="flex min-w-0 flex-1 flex-col items-center gap-0.5 py-2 text-[11px] {active(item.href) ? 'text-emerald-400' : 'text-zinc-500'}"
+				>
+					<PluginIcon svg={item.svg} size={20} />
+					<span class="max-w-full truncate px-1">{item.label}</span>
+				</a>
+			{/each}
+			{#each nav.slice(2) as item (item.href)}
 				<a
 					href={item.href}
 					class="flex flex-1 flex-col items-center gap-0.5 py-2 text-[11px] {active(item.href) ? 'text-emerald-400' : 'text-zinc-500'}"

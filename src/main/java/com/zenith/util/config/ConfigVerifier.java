@@ -23,13 +23,6 @@ public final class ConfigVerifier {
         return new ConfigVerificationResult(true, "");
     }
 
-    public static ConfigVerificationResult verifyPluginConfig(Object config, String name) {
-        if (containsNullFields(config, config.getClass().getPackageName())) {
-            return failDueToNullsIn(name);
-        }
-        return new ConfigVerificationResult(true, "");
-    }
-
     public record ConfigVerificationResult(boolean pass, String msg) {}
 
     private static ConfigVerificationResult failDueToNullsIn(String configName) {

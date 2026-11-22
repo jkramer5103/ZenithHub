@@ -1,0 +1,24 @@
+{
+  "id": "hello",
+  "name": "Hello",
+  "version": "1.0.0",
+  "description": "Example plugin: a page, an instance tab, a dashboard card, settings, routes, bot events and mixins in the manager and the bots.",
+  "authors": ["ZenithHub"],
+  "manager": {
+    "main": "example.hello.HelloManager",
+    "mixins": ["example.hello.mixins.OverviewMixin"]
+  },
+  "bot": {
+    "main": "example.hello.HelloBot",
+    "mixins": ["example.hello.mixins.StatusMixin"]
+  },
+  "web": {},
+  "settings": [
+    { "key": "greeting", "label": "Greeting", "type": "string", "default": "Hello", "public": true,
+      "description": "Shown on the Hello page and the dashboard card." },
+    { "key": "announce", "label": "Log when a bot comes online", "type": "boolean", "default": true },
+    { "key": "color", "label": "Card color", "type": "select", "default": "emerald", "public": true,
+      "options": [{ "value": "emerald", "label": "Green" }, { "value": "sky", "label": "Blue" }, { "value": "amber", "label": "Yellow" }] },
+    { "key": "apiKey", "label": "API key", "type": "secret", "description": "Example secret: the manager and bots get it, browsers never do." }
+  ]
+}
