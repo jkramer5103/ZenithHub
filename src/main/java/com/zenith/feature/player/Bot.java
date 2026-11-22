@@ -691,6 +691,9 @@ public final class Bot extends ModuleUtils {
         syncFromCache(false);
         CLIENT_LOG.info("Server teleport {} to: {}, {}, {}", teleportId, String.format("%.8f", this.x), String.format("%.8f", this.y), String.format("%.8f", this.z));
         sendClientPacketAwait(new ServerboundAcceptTeleportationPacket(teleportId, this.x, this.y, this.z, this.yaw, this.pitch));
+        // the vanilla client confirms every teleport with a full position + rotation packet.
+        // its post-outgoing handler also sends ServerboundPlayerLoaded, which servers may require before letting the player stay
+        sendClientPacketAwait(new ServerboundMovePlayerPosRotPacket(false, false, this.x, this.y, this.z, this.yaw, this.pitch));
         CLIENT_LOG.debug("Accepted teleport: {}", teleportId);
         this.velocity.set(CACHE.getPlayerCache().getVelX(), CACHE.getPlayerCache().getVelY(), CACHE.getPlayerCache().getVelZ());
     }
